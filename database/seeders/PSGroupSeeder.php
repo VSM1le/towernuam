@@ -19,24 +19,32 @@ class PSGroupSeeder extends Seeder
                 'ps_desc' => 'Rental Fee',
                 'begin_date' => 1,
                 'end_date' => 31,
+                'created_by' => 1,
+                'updated_by' => 1
             ],
             [
                 'ps_group' => 'CF',
                 'ps_desc' => 'Car Park Fee',
                 'begin_date' => 15,
                 'end_date' => 16,
+                'created_by' => 1,
+                'updated_by' => 1
             ],
             [
                 'ps_group' => 'EW',
                 'ps_desc' => 'Electric Water Fee',
                 'begin_date' => 8,
                 'end_date' => 7,
+                'created_by' => 1,
+                'updated_by' => 1
             ],
             [
                 'ps_group' => 'OT',
                 'ps_desc' => 'Other Fee',
                 'begin_date' => 1,
                 'end_date' => 31,
+                'created_by' => 1,
+                'updated_by' => 1
             ],
         ];
         foreach ($psGroups as $psGroup) {

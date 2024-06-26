@@ -13,7 +13,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('companys', function (Blueprint $table) {
-            $table->char('company_code', 5)->primary(); // COMPANY_CODE
+            $table->id();
+            $table->char('company_code', 5); // COMPANY_CODE
             $table->char('com_abb', 10)->nullable(); // COM_ABB
             $table->char('com_building', 100)->nullable(); // COM_BUILDING
             $table->char('com_building2', 100)->nullable(); // COM_BUILDING2

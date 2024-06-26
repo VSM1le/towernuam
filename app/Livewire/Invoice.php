@@ -11,18 +11,26 @@ use Livewire\Component;
 
 class Invoice extends Component
 {
-    public $psGroup;
-    public $customerName;
-    public $customerCode;
-    public $rental;
-    public $service;
-    public $invoiceDate;
-
+    public $psGroup = null;
+    public $customerName = null;
+    public $customerCode = null;
+    public $customerrents = null;
+    public $rental = null;
+    public $service = null;
+    public $invoiceDate = null;
     public $invoiceDetails;
 
     public function updatedCustomerCode(){
-        $this->rental= null;
+        $this->rental = null;
+        $this->invoiceDetails = null;
+          if (!is_null($this->customerCode)) {
+            $this->customerrents = CustomerRental::where('id',$this->customerCode)->get();
+        } else {
+            $this->customerrents = null;    
+        }
+        
     }
+
 
     #[Computed()]
     public function customers(){
@@ -33,10 +41,6 @@ class Invoice extends Component
     public function psgroups(){
         return PsGroup::all();
     }
-    #[Computed()]
-    public function customerrents(){
-        return CustomerRental::where('cust_code',$this->customerCode)->get();
-    }
 
     #[Computed()]
     public function productservices(){
@@ -45,9 +49,11 @@ class Invoice extends Component
 
     public function addline(){
         if(!is_null($this->service)){
+        $customer_rent= CustomerRental::where('customer_id',$this->customerCode)->where('id',$this->rental)->first();
         $product_service = ProductService::where('ps_code',$this->service)->first();
-        $this->invoiceDetails[] = ['pscode'=> $product_service->ps_code,'psname' => $product_service->ps_name_th,'amt'=>'0000','vat'=>$product_service->ps_vat,'vatamt'=>'00.00','whvat'=>$product_service->ps_whtax,'netamt'=>'0000','remark'=>''];
-        // dump($this->invoiceDetails);
+        $amt = $customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm;
+        $vatamt = ($amt * $product_service->ps_vat)/100;
+        $this->invoiceDetails[] = ['pscode'=> $product_service->ps_code,'psname' => $product_service->ps_name_th,'amt'=>$amt,'vat'=>$product_service->ps_vat,'vatamt'=>$vatamt,'whvat'=>$product_service->ps_whtax,'netamt'=>$amt + $vatamt,'remark'=>''];
         }
     }
 

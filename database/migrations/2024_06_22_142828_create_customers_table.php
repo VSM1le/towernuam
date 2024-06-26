@@ -13,7 +13,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('customers', function (Blueprint $table) {
-            $table->char('cust_code', 10)->primary(); // CUST_CODE
+            $table->id();
+            $table->char('cust_code', 10); // CUST_CODE
             $table->char('cust_abb', 20)->nullable(); // CUST_ABB
             $table->char('cust_name_th', 120)->nullable(); // CUST_NAME_TH
             $table->char('cust_name_en', 120)->nullable(); // CUST_NAME_EN

@@ -13,8 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('meters', function (Blueprint $table) {
-            $table->char('meter_code', 20)->primary(); // METER_CODE
-            $table->char('cust_code', 10); // CUST_CODE
+            $table->id();
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->char('meter_code', 20); // METER_CODE
             $table->char('meter_name', 50)->nullable(); // METER_NAME
             $table->char('meter_type', 5)->nullable(); // METER_TYPE
             $table->char('meter_floor', 20)->nullable(); // METER_FLOOR

@@ -36,9 +36,9 @@
                         <label class="w-40 text-sm font-medium text-gray-900"></label>
                         <select id= "pagroup" wire:model.live="psGroup"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                            <option value="">Select Group</option>
+                            <option>Select Group</option>
                             @foreach ( $this->psgroups as $psgroup )
-                                <option value="{{ $psgroup->ps_group }}">{{ $psgroup->ps_group }}</option>
+                                <option value="{{ $psgroup->id}}">{{ $psgroup->ps_group }}</option>
                             @endforeach
                         </select>
                     {{-- @error('car') 
@@ -50,30 +50,32 @@
                         <label class="w-40 text-sm font-medium text-gray-900"></label>
                         <select id= "customercode" wire:model.live="customerCode"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                            <option value="">Select Customer</option>
+                            <option>Select Customer</option>
                         @foreach ($this->customers as $customer)
-                            <option value="{{$customer->cust_code}}">{{$customer->cust_code}} : {{$customer->cust_name_th}}</option>
+                            <option value="{{$customer->id}}">{{$customer->cust_code}} : {{$customer->cust_name_th}}</option>
                         @endforeach
                         </select>
                      {{-- @error('gowith') 
                     <span class="text-red-500 text-xs">{{ $message }}</span>  --}}
                 </div>
-                @if (!is_null($customerCode))
+               
                  <div class="w-48 ml-5">
                     <label for="rental" class="text-xs">Contact</label>
                         <label class="w-40 text-sm font-medium text-gray-900"></label>
                         <select id= "rental" wire:model="rental"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                             <option value="">Select Contact</option>
-                            @foreach ( $this->customerrents as $rental )
-                                <option value="{{ $rental->custr_no }}">{{ $rental->custr_no }}</option>
-                            @endforeach
+                             @if (!is_null($customerCode))
+                            @foreach ( $customerrents as $rental )
+                                <option value="{{ $rental->id}}">{{ $rental->custr_contract_no}} : {{ $rental->custr_unit }}</option>
+                            @endforeach 
+                            @endif
                         </select>
                     {{-- @error('car') 
                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror  --}}
                 </div> 
-                @endif
+               
             </div>
         </div> 
         <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">

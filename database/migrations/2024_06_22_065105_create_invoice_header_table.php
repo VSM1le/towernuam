@@ -13,9 +13,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('invoice_headers', function (Blueprint $table) {
-            $table->char('inv_no',length:20)->primary();
+            $table->id();
+            $table->char('inv_no',length:20);
             $table->date('inv_date')->nullable();
-            $table->char('inv_cust_code',length:10)->nullable();
+            $table->foreignId('ps_group_id')->constrained();
             $table->char('inv_ps_group', 5)->nullable();
             $table->char('inv_status',length:5)->nullable();
             $table->double('inv_tamp',15,8)->nullable();

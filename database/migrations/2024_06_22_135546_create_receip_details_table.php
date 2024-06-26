@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,8 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('receip_details', function (Blueprint $table) {
-             $table->char('rec_no', 20); // REC_NO
-            $table->integer('recd_seq')->primary(); // RECD_SEQ
+             $table->id();
+             $table->foreignId('receipt_header_id')->constrained()->onDelete('cascade');
+            $table->integer('recd_seq'); // RECD_SEQ
             $table->char('recd_inv_no', 20)->nullable(); // RECD_INV_NO
             $table->char('recd_product_code', 10)->nullable(); // RECD_PRODUCT_CODE
             $table->char('recd_period', 50)->nullable(); // RECD_PERIOD
@@ -28,6 +30,8 @@ return new class extends Migration
             $table->double('recd_discount_amt', 15, 8)->nullable(); // RECD_DISCOUNT_AMT
             $table->char('recd_desc1', 80)->nullable(); // RECD_DESC1
             $table->char('recd_desc2', 80)->nullable(); // RECD_DESC2
+            $table->foreignIdFor(User::class,'created_by')->constrained('users');
+            $table->foreignIdFor(User::class,'updated_by')->constrained('users');
             $table->timestamps();
         });
     }

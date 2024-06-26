@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('invoice_headers', function (Blueprint $table) {
-            $table->foreign('contact_no')->references('custr_no')->on('customer_rentals');
+            $table->foreignId('customer_rental_id')->constrained();
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('invoice_headers', function (Blueprint $table) {
-            $table->dropForeign('invoice_headers_contact_no_foreign');
+            $table->dropColumn('customer_rental_id');
         });
     }
 };

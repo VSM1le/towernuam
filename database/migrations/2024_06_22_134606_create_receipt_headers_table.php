@@ -13,7 +13,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('receipt_headers', function (Blueprint $table) {
-            $table->char('rec_no', 20)->primary(); // REC_NO
+            $table->id();
+            $table->char('rec_no', 20); // REC_NO
             $table->date('rec_date')->nullable(); // REC_DATE
             $table->char('rec_cust_code', 10)->nullable(); // REC_CUST_CODE
             $table->char('rec_inv_no', 20)->nullable(); // REC_INV_NO

@@ -13,8 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('customer_rentals', function (Blueprint $table) {
-            $table->char('cust_code', 10); // CUST_CODE
-            $table->integer('custr_no')->primary(); // CUSTR_NO
+            $table->id();
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade'); // CUST_CODE
+            $table->integer('custr_no'); // CUSTR_NO
             $table->char('custr_contract_no', 20)->nullable(); // CUSTR_CONTRACT_NO
             $table->char('custr_tower', 5)->nullable(); // CUSTR_TOWER
             $table->char('custr_unit', 30)->nullable(); // CUSTR_UNIT
