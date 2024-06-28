@@ -55,8 +55,9 @@
                             <option value="{{$customer->id}}">{{$customer->cust_code}} : {{$customer->cust_name_th}}</option>
                         @endforeach
                         </select>
-                     {{-- @error('gowith') 
-                    <span class="text-red-500 text-xs">{{ $message }}</span>  --}}
+                          @error('customerCode') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                         @enderror
                 </div>
                
                  <div class="w-48 ml-5">
@@ -71,9 +72,9 @@
                             @endforeach 
                             @endif
                         </select>
-                    {{-- @error('car') 
+                    @error('rental') 
                     <span class="text-red-500 text-xs">{{ $message }}</span> 
-                    @enderror  --}}
+                    @enderror 
                 </div> 
                
             </div>
@@ -147,29 +148,38 @@
                         @foreach ($invoiceDetails as $index => $row)
                             <tr class="bg-white border-b hover:bg-gray-50">
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.pscode" type="text" class="w-24 p-2 border border-gray-300 rounded text-xs"  />
+                                        <input wire:model.live="invoiceDetails.{{ $index }}.pscode" type="text" class="w-24 p-2 border border-gray-300 rounded text-xs"  disabled/>
                                     </td>
                                    
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.psname" type="text" class="w-48 p-2 border border-gray-300 text-xs rounded"  />
+                                        <input wire:model.live="invoiceDetails.{{ $index }}.psname" type="text" class="w-48 p-2 border border-gray-300 text-xs rounded" disabled  />
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.amt" type="text" class="w-full p-2 border border-gray-300 text-xs rounded"  />
+                                        <input wire:model="invoiceDetails.{{ $index }}.amt" 
+                                        wire:change="updateInvoiceDetail({{ $index }}, 'amt', $event.target.value)" 
+                                        type="number" 
+                                        class="w-full p-2 border border-gray-300 text-xs rounded"  />
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.vat" type="text" class="w-14 p-2 border border-gray-300 text-xs rounded" />     
+                                        <input wire:model="invoiceDetails.{{ $index }}.vat" 
+                                        wire:change="updateInvoiceDetail({{ $index }}, 'vat', $event.target.value)" 
+                                        type="number" 
+                                        class="w-14 p-2 border border-gray-300 text-xs rounded" />     
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.vatamt" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" required />
+                                        <input wire:model="invoiceDetails.{{ $index }}.vatamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.whvat" type="text" class="w-14 p-2 border border-gray-300 text-xs rounded" required />     
+                                        <input wire:model="invoiceDetails.{{ $index }}.whvat" 
+                                        wire:change="updateInvoiceDetail({{ $index }}, 'whvat', $event.target.value)"
+                                        type="number" 
+                                        class="w-14 p-2 border border-gray-300 text-xs rounded" />     
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.netamt" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" />     
+                                        <input wire:model="invoiceDetails.{{ $index }}.whtaxamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />     
                                     </td>
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.netamt" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" />     
+                                        <input wire:model="invoiceDetails.{{ $index }}.netamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />     
                                     </td>
                                      <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.remark" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" />     
@@ -194,7 +204,7 @@
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                     <option value="">Select Customer</option>
                     @foreach ($this->productservices as $productservice)
-                        <option value="{{$productservice->ps_code}}">{{$productservice->ps_code}} : {{$productservice->ps_name_th}}</option>
+                        <option value="{{$productservice->id}}">{{$productservice->ps_code}} : {{$productservice->ps_name_th}}</option>
                     @endforeach
                 </select>
             </div>  

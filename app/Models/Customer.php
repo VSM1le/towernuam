@@ -49,6 +49,7 @@ class Customer extends Model
         'cust_e_unitcost',
         'cust_costcenter',
         'cust_showmeter',
+        'cust_gov_flag',
         'created_by',
         'updated_by',
     ];

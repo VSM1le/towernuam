@@ -23,16 +23,16 @@ class PSGroupSeeder extends Seeder
                 'updated_by' => 1
             ],
             [
-                'ps_group' => 'CF',
+                'ps_group' => 'CV',
                 'ps_desc' => 'Car Park Fee',
-                'begin_date' => 15,
-                'end_date' => 16,
+                'begin_date' => 16,
+                'end_date' => 15,
                 'created_by' => 1,
                 'updated_by' => 1
             ],
             [
-                'ps_group' => 'EW',
-                'ps_desc' => 'Electric Water Fee',
+                'ps_group' => 'EC',
+                'ps_desc' => 'Electric Fee',
                 'begin_date' => 8,
                 'end_date' => 7,
                 'created_by' => 1,
@@ -46,16 +46,25 @@ class PSGroupSeeder extends Seeder
                 'created_by' => 1,
                 'updated_by' => 1
             ],
+            [
+                'ps_group' => 'WA',
+                'ps_desc' => 'Water Fee',
+                'begin_date' => 16,
+                'end_date' => 15,
+                'created_by' => 1,
+                'updated_by' => 1
+            ],
+            [
+                'ps_group' => 'CM',
+                'ps_desc' => 'Other Fee',
+                'begin_date' => 1,
+                'end_date' => 31,
+                'created_by' => 1,
+                'updated_by' => 1
+            ],
         ];
         foreach ($psGroups as $psGroup) {
             PsGroup::create($psGroup);
         }
-
-    // PsGroup::create([
-    //     'PS_GROUP' => 'RF',
-    //     'PS_DESC' => 'Rental Fee',
-    //     'BEGIN_DATE' => 1,
-    //     'END_DATE' => 31,
-    // ]);
     }
 }

@@ -13,6 +13,6 @@ class ProductService extends Model
     protected $fillable = [
         'ps_code', 'ps_abb', 'ps_name_th', 'ps_name_en', 'ps_unit', 
         'ps_price', 'ps_type', 'ps_group', 'ps_vat', 'ps_whtax', 
-        'ps_tower', 'ps_price_gr'
+        'ps_tower', 'ps_price_gr','gov_whtax'
     ];
 }

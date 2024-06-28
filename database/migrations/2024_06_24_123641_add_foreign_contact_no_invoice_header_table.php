@@ -16,13 +16,15 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
+    /**     * Reverse the migrations.
      */
     public function down(): void
     {
         Schema::table('invoice_headers', function (Blueprint $table) {
-            $table->dropColumn('customer_rental_id');
+         $table->dropForeign(['customer_rental_id']);
+        
+        // Drop the column 'customer_rental_id' itself
+        $table->dropColumn('customer_rental_id');
         });
     }
 };
