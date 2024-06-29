@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CustomerRental extends Model
 {
@@ -42,4 +43,8 @@ class CustomerRental extends Model
         'created_by',
         'updated_by'
     ];
+
+    public function invoiceheader():HasMany{
+        return $this->hasMany(InvoiceHeader::class);
+    }
 }

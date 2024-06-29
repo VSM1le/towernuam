@@ -1,22 +1,15 @@
-<div>
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                   test
-                </div>
-            </div>
-        </div>
-    </div>
-
-
+<div class="flex justify-end">
+      <button type="button"
+      wire:click = "openCreateInvoice"  
+      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+      Default</button>
       {{-- Create modal --}}
-    {{-- @if($showCreateModal) --}}
-    <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click=""></div>
-    <form wire:submit.prevent="" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '800px', 'max-width' : '1500px' }">
+    @if($showCreateInvoice)
+    <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeCreateInvoice"></div>
+    <form wire:submit.prevent="createInvoice" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '800px', 'max-width' : '1500px' }">
         <div class="bg-blue-700 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
             <div class="text-xl font-bold">Create Invoice</div>
-            <button wire:click="" type="button" class="focus:outline-none">
+            <button wire:click="closeCreateInvoice" type="button" class="focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -26,10 +19,10 @@
             <div class="flex">
                 <div class="w-48">
                     <label for="vdate" class="text-xs">Invoice date</label>
-                    <input id="vdate" wire:model="invoiceDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" required /> 
-                    {{-- @error('duedate') 
+                    <input id="vdate" wire:model="invoiceDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    @error('invoiceDate') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
-                    @enderror  --}}
+                    @enderror 
                 </div>
                 <div class="w-48 ml-5">
                     <label for="psgroup" class="text-xs">Ps Group</label>
@@ -41,9 +34,9 @@
                                 <option value="{{ $psgroup->id}}">{{ $psgroup->ps_group }}</option>
                             @endforeach
                         </select>
-                    {{-- @error('car') 
+                    @error('psGroup') 
                     <span class="text-red-500 text-xs">{{ $message }}</span> 
-                    @enderror  --}}
+                    @enderror 
                 </div>
                 <div class="w-80 ml-5">
                     <label for="customercode" class="text-xs">Customer code</label>
@@ -63,7 +56,7 @@
                  <div class="w-48 ml-5">
                     <label for="rental" class="text-xs">Contact</label>
                         <label class="w-40 text-sm font-medium text-gray-900"></label>
-                        <select id= "rental" wire:model="rental"
+                        <select id= "rental" wire:model.live="rental"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                             <option value="">Select Contact</option>
                              @if (!is_null($customerCode))
@@ -89,15 +82,16 @@
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3">Service Code</th>
-                            <th scope="col" class="px-6 py-3">Product/Services</th>
-                            <th scope="col" class="px-6 py-3">AMT</th>
-                            <th scope="col" class="px-6 py-3">VAT</th>
-                            <th scope="col" class="px-6 py-3">VAT AMT</th>
-                            <th scope="col" class="px-6 py-3">WH TAX</th>
-                            <th scope="col" class="px-6 py-3">WH TAX AMT</th>
-                            <th scope="col" class="px-6 py-3">Net AMT</th>
-                            <th scope="col" class="px-6 py-3">REMARK</th>
-                            <th scope="col" class="px-6 py-3">Action</th>
+                            <th scope="col" class="px-2 py-3">Product/Services</th>
+                            <th scope="col" class="px-2 py-3">Period</th>
+                            <th scope="col" class="px-2 py-3">AMT</th>
+                            <th scope="col" class="px-2 py-3">VAT</th>
+                            <th scope="col" class="px-2 py-3">VAT AMT</th>
+                            <th scope="col" class="px-2 py-3">WH TAX</th>
+                            <th scope="col" class="px-2 py-3">WH TAX AMT</th>
+                            <th scope="col" class="px-2 py-3">Net AMT</th>
+                            <th scope="col" class="px-2 py-3">REMARK</th>
+                            <th scope="col" class="px-2 py-3">Action</th>
 
                         </tr>
                     </thead>
@@ -148,45 +142,55 @@
                         @foreach ($invoiceDetails as $index => $row)
                             <tr class="bg-white border-b hover:bg-gray-50">
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model.live="invoiceDetails.{{ $index }}.pscode" type="text" class="w-24 p-2 border border-gray-300 rounded text-xs"  disabled/>
+                                        <input wire:model="invoiceDetails.{{ $index }}.pscode" type="text" class="w-24 p-2 border border-gray-300 rounded text-xs"  disabled/>
                                     </td>
                                    
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
-                                        <input wire:model.live="invoiceDetails.{{ $index }}.psname" type="text" class="w-48 p-2 border border-gray-300 text-xs rounded" disabled  />
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="invoiceDetails.{{ $index }}.psname" type="text" class="w-44 p-2 border border-gray-300 text-xs rounded" disabled  />
                                     </td>
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="invoiceDetails.{{ $index }}.period" type="text" class="w-48 p-2 border border-gray-300 text-xs rounded" />
+                                    </td>
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.amt" 
                                         wire:change="updateInvoiceDetail({{ $index }}, 'amt', $event.target.value)" 
                                         type="number" 
-                                        class="w-full p-2 border border-gray-300 text-xs rounded"  />
+                                        class="w-full p-2 border border-gray-300 text-xs rounded" 
+                                         />
+
                                     </td>
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.vat" 
                                         wire:change="updateInvoiceDetail({{ $index }}, 'vat', $event.target.value)" 
                                         type="number" 
-                                        class="w-14 p-2 border border-gray-300 text-xs rounded" />     
+                                        class="w-12 p-2 border border-gray-300 text-xs rounded" 
+                                        
+                                        />     
+                                         @if ($errors->has('invoiceDetails.' . $index . '.vat'))
+                                            <div class="text-red-500 text-xs mt-1">{{ $errors->first('invoiceDetails.' . $index . '.vat') }}</div>
+                                        @endif 
                                     </td>
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.vatamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />
                                     </td>
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.whvat" 
                                         wire:change="updateInvoiceDetail({{ $index }}, 'whvat', $event.target.value)"
                                         type="number" 
                                         class="w-14 p-2 border border-gray-300 text-xs rounded" />     
                                     </td>
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.whtaxamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />     
                                     </td>
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                    <td scope="row" class="px-2py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.netamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />     
                                     </td>
-                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.remark" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" />     
                                     </td>
                                 
                                 <td class="px-6 py-4">
-                                    <button type="button" wire:click="" class="text-red-500 focus:outline-none">
+                                    <button type="button" wire:click="removeItem({{ $index }})" class="text-red-500 focus:outline-none">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
@@ -209,7 +213,11 @@
                 </select>
             </div>  
             <div class="mt-4">
-                <button type="button" wire:click='addline' class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Dark</button>
+                <button type="button" 
+                wire:click='addline' 
+                class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+               Add
+                </button>
             </div>     
         </div>
    
@@ -233,5 +241,5 @@
     </div>
 </form>
 </div>
-{{-- @endif  --}}
+@endif 
 </div>
