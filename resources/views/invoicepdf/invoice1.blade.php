@@ -53,27 +53,60 @@
         }
         .grid-container2 {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 columns of equal width */
+            grid-template-columns: 58% 14% 14% 14%; /* 4 columns of equal width */
             gap: 0px; /* Gap between columns and rows */
-            margin-bottom: 20px; /* Example margin between grid containers */
         }
         .column {
             border: 1px solid #ccc;
         }
         .row {
             border: 1px solid #ccc; /* Border for each row */
-            padding: 10px;
         }
         .flex {
             display: flex;
             align-items: flex-start;
         }
+         .checkbox-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            display: none; /* Hide the default checkbox */
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border: 2px solid #000;
+            display: inline-block;
+            position: relative;
+        }
+        .signature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 150px; /* Adjust overall grid width */
+    height: 80px; /* Adjust overall grid height */
+    margin-top: 10px; /* Add space from top if needed */
+    border-collapse: collapse; /* Prevents double borders */
+}
+
+.signature-cell {
+    border-collapse: collapse; /* Prevents double borders */
+    border: 1px solid #000;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px; /* Adjust font size */
+}
         table {
             width: 100%;
             border-collapse: collapse;
         }
         p{
             font-size: 14px;
+            margin: 0px;
         }
         table, th, td {
             border: 1px solid #ddd;
@@ -109,95 +142,230 @@
             <p><strong>COPY RECEIPT/TAX INVOICE</strong></p>
         </div>
          <div class="grid-container">
-        <div class="column" style="width: 500px;">
+        <div class="column" style="width: 540px;">
             <div class="flex">
-            <div style="width: 80px;">
-                <p>ได้รับเงินจาก</p> 
-                <p>Recieved&nbsp;From</p> 
+            <div style="width: 120px;">
+                <p style="margin: 10px">ได้รับเงินจาก</p> 
+                <p style="margin: 10px">Recieved&nbsp;From</p> 
             </div>
             <div style="margin-left: 50px;">
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Natus at amet ipsum officiis molestiae velit!</p>
+                <p style="margin: 10px">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Natus at amet ipsum officiis molestiae velit!</p>
             </div>
         </div>
          <div class="flex">
-            <div style="width: 130px;">
-                <p>ที่อยู่</p> 
-                <p>Address</p> 
+            <div style="width: 175px;">
+                <p style="margin: 10px">ที่อยู่</p> 
+                <p style="margin: 10px">Address</p> 
             </div>
             <div style="margin-left: 50px;">
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Natus at amet ipsum officiis molestiae velit!</p>
+                <p style="margin: 10px">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Natus at amet ipsum officiis molestiae velit!</p>
             </div>
         </div>
         </div>
         <div class="column">
-            <div class="row">
-                <!-- Content for the first row in the second column -->
-                <p style="margin: 0; font-size: 14px;">เลขที่ใบเสร็จ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OPRV AS231120064</p>
-                No.<br>
+            <div class="row" style="display: flex;">
+                <div style="width:35%;">
+                    <p style="margin: 10px; font-size: 12px;">เลขที่ใบเสร็จ<br> No. </p>
+                   
+                </div>
+               <div>
+                <p style="padding-left: 10px; font-size:10px; margin:10px;">OPRV AS23120029</p>
+               </div>
             </div>
-            <div class="row">
-            <p style="margin: 0; font-size: 14px;">วันที่&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12/01/2222</p>
-                Date.<br>
+            <div class="row" style="display: flex;">
+                 <div style="width:35%;">
+                    <p style="margin: 10px; font-size: 12px;">วันที่<br>Date.</p>
+                    
+                </div>
+               <div>
+                <p style="padding-left: 10px; font-size:11px; margin:10px;">12/02/2222</p>
+               </div>
             </div>
-            <div class="row">
-                <p style="margin: 0; font-size: 14px;">แปลนเลขที่&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1501,1502</p>
-                Plan No.<br>
+            <div class="row" style="display: flex;">
+                 <div style="width:35%;">
+                    <p style="margin: 10px; font-size: 12px;">แปลนเลขที่<br> Plan No.</p>
+                   
+                   
+                </div>
+               <div>
+                <p style="padding-left: 10px; font-size:11px; margin:10px">1501</p>
+               </div>
             </div>
         </div>
     </div>
      <div class="grid-container2">
-        <div class="grid-item">
-            <div class="row">
+        <div class="grid-item" >
+            <div class="row" style="padding: 5px">
+                <div  style="display: flex; padding: 4px; align-items: center; justify-content: center;">
+                    <p style="margin: 0; padding-right: 10px; font-size:12px">รายการ</p>
+                </div>
+               <div  style="display: flex; padding: 4px; align-items: center; justify-content: center;">
+                    <p style="margin: 0; font-size:11px"">Description</p>
+                </div> 
+            </div>
+            <div class="row" style="height: 200px">
                 <p>Row 1</p>
             </div>
-            <div class="row">
+            <div class="row" style="height: 120px">
                 <p>Row 1</p>
             </div>
-            <div class="row">
+              <div class="row" style="height: 30px">
                 <p>Row 1</p>
             </div>
             
         </div>
         <div class="grid-item">
            
-            <div class="row">
+            <div class="row" style="padding: 5px">
+                <div  style="display: flex; padding: 4px; align-items: center; justify-content: center;">
+                    <p style="margin: 0; padding-right: 10px; font-size:12px">จำนวนเงิน</p>
+                </div>
+               <div  style="display: flex; padding: 4px; align-items: center; justify-content: center;">
+                    <p style="margin: 0; font-size:11px"">Gross Amount</p>
+                </div> 
+            </div>
+            <div class="row" style="height: 322px">
                 <p>Row 1</p>
             </div>
-            <div class="row">
-                <p>Row 1</p>
-            </div>
-            <div class="row">
-                <p>Row 1</p>
-            </div>
-        </div>
-        <div class="grid-item">
-            
-            <div class="row">
-                <p>Row 1</p>
-            </div>
-            <div class="row">
-                <p>Row 1</p>
-            </div>
-            <div class="row">
+            <div class="row" style="height:30px">
                 <p>Row 1</p>
             </div>
         </div>
         <div class="grid-item">
             
-            <div class="row">
+            <div class="row" style="padding: 5px">
+                <div  style="display: flex; padding: 4px; align-items: center; justify-content: center;">
+                    <p style="margin: 0; padding-right: 10px; font-size:12px">ภาษีมูลค่าเพิ่ม</p>
+                </div>
+               <div  style="display: flex; padding: 4px; align-items: center; justify-content: center;">
+                    <p style="margin: 0; font-size:11px">Value Added Tax</p>
+                </div> 
+            </div>
+            <div class="row" style="height:322px">
                 <p>Row 1</p>
             </div>
-            <div class="row">
+            <div class="row" style="height: 30px;">
                 <p>Row 1</p>
             </div>
-            <div class="row">
+        </div>
+        <div class="grid-item">
+            
+            <div class="row" style="padding: 5px">
+                <div  style="display: flex; padding: 4px; align-items: center; justify-content: center;">
+                    <p style="margin: 0; padding-right: 10px; font-size:12px">จำนวนเงินสุทธิ</p>
+                </div>
+               <div  style="display: flex; padding: 4px; align-items: center; justify-content: center;">
+                    <p style="margin: 0; font-size:11px;">Net Amount</p>
+                </div> 
+            </div>
+            <div class="row" style="height: 322px;">
+                <p>Row 1</p>
+            </div>
+            <div class="row" style="height: 30px">
                 <p>Row 1</p>
             </div>
         </div>
     </div> 
-        <div class="footer">
-            <p class="total">Total: 78979</p>
-            <p>Thank you for your business!</p>
+        <div style="gap: 0px" >
+            <div style="display:flex;">
+                <div style="margin: 5px;">
+                    <p>ชำระโดย</p>
+                    <p>Payment of</p>
+                </div>
+                <div style="display:flex; justify-content:center; margin-left: 50px">
+                     <div class="checkbox-container">
+                        <input type="checkbox" id="checkbox">
+                        <label for="checkbox" class="custom-checkbox"></label>
+                    </div>
+                    <div style="margin: 5px">
+                        <p>เงินสด</p>
+                        <p>Cash</p>
+                    </div>
+                    
+                </div>
+                     <div style="display:flex; justify-content:center; margin-left:100px">
+                     <div class="checkbox-container">
+                        <input type="checkbox" id="checkbox">
+                        <label for="checkbox" class="custom-checkbox"></label>
+                    </div>
+                    <div style="margin: 5px;">
+                        <p>เงินโอน</p>
+                    </div>
+                    <div style="margin: 5px; margin-left:100px;">
+                        <p>100000</p>
+                    </div>
+                    
+                </div> 
+                
+            </div>
+            <div style="display:flex;">
+                 <div style="display:flex; justify-content:center; margin-left: 130px">
+                     <div class="checkbox-container">
+                        <input type="checkbox" id="checkbox">
+                        <label for="checkbox" class="custom-checkbox"></label>
+                    </div>
+                    <div style="margin: 5px">
+                        <p>เข็คธนาคาร</p>
+                        <p>Cheque Bank</p>
+                    </div>
+                    
+                </div>
+                  <div style="margin: 5px; margin-left:100px;">
+                        <p>สาขา</p>
+                        <p>Branch</p>
+                    </div>
+                      <div style="margin: 5px; margin-left:70px">
+                        <p>เลขที่</p>
+                        <p>No.</p>
+                    </div>
+                      <div style="margin: 5px; margin-left:70px">
+                        <p>วันที่</p>
+                        <p>Date</p>
+                    </div>
+                      <div style="margin: 5px; margin-left:70px">
+                        <p>จำนวนเงิน</p>
+                        <p>Amount</p>
+                    </div>
+            </div>
+          <div style="display:flex;">
+                 <div style="display:flex; justify-content:center; margin-left: 130px">
+                     <div class="checkbox-container">
+                        <input type="checkbox" id="checkbox">
+                        <label for="checkbox" class="custom-checkbox"></label>
+                    </div>
+                    <div style="margin: 5px">
+                        <p>เช็คหัก ณ ที่จ่าย</p>
+                        <p>Withholding Tax</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; margin:5px">
+            <div class="signature-grid">
+                <div class="signature-cell">
+                    <div style="display: flex; justify-content: center;">
+                         <p>ผู้รับเงิน</p>
+                    </div>
+                    <div style="display: flex; justify-content: center;">
+                    <p>Collector</p>
+                    </div>
+                </div>
+                
+                <div class="signature-cell">
+                    <div style="display: flex; justify-content: center;">
+                         <p>การเงิน</p>
+                    </div>
+                    <div style="display: flex; justify-content: center;">
+                    <p>Cashier</p>
+                    </div>
+                </div>
+                <div class="signature-cell"></div>
+                <div class="signature-cell"></div>
+            </div>
+            <div style="margin: 5px; margin-top:15px;">
+                <p style="font-size: 12px ">หมายเหตุ: ในกรณีชำระเป็น ใบเส็จรับเงินและใบกำกับภาษีฉบับนี้จะสมบูรณ์ต่อเมื่อบริษัทฯ ได้รับเงินตามเช็คแล้ว</p>
+                <p style="font-size: 12px; margin-top:8px">REMARK: If payment is made by cheque. This receipt will be valid cheque has been cleared by the bank.</p>
+            </div>
         </div>
     </div>
 </body>
