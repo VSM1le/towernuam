@@ -13,7 +13,7 @@ class InvoiceHeader extends Model
     protected $table = 'invoice_headers';
     protected $fillable  = ['inv_no','inv_date','ps_group_id','inv_status','created_by','updated_by','customer_rental_id','inv_tower','customer_id'];
 
-    public function invoicedetail()
+    public function invoicedetail():HasMany
     {
         return $this->hasMany(InvoiceDetail::class, 'invoice_header_id', 'id');
     }

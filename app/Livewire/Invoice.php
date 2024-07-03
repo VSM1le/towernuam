@@ -8,6 +8,7 @@ use App\Models\InvoiceDetail;
 use App\Models\InvoiceHeader;
 use App\Models\ProductService;
 use App\Models\PsGroup;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Carbon as SupportCarbon;
 use Livewire\Attributes\Computed;
@@ -223,9 +224,25 @@ class Invoice extends Component
 
     public function closeCreateInvoice(){
         $this->showCreateInvoice = false;
+        $this->reset(['psGroup','customerName','customerCode','customerrents','rental','service','invoiceDate','invoiceDetails']);
+        $this->resetValidation();
     }
+
+    public function exportPdf($id){
+        $invoice = InvoiceHeader::where('id',$id)->with('invoicedetail')->first();
+        $data = [
+            'invoice' => $invoice
+        ];
+        $pdf = Pdf::loadView('invoicepdf.invoice2');
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, 'aaa.pdf');
+    }
+
+    
     public function render()
     {
-        return view('livewire.invoice');
+        $invoices = InvoiceHeader::with('invoicedetail')->orderBy('id','desc')->get();
+        return view('livewire.invoice',compact('invoices'));
     }
 }

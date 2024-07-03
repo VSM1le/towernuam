@@ -1,8 +1,133 @@
-<div class="flex justify-end">
-      <button type="button"
-      wire:click = "openCreateInvoice"  
-      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-      Default</button>
+<div class="">
+    <div class="flex justify-end">
+            <button type="button"
+            wire:click = "openCreateInvoice"  
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+            Create Invoice</button>
+    </div>
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    @foreach ($invoices as $index => $pland)
+                    <div wire:key="items-{{ $index }}" class="wrapper relative ">
+                        <div x-data="{ isOpen: false }" @click="isOpen = !isOpen" class="tab px-5 py-2 border-2   
+                            bg-slate-100 shadow-lg relative mb-4 rounded-md cursor-pointer">
+                            <div 
+                                class="flex justify-between items-center font-semibold text-lg after:absolute after:right-5 after:text-2xl after:text-gray-400 hover:after:text-gray-950 peer-checked:after:transform peer-checked:after:rotate-45">
+                                <div class="flex">
+                                    <h2 class="w-8 h-8 bg-sky-300 text-white flex justify-center items-center rounded-sm mr-3">{{ $index + 1 }}</h2>
+                                    <h3>{{ $pland->inv_no}}</h3>
+                                    <h3 class="ml-1"></h3>
+                                </div>
+                                <div class="flex">
+                                    <button wire:click.stop="exportPdf({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                        Export Tag
+                                    </button>
+                                </div>
+                                
+                            </div>
+                            {{-- Accordion content --}}
+                            <div x-show="isOpen" class="answer justify-center mt-5 h-full mr-9"> 
+                                <div class="overflow-x-auto"> 
+                                <table  @click.stop class="m-6 w-full overflow-x-auto  text-sm text-left rtl:text-right text-gray-500 ">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3">
+                                                No.
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                               Product Code 
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                               Product Name
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd Period 
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd Amount
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd vat percent
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd vat amount
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd whtax percent
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd whtax amount
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd new amount
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Remark
+                                            </th>                                             
+                                        </tr>
+                                    </thead>
+                                     @foreach ($pland->invoicedetail as $listitem)
+                                        <tr class="bg-white border-b hover:bg-gray-50">
+                                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
+                                                {{ $loop->iteration }}
+                                            </th>
+                                            
+                                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                                                {{ $listitem->invd_product_code}}
+                                            </th>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invd_product_name}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invd_period}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invd_amt}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invd_vat_percent}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{$listitem->invd_vat_amt}}
+                                            </td>
+                                            
+                                            <td class="px-6 py-4">
+                                                {{$listitem->invd_wh_tax_percent}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invd_wh_tax_amt}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invd_net_amt}}
+                                            </td>
+                                               <td class="px-6 py-4">
+                                                {{ $listitem->remark}}
+                                            </td>
+                                        </tr>   
+                                    @endforeach 
+                                </table>
+                                 </div>
+                            </div>
+                            {{-- End Accordion content --}}
+                        </div>    
+                    </div>
+                @endforeach
+                   
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
       {{-- Create modal --}}
     @if($showCreateInvoice)
     <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeCreateInvoice"></div>

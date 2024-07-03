@@ -15,5 +15,8 @@ Route::view('profile', 'profile')
 Route::view('invoice', 'invoicepdf.invoice1')
     ->middleware(['auth'])
     ->name('invoice');
+Route::view('invoice2', 'invoicepdf.invoice2')
+    ->middleware(['auth'])
+    ->name('invoice');
 
 require __DIR__.'/auth.php';
