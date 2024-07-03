@@ -234,10 +234,7 @@ class Invoice extends Component
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
         $invoice = InvoiceHeader::where('id',$id)->with('invoicedetail')->first();
-        $data = [
-            'invoice' => $invoice
-        ];
-        $pdf = Pdf::loadView('invoicepdf.invoice3');
+        $pdf = Pdf::loadView('invoicepdf.invoice3',['Invoices' => $invoice]);
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
         }, 'aaa.pdf');

@@ -30,6 +30,9 @@
             font-weight: italic;
             font-style: bold;
         }
+         @page {
+            margin: 2px; /* Adjust this value as needed */
+        }
         body {
             font-family: 'THSarabunNew';
             margin: auto;
@@ -39,8 +42,8 @@
             width: 100%;
             max-width: 800px;
             margin: auto;
-            border: 1px solid #000000;
-            box-shadow: 0 0 10px rgb(0, 0, 0);
+            /* border: 1px solid #000000; */
+            /* box-shadow: 0 0 10px rgb(0, 0, 0); */
         }
         .header {
             width: 100%;
@@ -58,7 +61,7 @@
         }
         .invoice-details {
             text-align: center;
-            margin: 20px 0;
+            margin: 5px 0;
         }
         .content-table {
             width: 100%;
@@ -66,8 +69,7 @@
             margin-bottom: 20px;
         }
         .content-table th, .content-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 4px;
         }
         .content-table th {
             text-align: left;
@@ -118,7 +120,7 @@
                     <p style="margin: 0px">เลขประจำตัวผู้เสียภาษี 0105565185083&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;สำนักงานใหญ่(Head Office)</p>
                 </td>
                 <td class="blank-column">
-                    <p>Page: <span class="page-number"></span></p>
+                    <p><span class="page-number"></span></p>
                 </td>
             </tr>
         </table>
@@ -127,74 +129,79 @@
             <p style="margin: 0px"><strong>COPY INVOICE</strong></p>
             <p style="margin: 0px"><strong>(สำเนา)</strong></p>
         </div>
-        <table class="details-table">
-            <tr>
-                <td>
-                    <p>ได้รับเงินจาก</p>
-                    <p>Recieved&nbsp;From</p>
-                </td>
-                <td>
-                    <p>N2323233</p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p>ที่อยู่</p>
-                    <p>Address</p>
-                </td>
-                <td>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Natus at amet ipsum officiis molestiae velit!</p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p>วันที่</p>
-                    <p>Date</p>
-                </td>
-                <td>
-                    <p>12/02/2222</p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p>เลขที่ใบแจ้งนี้</p>
-                    <p>No.</p>
-                </td>
-                <td>
-                    <p>OPRV AS23120029</p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p>กำหนดชำระวันที่</p>
-                    <p>DUE DATE</p>
-                </td>
-                <td>
-                    <p>1501</p>
-                </td>
-            </tr>
-        </table>
-        <table class="content-table">
-            <thead>
+        <table style="width:100%; border: 1px solid #000; border-collapse: collapse;">
+            <tbody>
+                <tr >
+                    <td style="width:80%; vertical-align:top;">
+                    <p style="font-size: 17px">เลขที่สัญญา&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N2304005</p> 
+                    <p style="font-size: 17px; margin:0px">ชื่อลูกต้า&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;บริษัท ลุฟท์ฮันซ่าวิสเซส (ไทยแลนด์) จำกัด </p>
+                    </td>
+
+                    <td style="height: 2px; border:1px solid #000; margin:0px; vertical-align:top">
+                        <p style="font-size: 17px">วันที่</p>
+                        <p style="font-size: 17px">Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12/02/2024</p>
+                    </td>
+                </tr>
                 <tr>
-                    <th>รายการ</th>
-                    <th>จำนวนเงิน</th>
-                    <th>จำนวนเงิน</th>
-                    <th>ภาษีมูลค่าเพิ่ม</th>
-                    <th>จำนวนเงินสุทธิ</th>
+                    <td style="height:60px; vertical-align:top;">
+                    <p style="font-size: 17px">ที่อยู่&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lorem ipsum dolor sit amet consectetur adipisic</p>   
+                    <p style="font-size: 17px">Address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lorem ipsum dolor sit amet.</p>   
+                    </td>
+                    <td style="vertical-align:top;width: 40%; border:1px solid #000; margin:0px;">
+                        <p style="font-size: 17px">เลชที่ใบแจ้งนี้</p>
+                        <p style="font-size: 17px">No.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ISA24080001</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="height: 60px; vertical-align:top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;092341234234&nbsp;banch 0002</td>
+                    <td style="vertical-align:top; width: 40%; border:1px solid #000; margin:0px;">
+                        <p style="font-size: 17px">กำหนดชำระภายในวันที่</p>
+                       <p style="font-size: 17px;">DUE DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12/02/2024</p> 
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="content-table" style="border: 1px solid #000">
+            <thead>
+                <tr style="text-align: center;">
+                    <th style="text-align: center;padding:10px; line-height:8px; border: 1px solid #000;border-top: none;">รายการ<br style="margin: 0">Description</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">ประจำเดือน<br>Period</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">จำนวนเงิน<br>Gross Amount</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">ภาษีมูลค่าเพิ่ม<br>Value Added Tax</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">จำนวนเงินสุทธิ<br>Net Amount</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Row 1</td>
-                    <td>Row 1</td>
-                    <td>Row 1</td>
-                    <td>Row 1</td>
-                    <td>Row 1</td>
+                <tr style="height: 300px;">
+                    <td style="height:400px;width: 280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
+                        @foreach ( $Invoices->invoicedetail as $invoice )
+                            <p>{{ $invoice->invd_product_name }}</p>
+                        @endforeach
+                    </td>
+                    <td style="width: 140px; text-align: center; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
+                        @foreach ( $Invoices->invoicedetail as $invoice )
+                            <p>{{ $invoice->invd_period }}</p>
+                        @endforeach
+                       </td>
+                    <td style="width:100px;text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
+                         @foreach ( $Invoices->invoicedetail as $invoice )
+                            <p >{{ number_format($invoice->invd_amt,2,'.',',') }}</p>
+                        @endforeach
+                    </td>
+                    <td style="text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
+                         @foreach ( $Invoices->invoicedetail as $invoice )
+                            <p >{{ number_format($invoice->invd_vat_amt,2,'.',',')}}</p>
+                        @endforeach
+                    </td>
+                    <td style="text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
+                         @foreach ( $Invoices->invoicedetail as $invoice )
+                            <p >{{ number_format($invoice->invd_net_amt,2,'.',',')}}</p>
+                        @endforeach
+                    </td>
                 </tr>
                 <tr>
                     <td>Row 1</td>
-                    <td>Row 1</td>
+                    <td style="border-left: none">Row 1</td>
                     <td>Row 1</td>
                     <td>Row 1</td>
                     <td>Row 1</td>
