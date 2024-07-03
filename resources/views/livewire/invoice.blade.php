@@ -27,8 +27,8 @@
                             </div>
                             {{-- Accordion content --}}
                             <div x-show="isOpen" class="answer justify-center mt-5 h-full mr-9"> 
-                                <div class="overflow-x-auto"> 
-                                <table  @click.stop class="m-6 w-full overflow-x-auto  text-sm text-left rtl:text-right text-gray-500 ">
+                                <div  @click.stop class="overflow-x-auto"> 
+                                <table  class="m-6 w-full overflow-x-auto  text-sm text-left rtl:text-right text-gray-500 ">
                                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                         <tr>
                                             <th scope="col" class="px-6 py-3">
