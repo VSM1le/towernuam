@@ -6,17 +6,18 @@
      <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-
         <title>{{ config('app.name', 'Laravel') }}</title>
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <title>Invoice</title>
     <style>
-         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
+       @font-face {
+            font-family: 'THSarabunNew';
+            src: url('{{ url('/fonts/THSarabunNew.ttf') }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: 'THSarabunNew';
+            margin: auto;
             padding: 20px;
         }
         .invoice-container {
@@ -133,7 +134,7 @@
 <body>
     <div class="invoice-container">
         <div class="header">
-            <img src="{{ asset('path/to/logo.png') }}" alt="Company Logo">
+            <img src="{{ asset('/nuam.jpg') }}" alt="Company Logo">
             <div class="company-details">
                 <h2>บริษัท นวม จำกัด</h2>
                 <h4>NUAM CO., LTD</h4>

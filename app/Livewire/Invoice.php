@@ -10,6 +10,7 @@ use App\Models\ProductService;
 use App\Models\PsGroup;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Dompdf\Options;
 use Illuminate\Support\Carbon as SupportCarbon;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -229,11 +230,14 @@ class Invoice extends Component
     }
 
     public function exportPdf($id){
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
         $invoice = InvoiceHeader::where('id',$id)->with('invoicedetail')->first();
         $data = [
             'invoice' => $invoice
         ];
-        $pdf = Pdf::loadView('invoicepdf.invoice2');
+        $pdf = Pdf::loadView('invoicepdf.invoice3');
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
         }, 'aaa.pdf');

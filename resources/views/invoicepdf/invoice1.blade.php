@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice</title>
     <style>
-         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
+         @font-face {
+            font-family: 'THSarabunNew';
+            src: url('{{ url('/fonts/THSarabunNew.ttf') }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: 'THSarabunNew';
+            margin: auto;
             padding: 20px;
         }
         .invoice-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 1200px;
             margin: auto;
             /* padding: 20px; */
             border: 1px solid #ddd;

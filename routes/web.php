@@ -15,7 +15,7 @@ Route::view('profile', 'profile')
 Route::view('invoice', 'invoicepdf.invoice1')
     ->middleware(['auth'])
     ->name('invoice');
-Route::view('invoice2', 'invoicepdf.invoice2')
+Route::view('invoice3', 'invoicepdf.invoice3')
     ->middleware(['auth'])
     ->name('invoice');
 
