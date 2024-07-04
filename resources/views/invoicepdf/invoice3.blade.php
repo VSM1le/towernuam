@@ -110,6 +110,13 @@
             border-collapse: collapse;
             margin-top: -20px; /* Adjusts overlap of the borders */
         }
+         .adjacent-table2 {
+            width: 100%;
+            border: 1px solid #000;
+            border-top: none;
+            border-collapse: collapse;
+            margin-top: 0px; /* Adjusts overlap of the borders */
+        }
     </style>
 </head>
 <body>
@@ -140,15 +147,15 @@
         <table style="width:100%; border: 1px solid #000; border-collapse: collapse;">
             <tbody>
                 <tr >
-                    <td style="width:80%; vertical-align:top;">
+                    <td style="width:544px; vertical-align:top;">
                     <p style="font-size: 17px">เลขที่สัญญา&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         {{$Invoices->customerrental->custr_contract_no }}</p> 
-                    <p style="font-size: 17px; margin:0px">ชื่อลูกต้า&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->customer->cust_name_th }} </p>
+                    <p style="font-size: 17px; margin:0px">ชื่อลูกต้า&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->customer->cust_name_th }} </p>
                     </td>
 
                     <td style="height: 2px; border:1px solid #000; margin:0px; vertical-align:top">
                         <p style="font-size: 17px">วันที่</p>
-                        <p style="font-size: 17px">Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12/02/2024</p>
+                        <p style="font-size: 17px">Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->inv_date }}</p>
                     </td>
                 </tr>
                 <tr>
@@ -164,17 +171,17 @@
                         </p>   
                     </td>
                     <td style="vertical-align:top;width: 40%; border:1px solid #000; margin:0px;">
-                        <p style="font-size: 17px">เลชที่ใบแจ้งนี้</p>
+                        <p style="font-size: 17px">เลชที่ใบแจ้งหนี้</p>
                         <p style="font-size: 17px">No.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->inv_no }}</p>
                     </td>
                 </tr>
                 <tr>
-                    <td style="height: 60px; vertical-align:top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;{{ $Invoices->customer->cust_taxid }}&nbsp;
+                    <td style="height: 60px; vertical-align:top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;{{ $Invoices->customer->cust_taxid }}&nbsp;
                         {{ $Invoices->customer->cust_branch }}
                     </td>
                     <td style="vertical-align:top; width: 40%; border:1px solid #000; margin:0px;">
                         <p style="font-size: 17px">กำหนดชำระภายในวันที่</p>
-                       <p style="font-size: 17px;">DUE DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12/02/2024</p> 
+                       <p style="font-size: 17px;">DUE DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{$Invoices->invd_duedate}}</p> 
                     </td>
                 </tr>
             </tbody>
@@ -190,8 +197,8 @@
                 </tr>
             </thead>
             <tbody>
-                <tr style="height: 300px;">
-                    <td style="height:400px;width: 280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
+                <tr style="height: 200px;">
+                    <td style="height:390px;width: 280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ( $Invoices->invoicedetail as $invoice )
                             <p>{{ $invoice->invd_product_name }}</p>
                         @endforeach
@@ -234,12 +241,26 @@
         </table>
        <table class="adjacent-table">
         <tr>
-             <td style="width:73.1%;border-right: 1px solid #000; height:30px">
-                {{ $bath }}
+             <td style="width:58.5%; height:30px; text-align:center;">
+                <p>({{ $bath }})</p>
              </td>
-             <td></td>
+             <td style="width: 29.6%; text-align:center; line-height:8px">
+                <p>รวมเป็นเงิน<br style="">TOTAL AMOUNT</p>
+             </td>
+             <td style="border-left: 1px solid #000;text-align:right;">{{ number_format($Invoices->invoicedetail->sum('invd_net_amt'),2,'.',',') }}</td>
         </tr>
         </table>
+        <table class="adjacent-table2">
+        <tr>
+             <td style="width:58.5%;border-right: 1px solid #000; height:90px; text-align:center;">
+                <p></p>
+             </td>
+             <td style="border-left: 1px solid #000;text-align:center;">
+                <p>........................................................................................................<br>ผู้มีอำนาจลงนาม AUTHORIZED SIGNATURE</p>
+             </td>
+        </tr>
+        </table>
+        
  
     </div>
 </body>

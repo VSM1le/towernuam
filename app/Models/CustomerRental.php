@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CustomerRental extends Model
@@ -47,4 +48,8 @@ class CustomerRental extends Model
     public function invoiceheader():HasMany{
         return $this->hasMany(InvoiceHeader::class);
     }
+    public function customer():BelongsTo{
+        return $this->belongsTo(Customer::class,'customer_id');
+    }
+   
 }

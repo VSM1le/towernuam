@@ -15,9 +15,11 @@ use Dompdf\Options;
 use Illuminate\Support\Carbon as SupportCarbon;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Invoice extends Component
 {
+    use WithPagination;
     public $psGroup = null;
     public $customerName = null;
     public $customerCode = null;
@@ -26,6 +28,7 @@ class Invoice extends Component
     public $service = null;
     public $invoiceDate = null;
     public $invoiceDetails;
+    public $dueDate = null;
     public $tower = "A";
     public $showCreateInvoice = false;
 
@@ -88,42 +91,6 @@ class Invoice extends Component
         return ProductService::all();
     }
 
-    public function numberToThai($number){
-        $thaiNumbers = [
-        '0' => 'ศูนย์', '1' => 'หนึ่ง', '2' => 'สอง', '3' => 'สาม', '4' => 'สี่',
-        '5' => 'ห้า', '6' => 'หก', '7' => 'เจ็ด', '8' => 'แปด', '9' => 'เก้า'
-    ];
-
-    $thaiUnits = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
-    
-    $integerPart = floor($number);
-    $decimalPart = explode('.', number_format($number, 2))[1];
-
-    $result = '';
-
-    $intDigits = str_split(strrev((string)$integerPart));
-    foreach ($intDigits as $position => $digit) {
-        $unit = $thaiUnits[$position % count($thaiUnits)];
-        if ($position == 0 && $digit == '1' && $position > 0) {
-            $result = $unit . $result;
-        } elseif ($position == 1 && $digit == '1') {
-            $result = 'สิบ' . $result;
-        } elseif ($position == 1 && $digit == '2') {
-            $result = 'ยี่สิบ' . $result;
-        } else {
-            $result = $thaiNumbers[$digit] . $unit . $result;
-        }
-    }
-
-    $result .= 'จุด';
-    $decimalDigits = str_split($decimalPart);
-    foreach ($decimalDigits as $digit) {
-        $result .= $thaiNumbers[$digit];
-    }
-
-    return $result; 
-    }
-
     public function addline(){
        $this->validate([
             'invoiceDate' => ['required'],
@@ -131,17 +98,19 @@ class Invoice extends Component
             'customerCode'  => ['required'],
             'service' => ['required'],
             'psGroup' => ['required'],
+            'dueDate' => ['required'],
        ]); 
         $check = True;
-        $customer_rent= CustomerRental::where('customer_id',$this->customerCode)->where('id',$this->rental)->first();
+        $customer_rent= CustomerRental::where('customer_id',$this->customerCode)->where('id',$this->rental)->with('customer')->first();
         $product_service = ProductService::where('id',$this->service)->first();
         $ps_group = PsGroup::where('id',$this->psGroup)->first();
+        $wh_tax = $product_service->ps_whtax;
         if($ps_group->begin_date == '1' && $ps_group->end_date == '31'){
 
             $carbon_date = Carbon::parse($this->invoiceDate);
 
-            $start = $carbon_date->copy()->startOfMonth()->format('d/m/Y');
-            $end = $carbon_date->copy()->endOfMonth()->format('d/m/Y');
+            $start = $carbon_date->copy()->addMonth()->startOfMonth()->format('d/m/Y');
+            $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
             $period = $start . " - " . $end;
         }
         else{
@@ -149,10 +118,14 @@ class Invoice extends Component
             $period = $carbon_date->copy()->day($ps_group->begin_date)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day($ps_group->end_date)->format('d/m/Y');
         }
         
-        if($product_service->ps_code == "1001"){
+       if($customer_rent->customer->cust_gov_flag == 1){
+            $wh_tax = $product_service->gov_whtax;
+       } 
+        
+        if($product_service->ps_code == "1001" || $product_service->ps_code == "1010"){
             $amt = $customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm;
             $vatamt = ($amt * $product_service->ps_vat)/100;
-            $whamt = ($amt * $product_service->ps_whtax)/100;
+            $whamt = ($amt * $wh_tax)/100;
             $this->invoiceDetails[] = 
             ['pscode'=> $product_service->ps_code
             ,'psname' => $product_service->ps_name_th
@@ -160,7 +133,7 @@ class Invoice extends Component
             ,'amt'=>$amt
             ,'vat'=>$product_service->ps_vat
             ,'vatamt'=>$vatamt
-            ,'whvat'=>$product_service->ps_whtax
+            ,'whvat'=>$wh_tax
             ,'whtaxamt' => $whamt 
             ,'netamt'=>$amt + $vatamt - $whamt
             ,'remark'=>''];
@@ -169,7 +142,7 @@ class Invoice extends Component
         if($product_service->ps_code == '1030'){
             $amt = $customer_rent->custr_area_sqm * $customer_rent->custr_service_fee;
             $vatamt = ($amt * $product_service->ps_vat)/100;
-            $whamt = ($amt * $product_service->ps_whtax)/100;
+            $whamt = ($amt * $wh_tax)/100;
             $this->invoiceDetails[] = 
             ['pscode'=> $product_service->ps_code
             ,'psname' => $product_service->ps_name_th
@@ -177,7 +150,7 @@ class Invoice extends Component
             ,'amt'=>$amt
             ,'vat'=>$product_service->ps_vat
             ,'vatamt'=>$vatamt
-            ,'whvat'=>$product_service->ps_whtax
+            ,'whvat'=>$wh_tax
             ,'whtaxamt' => $whamt 
             ,'netamt'=>$amt + $vatamt - $whamt
             ,'remark'=>''];
@@ -209,6 +182,7 @@ class Invoice extends Component
             'rental' => ['required'],
             'customerCode'  => ['required'],
             'service' => ['required'],  
+            'dueDate' => ['required'],
         ]);
         $prefix = 'I'.$this->tower.'S';
         $year = Carbon::now()->year;
@@ -229,6 +203,7 @@ class Invoice extends Component
             'customer_id' => $this->customerCode,
             'customer_rental_id' => $this->rental,
             'inv_date' => $this->invoiceDate,
+            'invd_duedate' => $this->dueDate,
             'ps_group_id' => $this->psGroup,
             'inv_status' => 'USE',
             'inv_tower' => $this->tower,
@@ -278,13 +253,13 @@ class Invoice extends Component
         $pdf = Pdf::loadView('invoicepdf.invoice3',['Invoices' => $invoice,'bath' => $bath]);
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
-        }, 'aaa.pdf');
+        }, ($invoice->inv_no).'.pdf');
     }
 
     
     public function render()
     {
-        $invoices = InvoiceHeader::with('invoicedetail')->orderBy('id','desc')->get();
+        $invoices = InvoiceHeader::with(['invoicedetail','customer'])->orderBy('id','desc')->paginate(10);
         return view('livewire.invoice',compact('invoices'));
     }
 }

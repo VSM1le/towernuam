@@ -15,12 +15,12 @@
                                 class="flex justify-between items-center font-semibold text-lg after:absolute after:right-5 after:text-2xl after:text-gray-400 hover:after:text-gray-950 peer-checked:after:transform peer-checked:after:rotate-45">
                                 <div class="flex">
                                     <h2 class="w-8 h-8 bg-sky-300 text-white flex justify-center items-center rounded-sm mr-3">{{ $index + 1 }}</h2>
-                                    <h3>{{ $pland->inv_no}}</h3>
+                                    <h3>{{ $pland->inv_no}} {{ $pland->customer->cust_name_th}} {{ $pland->customerrental->custr_contract_no}}</h3>
                                     <h3 class="ml-1"></h3>
                                 </div>
                                 <div class="flex">
                                     <button wire:click.stop="exportPdf({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
-                                        Export Tag
+                                        Export
                                     </button>
                                 </div>
                                 
@@ -114,6 +114,10 @@
                 @endforeach
                    
                 </div>
+                <div class="m-3">
+                    {{ $invoices->links() }}
+                </div>
+                 
             </div>
 
 
@@ -194,7 +198,13 @@
                     <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
                 </div> 
-               
+                <div class="w-48 ml-5">
+                    <label for="duedate" class="text-xs">Due Date</label>
+                    <input id="duedate" wire:model="dueDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    @error('dueDate') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
             </div>
         </div> 
         <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
@@ -221,49 +231,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- @foreach ($itemDetails as $rowIndex => $row) --}}
-                        {{-- <tr>
-                            <td class="px-6" >
-                                @error('itemDetails.' . $rowIndex . '.customer') 
-                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
-                                @enderror 
-                            </td>
-                            <td class="px-6" >
-                                @error('itemDetails.' . $rowIndex . '.issue') 
-                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
-                                @enderror 
-                            </td>
-                            <td class="px-6" >
-                                @error('itemDetails.' . $rowIndex . '.po') 
-                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
-                                @enderror 
-                            </td>
-                            <td class="px-6" >
-                                @error('itemDetails.' . $rowIndex . '.pr') 
-                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
-                                @enderror 
-                            </td>
-                            <td class="px-6" >
-                                @error('itemDetails.' . $rowIndex . '.outpart') 
-                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
-                                @enderror 
-                            </td>
-                            <td class="px-6" >
-                                @error('itemDetails.' . $rowIndex . '.quantity') 
-                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
-                                @enderror 
-                            </td>
-                            <td class="px-6" >
-                                @error('itemDetails.' . $rowIndex . '.body') 
-                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
-                                @enderror 
-                            </td>
-                            <td class="px-6" >
-                                @error('itemDetails.' . $rowIndex . '.ship_to') 
-                                    <span class="text-red-500 text-xs">{{ $message }}</span> 
-                                @enderror 
-                            </td>
-                        </tr> --}}
                         @foreach ($invoiceDetails as $index => $row)
                             <tr class="bg-white border-b hover:bg-gray-50">
                                     <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
