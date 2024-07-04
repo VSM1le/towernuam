@@ -139,7 +139,7 @@ class Invoice extends Component
             ,'remark'=>''];
             $check = false;
         }
-        if($product_service->ps_code == '1030'){
+        if($product_service->ps_code == '1020'){
             $amt = $customer_rent->custr_area_sqm * $customer_rent->custr_service_fee;
             $vatamt = ($amt * $product_service->ps_vat)/100;
             $whamt = ($amt * $wh_tax)/100;
