@@ -8,6 +8,7 @@ use App\Models\InvoiceDetail;
 use App\Models\InvoiceHeader;
 use App\Models\ProductService;
 use App\Models\PsGroup;
+use App\Services\numberToBath;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Dompdf\Options;
@@ -48,6 +49,9 @@ class Invoice extends Component
 
     public function updateInvoiceDetail($index, $field, $value)
     {
+        if($this->invoiceDetails[$index][$field] == null){
+            $this->invoiceDetails[$index][$field] = 0;
+        }
         if (isset($this->invoiceDetails[$index]) && $this->invoiceDetails[$index]['amt'] != null) {
             $this->invoiceDetails[$index][$field] = $value;
 
@@ -66,9 +70,6 @@ class Invoice extends Component
                 $this->invoiceDetails[$index]['netamt'] = $netamt;
             }
         }
-        else{
-            $this->invoiceDetails[$index]['amt'] = 0;    
-        }
     }
 
 
@@ -85,6 +86,42 @@ class Invoice extends Component
     #[Computed()]
     public function productservices(){
         return ProductService::all();
+    }
+
+    public function numberToThai($number){
+        $thaiNumbers = [
+        '0' => 'ศูนย์', '1' => 'หนึ่ง', '2' => 'สอง', '3' => 'สาม', '4' => 'สี่',
+        '5' => 'ห้า', '6' => 'หก', '7' => 'เจ็ด', '8' => 'แปด', '9' => 'เก้า'
+    ];
+
+    $thaiUnits = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+    
+    $integerPart = floor($number);
+    $decimalPart = explode('.', number_format($number, 2))[1];
+
+    $result = '';
+
+    $intDigits = str_split(strrev((string)$integerPart));
+    foreach ($intDigits as $position => $digit) {
+        $unit = $thaiUnits[$position % count($thaiUnits)];
+        if ($position == 0 && $digit == '1' && $position > 0) {
+            $result = $unit . $result;
+        } elseif ($position == 1 && $digit == '1') {
+            $result = 'สิบ' . $result;
+        } elseif ($position == 1 && $digit == '2') {
+            $result = 'ยี่สิบ' . $result;
+        } else {
+            $result = $thaiNumbers[$digit] . $unit . $result;
+        }
+    }
+
+    $result .= 'จุด';
+    $decimalDigits = str_split($decimalPart);
+    foreach ($decimalDigits as $digit) {
+        $result .= $thaiNumbers[$digit];
+    }
+
+    return $result; 
     }
 
     public function addline(){
@@ -174,7 +211,7 @@ class Invoice extends Component
             'service' => ['required'],  
         ]);
         $prefix = 'I'.$this->tower.'S';
-        $year = Carbon::now()->year + 543;
+        $year = Carbon::now()->year;
         $datePart = substr($year,-2) . Carbon::now()->format('m');
 
         $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
@@ -216,6 +253,7 @@ class Invoice extends Component
                 'updated_by' => auth()->id(),
             ]);
         }
+        $this->closeCreateInvoice();
         
     }
 
@@ -230,11 +268,14 @@ class Invoice extends Component
     }
 
     public function exportPdf($id){
+        $number = new numberToBath;
+        
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
-        $invoice = InvoiceHeader::where('id',$id)->with('invoicedetail')->first();
-        $pdf = Pdf::loadView('invoicepdf.invoice3',['Invoices' => $invoice]);
+        $invoice = InvoiceHeader::where('id',$id)->with(['invoicedetail','customerrental','customer'])->first();
+        $bath = $number->baht_text($invoice->invoicedetail->sum('invd_net_amt'));
+        $pdf = Pdf::loadView('invoicepdf.invoice3',['Invoices' => $invoice,'bath' => $bath]);
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
         }, 'aaa.pdf');

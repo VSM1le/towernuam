@@ -18,9 +18,14 @@ class InvoiceHeader extends Model
         return $this->hasMany(InvoiceDetail::class, 'invoice_header_id', 'id');
     }
     public function customerrental(): BelongsTo{
-        return $this->belongsTo(CustomerRental::class);
+        return $this->belongsTo(CustomerRental::class,'customer_rental_id');
     }
     public function psgroup():BelongsTo{
-        return $this->belongsTo(PsGroup::class);
+        return $this->belongsTo(PsGroup::class,'ps_group_id');
     }
+
+    public function customer():BelongsTo{
+        return $this->belongsTo(Customer::class,'customer_id');
+    }
+    
 }

@@ -400,5 +400,65 @@
             </div>
         </div>
     </div>
+    <table class="details-table">
+            <tr>
+                <td>
+                    <p>ชำระโดย</p>
+                    <p>Payment of</p>
+                </td>
+                <td>
+                    <input type="checkbox">
+                    <p>เงินสด</p>
+                    <p>Cash</p>
+                </td>
+                <td>
+                    <input type="checkbox">
+                    <p>เช็คธนาคาร</p>
+                    <p>Cheque of Bank</p>
+                </td>
+                <td>
+                    <input type="checkbox">
+                    <p>เช็คธนาคาร</p>
+                    <p>Cheque No.</p>
+                </td>
+            </tr>
+        </table>
+        <table class="details-table">
+            <tr>
+                <td>
+                    <p>บาท(Baht) :</p>
+                    <p>หมายเหตุ (Remark) :</p>
+                    <p>฿23,232,323</p>
+                </td>
+                <td class="signature-cell">
+                    <p>ในนาม</p>
+                    <p>For</p>
+                    <table class="signature-grid">
+                        <tbody>
+                            <tr>
+                                <td class="signature-cell"> </td>
+                            </tr>
+                            <tr>
+                                <td class="signature-cell">วันที่</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="signature-cell">
+                    <p>ผู้รับเงิน</p>
+                    <p>Receiver</p>
+                    <table class="signature-grid">
+                        <tbody>
+                            <tr>
+                                <td class="signature-cell"> </td>
+                            </tr>
+                            <tr>
+                                <td class="signature-cell">วันที่</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
 </body>
 </html>
