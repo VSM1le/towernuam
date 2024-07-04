@@ -32,6 +32,20 @@ class Invoice extends Component
     public $tower = "A";
     public $showCreateInvoice = false;
 
+
+
+    public $showEditInvoice = false;
+
+    public $editInvoices = null;
+    public $editInvoiceDetails = [];
+    public $editPsGroup = null;
+    public $editInvoiceDate = null;
+    public $editDueDate = null;
+    public $editCustomerCode = null;
+    public $editRental = null;
+    public $deleteItem;
+    public $editcustomerrents = [];
+
     private function sanitizeNumericValue($value)
     {
         $sanitizedValue = preg_replace('/[^-?\d.]/', '', $value);
@@ -186,7 +200,7 @@ class Invoice extends Component
         ]);
         $prefix = 'I'.$this->tower.'S';
         $year = Carbon::now()->year;
-        $datePart = substr($year,-2) . Carbon::now()->format('m');
+        $datePart = substr($year,-2) . Carbon::parse($this->invoiceDate)->format('m');
 
         $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
 
@@ -222,14 +236,14 @@ class Invoice extends Component
                 'invd_wh_tax_percent' => $detail['whvat'],
                 'invd_wh_tax_amt' => $detail['whtaxamt'],
                 'invd_net_amt' => $detail['netamt'],
-                'invd_net_remark' => $detail['remark'],
+                'invd_remake' => $detail['remark'],
                 'invd_receipt_flag' => "No",
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
             ]);
         }
         $this->closeCreateInvoice();
-        
+        return redirect()->route('dashboard');
     }
 
     public function openCreateInvoice(){
@@ -241,6 +255,225 @@ class Invoice extends Component
         $this->reset(['psGroup','customerName','customerCode','customerrents','rental','service','invoiceDate','invoiceDetails']);
         $this->resetValidation();
     }
+
+    public function updatedEditCustomerCode()
+    {
+        $this->editRental = null; // Clear dependent data
+    
+        if (!is_null($this->editCustomerCode)) {
+            $this->editcustomerrents = CustomerRental::where('customer_id', $this->editCustomerCode)->get();
+        } else {
+            $this->editcustomerrents = []; // Ensure the variable is an empty array or null as needed
+        }
+    }
+
+    public function openEditInvoice($id)
+    {
+        $this->editInvoices = InvoiceHeader::with('invoicedetail')->where('id', $id)->first();
+        if ($this->editInvoices) {
+            $this->editPsGroup = $this->editInvoices->ps_group_id;
+            $this->editInvoiceDate = $this->editInvoices->inv_date;
+            $this->editCustomerCode = $this->editInvoices->customer_id;
+            $this->editcustomerrents = CustomerRental::where('customer_id', $this->editCustomerCode)->get();
+            $this->editRental = $this->editInvoices->customer_rental_id;
+            $this->editDueDate = $this->editInvoices->invd_duedate;
+            foreach ($this->editInvoices->invoicedetail as $invoice) {
+                $this->editInvoiceDetails[] = [
+                    'id' => $invoice->id,
+                    'pscode' => $invoice->invd_product_code,
+                    'psname' => $invoice->invd_product_name,
+                    'period' => $invoice->invd_period,
+                    'amt' => $invoice->invd_amt,
+                    'vat' => $invoice->invd_vat_percent,
+                    'vatamt' => $invoice->invd_vat_amt,
+                    'whvat' => $invoice->invd_wh_tax_percent,
+                    'whtaxamt' => $invoice->invd_wh_tax_amt,
+                    'netamt' => $invoice->invd_net_amt,
+                    'remark' => $invoice->invd_remark,
+                ];
+            }
+            $this->showEditInvoice = true;
+        }
+    }
+
+     public function editRemove($index)
+    {
+        $deleteId = $this->editInvoiceDetails[$index]['id']; 
+        if(!empty($deleteId)){
+        $this->deleteItem[] = ['id'=>$deleteId];
+        }
+        unset($this->editItemDetails[$index]);
+        $this->editInvoiceDetails = array_values($this->editItemDetails);
+    }
+
+    public function editAdd(){
+        $this->validate([
+            'editInvoiceDate' => ['required'],
+            'editRental' => ['required'],
+            'editCustomerCode'  => ['required'],
+            'service' => ['required'],
+            'editPsGroup' => ['required'],
+            'editDueDate' => ['required'],
+       ]); 
+        $check = True;
+        $customer_rent= CustomerRental::where('customer_id',$this->editCustomerCode)->where('id',$this->editRental)->with('customer')->first();
+        $product_service = ProductService::where('id',$this->service)->first();
+        $ps_group = PsGroup::where('id',$this->editPsGroup)->first();
+        $wh_tax = $product_service->ps_whtax;
+        if($ps_group->begin_date == '1' && $ps_group->end_date == '31'){
+
+            $carbon_date = Carbon::parse($this->editInvoiceDate);
+
+            $start = $carbon_date->copy()->addMonth()->startOfMonth()->format('d/m/Y');
+            $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
+            $period = $start . " - " . $end;
+        }
+        else{
+            $carbon_date = Carbon::parse($this->editInvoiceDate);
+            $period = $carbon_date->copy()->day($ps_group->begin_date)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day($ps_group->end_date)->format('d/m/Y');
+        }
+        
+       if($customer_rent->customer->cust_gov_flag == 1){
+            $wh_tax = $product_service->gov_whtax;
+       } 
+        
+        if($product_service->ps_code == "1001" || $product_service->ps_code == "1010"){
+            $amt = $customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm;
+            $vatamt = ($amt * $product_service->ps_vat)/100;
+            $whamt = ($amt * $wh_tax)/100;
+            $this->editInvoiceDetails[] = 
+            [
+            'id' => null,
+            'pscode'=> $product_service->ps_code
+            ,'psname' => $product_service->ps_name_th
+            ,'period' => $period ?? 0
+            ,'amt'=>$amt
+            ,'vat'=>$product_service->ps_vat
+            ,'vatamt'=>$vatamt
+            ,'whvat'=>$wh_tax
+            ,'whtaxamt' => $whamt 
+            ,'netamt'=>$amt + $vatamt - $whamt
+            ,'remark'=>''];
+            $check = false;
+        }
+        if($product_service->ps_code == '1020'){
+            $amt = $customer_rent->custr_area_sqm * $customer_rent->custr_service_fee;
+            $vatamt = ($amt * $product_service->ps_vat)/100;
+            $whamt = ($amt * $wh_tax)/100;
+            $this->editInvoiceDetails[] = 
+            [
+            'id' => null,
+            'pscode'=> $product_service->ps_code
+            ,'psname' => $product_service->ps_name_th
+            ,'period' => $period
+            ,'amt'=>$amt
+            ,'vat'=>$product_service->ps_vat
+            ,'vatamt'=>$vatamt
+            ,'whvat'=>$wh_tax
+            ,'whtaxamt' => $whamt 
+            ,'netamt'=>$amt + $vatamt - $whamt
+            ,'remark'=>''];
+            $check = false;
+        }
+        if($check){
+             $this->editInvoiceDetails[] = 
+            [
+            'id' => null,    
+            'pscode'=> $product_service->ps_code
+            ,'psname' => $product_service->ps_name_th
+            ,'period' => $period
+            ,'amt'=> 0
+            ,'vat'=> 0
+            ,'vatamt'=> 0
+             ,'whvat'=> 0
+            ,'whtaxamt' => 0
+            ,'netamt'=> 0
+            ,'remark'=>''];
+        }
+    }
+
+    
+
+    public function editRemoveDetail($index){
+       unset($this->editInvoiceDetails[$index]);
+       $this->editInvoiceDetails = array_values($this->editInvoiceDetails);
+    }
+
+    public function editInvoice()
+{
+    $this->validate([
+        'editInvoiceDate' => ['required'],
+        'editRental' => ['required'],
+        'editCustomerCode'  => ['required'],
+        'editPsGroup' => ['required'],
+        'editDueDate' => ['required'],
+    ]); 
+
+    // Update InvoiceHeader
+    $header = InvoiceHeader::find($this->editInvoices->id); // Fetch the InvoiceHeader instance
+
+    if (!$header) {
+        // Handle case where InvoiceHeader is not found
+        return;
+    }
+
+    $header->update([
+        'customer_id' => $this->editCustomerCode,
+        'customer_rental_id' => $this->editRental,
+        'inv_date' => $this->editInvoiceDate,
+        'invd_duedate' => $this->editDueDate,
+        'ps_group_id' => $this->editPsGroup,
+        'updated_by' => auth()->id(),
+    ]);
+
+    // Collect existing InvoiceDetail IDs
+    $existingDetailIds = collect($this->editInvoiceDetails)->pluck('id')->filter();
+
+    // Delete InvoiceDetails that are not in the updated list
+    InvoiceDetail::where('invoice_header_id', $header->id)
+        ->whereNotIn('id', $existingDetailIds->toArray())
+        ->delete();
+
+    // Update or Create InvoiceDetails
+    foreach ($this->editInvoiceDetails as $detail) {
+        if (isset($detail['id'])) {
+            // Update existing InvoiceDetail
+            InvoiceDetail::where('id', $detail['id'])->update([
+                'invd_product_code' => $detail['pscode'],
+                'invd_product_name' => $detail['psname'],
+                'invd_period' => $detail['period'],
+                'invd_amt' => $detail['amt'],
+                'invd_vat_percent' => $detail['vat'],
+                'invd_vat_amt' => $detail['vatamt'],
+                'invd_wh_tax_percent' => $detail['whvat'],
+                'invd_wh_tax_amt' => $detail['whtaxamt'],
+                'invd_net_amt' => $detail['netamt'],
+                'invd_remake' => $detail['remark'],
+                'invd_receipt_flag' => 'No',
+                'updated_by' => auth()->id(),
+            ]);
+        } else {
+            // Create new InvoiceDetail with invoice_header_id
+            $newDetail = new InvoiceDetail([
+                'invoice_header_id' => $header->id,
+                'invd_product_code' => $detail['pscode'],
+                'invd_product_name' => $detail['psname'],
+                'invd_period' => $detail['period'],
+                'invd_amt' => $detail['amt'],
+                'invd_vat_percent' => $detail['vat'],
+                'invd_vat_amt' => $detail['vatamt'],
+                'invd_wh_tax_percent' => $detail['whvat'],
+                'invd_wh_tax_amt' => $detail['whtaxamt'],
+                'invd_net_amt' => $detail['netamt'],
+                'invd_remake' => $detail['remark'],
+                'invd_receipt_flag' => 'No',
+                'created_by' => auth()->id(),
+                'updated_by' => auth()->id(),
+            ]);
+            $header->invoicedetail()->save($newDetail); // Save the new detail with relationship
+        }
+    }
+}
 
     public function exportPdf($id){
         $number = new numberToBath;
