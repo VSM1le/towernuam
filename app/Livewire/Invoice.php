@@ -46,6 +46,9 @@ class Invoice extends Component
     public $deleteItem;
     public $editcustomerrents = [];
 
+    public $startDate;
+    public $endDate;
+    public $customer;
     private function sanitizeNumericValue($value)
     {
         $sanitizedValue = preg_replace('/[^-?\d.]/', '', $value);
@@ -84,7 +87,8 @@ class Invoice extends Component
 
                 $this->invoiceDetails[$index]['vatamt'] = $vatamt;
                 $this->invoiceDetails[$index]['whtaxamt'] = $whtaxamt;
-                $this->invoiceDetails[$index]['netamt'] = $netamt;
+                dump($netamt);
+                $this->invoiceDetails[$index]['netamt'] = round($netamt, 2); 
             }
         }
     }
@@ -140,6 +144,7 @@ class Invoice extends Component
             $amt = $customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm;
             $vatamt = ($amt * $product_service->ps_vat)/100;
             $whamt = ($amt * $wh_tax)/100;
+            $netamt = $amt + $vatamt - $whamt;
             $this->invoiceDetails[] = 
             ['pscode'=> $product_service->ps_code
             ,'psname' => $product_service->ps_name_th
@@ -149,7 +154,7 @@ class Invoice extends Component
             ,'vatamt'=>$vatamt
             ,'whvat'=>$wh_tax
             ,'whtaxamt' => $whamt 
-            ,'netamt'=>$amt + $vatamt - $whamt
+            ,'netamt'=>number_format((float)$netamt, 2, '.', '') 
             ,'remark'=>''];
             $check = false;
         }
@@ -157,6 +162,7 @@ class Invoice extends Component
             $amt = $customer_rent->custr_area_sqm * $customer_rent->custr_service_fee;
             $vatamt = ($amt * $product_service->ps_vat)/100;
             $whamt = ($amt * $wh_tax)/100;
+            $netamt = $amt + $vatamt - $whamt;
             $this->invoiceDetails[] = 
             ['pscode'=> $product_service->ps_code
             ,'psname' => $product_service->ps_name_th
@@ -166,7 +172,7 @@ class Invoice extends Component
             ,'vatamt'=>$vatamt
             ,'whvat'=>$wh_tax
             ,'whtaxamt' => $whamt 
-            ,'netamt'=>$amt + $vatamt - $whamt
+            ,'netamt'=> number_format((float)$netamt, 2, '.', '') 
             ,'remark'=>''];
             $check = false;
         }
@@ -254,6 +260,7 @@ class Invoice extends Component
         $this->showCreateInvoice = false;
         $this->reset(['psGroup','customerName','customerCode','customerrents','rental','service','invoiceDate','invoiceDetails']);
         $this->resetValidation();
+       
     }
 
     public function updatedEditCustomerCode()
@@ -264,6 +271,30 @@ class Invoice extends Component
             $this->editcustomerrents = CustomerRental::where('customer_id', $this->editCustomerCode)->get();
         } else {
             $this->editcustomerrents = []; // Ensure the variable is an empty array or null as needed
+        }
+    }
+     public function updateEditInvoiceDetail($index, $field, $value)
+    {
+        if($this->editInvoiceDetails[$index][$field] == null){
+            $this->editInvoiceDetails[$index][$field] = 0;
+        }
+        if (isset($this->editInvoiceDetails[$index]) && $this->editInvoiceDetails[$index]['amt'] != null) {
+            $this->editInvoiceDetails[$index][$field] = $value;
+
+            // Recalculate vatamt if amt or vat field is updated
+            if ($field == 'amt' || $field == 'vat' || $field == 'whvat') {
+                $amt = $this->editInvoiceDetails[$index]['amt'] ?? 0;
+                $vat = $this->sanitizeNumericValue($this->editInvoiceDetails[$index]['vat'] ?? 0); // Sanitize vat value
+                $whvat = $this->sanitizeNumericValue($this->editInvoiceDetails[$index]['whvat'] ?? 0); // Sanitize whvat value
+
+                $vatamt = ($amt * $vat) / 100 ?? 0;
+                $whtaxamt = ($amt * $whvat) / 100 ?? 0;
+                $netamt = $vatamt - $whtaxamt + $amt;
+
+                $this->editInvoiceDetails[$index]['vatamt'] = $vatamt;
+                $this->editInvoiceDetails[$index]['whtaxamt'] = $whtaxamt;
+                $this->editInvoiceDetails[$index]['netamt'] = $netamt;
+            }
         }
     }
 
@@ -341,6 +372,7 @@ class Invoice extends Component
             $amt = $customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm;
             $vatamt = ($amt * $product_service->ps_vat)/100;
             $whamt = ($amt * $wh_tax)/100;
+            $netamt =$amt + $vatamt - $whamt;
             $this->editInvoiceDetails[] = 
             [
             'id' => null,
@@ -352,7 +384,7 @@ class Invoice extends Component
             ,'vatamt'=>$vatamt
             ,'whvat'=>$wh_tax
             ,'whtaxamt' => $whamt 
-            ,'netamt'=>$amt + $vatamt - $whamt
+            ,'netamt'=> number_format((float)$netamt, 2, '.', '')  
             ,'remark'=>''];
             $check = false;
         }
@@ -360,6 +392,7 @@ class Invoice extends Component
             $amt = $customer_rent->custr_area_sqm * $customer_rent->custr_service_fee;
             $vatamt = ($amt * $product_service->ps_vat)/100;
             $whamt = ($amt * $wh_tax)/100;
+            $netamt =$amt + $vatamt - $whamt;
             $this->editInvoiceDetails[] = 
             [
             'id' => null,
@@ -371,7 +404,7 @@ class Invoice extends Component
             ,'vatamt'=>$vatamt
             ,'whvat'=>$wh_tax
             ,'whtaxamt' => $whamt 
-            ,'netamt'=>$amt + $vatamt - $whamt
+            ,'netamt'=>number_format((float)$netamt, 2, '.', '')   
             ,'remark'=>''];
             $check = false;
         }
@@ -473,6 +506,14 @@ class Invoice extends Component
             $header->invoicedetail()->save($newDetail); // Save the new detail with relationship
         }
     }
+    $this->closeEditModal();
+    
+}
+public function closeEditModal(){
+     $this->showEditInvoice = false;
+        $this->reset(['editPsGroup','editCustomerCode','editcustomerrents','editRental','editInvoiceDate','editInvoiceDetails']);
+        $this->resetValidation();
+        return redirect()->route('dashboard');
 }
 
     public function exportPdf($id){
@@ -483,16 +524,42 @@ class Invoice extends Component
         $options->set('isRemoteEnabled', true);
         $invoice = InvoiceHeader::where('id',$id)->with(['invoicedetail','customerrental','customer'])->first();
         $bath = $number->baht_text($invoice->invoicedetail->sum('invd_net_amt'));
-        $pdf = Pdf::loadView('invoicepdf.invoice3',['Invoices' => $invoice,'bath' => $bath]);
-        return response()->streamDownload(function () use ($pdf) {
+        $html1 = view('invoicepdf.invoice4', ['Invoices' => $invoice, 'bath' => $bath])->render();
+        $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
+        
+        // Combine the HTML and add a page break
+        $combinedHtml = $html1 . $html2;
+        $pdf = PDF::loadHTML($combinedHtml);
+       return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
-        }, ($invoice->inv_no).'.pdf');
-    }
+        }, $invoice->inv_no . '.pdf'); 
+    } 
+    
 
     
     public function render()
     {
-        $invoices = InvoiceHeader::with(['invoicedetail','customer'])->orderBy('id','desc')->paginate(10);
+        $invoices = InvoiceHeader::with(['invoicedetail', 'customer'])
+        ->when($this->startDate && $this->endDate, function ($query) {
+            $query->whereBetween('inv_date', [$this->startDate, $this->endDate]);
+        })
+        ->when($this->customer != "" ,function ($query){
+            $query->where('customer_id',$this->customer);
+        })
+        ->orderBy('id', 'desc')
+        ->paginate(10);
+
+        // if ($this->startDate && $this->endDate) {
+        //     $startDate = Carbon::parse($this->startDate)->startOfDay();
+        //     $endDate = Carbon::parse($this->endDate)->endOfDay();
+
+        //     $query->whereBetween('inv_date', [$startDate, $endDate]);
+        // }
+        // if ($this->customer){
+        //     $query->where('customer_id',$this->customer);
+        // }
+
+        // $invoices = $query
         return view('livewire.invoice',compact('invoices'));
     }
 }

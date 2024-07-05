@@ -62,7 +62,7 @@
         }
         .invoice-details {
             text-align: center;
-            margin: 5px 0;
+            margin: 1px 0;
         }
         .content-table {
             width: 100%;
@@ -140,9 +140,9 @@
             </tr>
         </table>
         <div class="invoice-details">
-            <p style="margin: 0px;font-size:18px"><strong>ใบแจ้งหนี้</strong></p>
-            <p style="margin: 0px;font-size:18px"><strong>COPY INVOICE</strong></p>
-            <p style="margin: 0px;font-size:18px"><strong>(สำเนา)</strong></p>
+            <p style="margin: 0px;font-size:18px;padding:0px"><strong>ใบแจ้งหนี้</strong></p>
+            <p style="margin: 0px;font-size:18px;padding:0px"><strong>ORIGINAL INVOICE</strong></p>
+            <p style="margin: 0px;font-size:18px;padding:0px"><strong>(ต้นฉบับ)</strong></p>
         </div>
         <table style="width:100%; border: 1px solid #000; border-collapse: collapse;">
             <tbody>
