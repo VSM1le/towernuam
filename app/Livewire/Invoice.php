@@ -87,8 +87,7 @@ class Invoice extends Component
 
                 $this->invoiceDetails[$index]['vatamt'] = $vatamt;
                 $this->invoiceDetails[$index]['whtaxamt'] = $whtaxamt;
-                dump($netamt);
-                $this->invoiceDetails[$index]['netamt'] = round($netamt, 2); 
+                $this->invoiceDetails[$index]['netamt'] = number_format($netamt, 2,'.',''); 
             }
         }
     }
@@ -182,9 +181,9 @@ class Invoice extends Component
             ,'psname' => $product_service->ps_name_th
             ,'period' => $period
             ,'amt'=> 0
-            ,'vat'=> 0
+            ,'vat'=> $product_service->ps_vat 
             ,'vatamt'=> 0
-             ,'whvat'=> 0
+             ,'whvat'=>$wh_tax 
             ,'whtaxamt' => 0
             ,'netamt'=> 0
             ,'remark'=>''];
@@ -291,9 +290,9 @@ class Invoice extends Component
                 $whtaxamt = ($amt * $whvat) / 100 ?? 0;
                 $netamt = $vatamt - $whtaxamt + $amt;
 
-                $this->editInvoiceDetails[$index]['vatamt'] = $vatamt;
-                $this->editInvoiceDetails[$index]['whtaxamt'] = $whtaxamt;
-                $this->editInvoiceDetails[$index]['netamt'] = $netamt;
+                $this->editInvoiceDetails[$index]['vatamt'] = number_format($vatamt,2,'.','');
+                $this->editInvoiceDetails[$index]['whtaxamt'] = number_format($whtaxamt,2,'.','');
+                $this->editInvoiceDetails[$index]['netamt'] = number_format($netamt,2,'.','');
             }
         }
     }
@@ -416,9 +415,9 @@ class Invoice extends Component
             ,'psname' => $product_service->ps_name_th
             ,'period' => $period
             ,'amt'=> 0
-            ,'vat'=> 0
+            ,'vat'=> $product_service->ps_vat 
             ,'vatamt'=> 0
-             ,'whvat'=> 0
+             ,'whvat'=>$wh_tax 
             ,'whtaxamt' => 0
             ,'netamt'=> 0
             ,'remark'=>''];

@@ -155,7 +155,7 @@
 
                     <td style="height: 2px; border:1px solid #000; margin:0px; vertical-align:top">
                         <p style="font-size: 17px">วันที่</p>
-                        <p style="font-size: 17px">Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->inv_date }}</p>
+                        <p style="font-size: 17px">Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ \Carbon\Carbon::parse($Invoices->inv_date)->format('d/m/Y') }}</p>
                     </td>
                 </tr>
                 <tr>
@@ -181,7 +181,7 @@
                     </td>
                     <td style="vertical-align:top; width: 40%; border:1px solid #000; margin:0px;">
                         <p style="font-size: 17px">กำหนดชำระภายในวันที่</p>
-                       <p style="font-size: 17px;">DUE DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{$Invoices->invd_duedate}}</p> 
+                       <p style="font-size: 17px;">DUE DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{\Carbon\Carbon::parse($Invoices->inv_duedate)->format('d/m/Y')}}</p> 
                     </td>
                 </tr>
             </tbody>
