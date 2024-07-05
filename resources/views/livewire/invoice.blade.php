@@ -270,9 +270,9 @@
                                         <input wire:model="invoiceDetails.{{ $index }}.amt" 
                                         wire:change="updateInvoiceDetail({{ $index }}, 'amt', $event.target.value)" 
                                         type="number" 
+                                        step="0.01" 
                                         class="w-full p-2 border border-gray-300 text-xs rounded" 
                                          />
-
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.vat" 

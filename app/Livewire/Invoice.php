@@ -85,8 +85,8 @@ class Invoice extends Component
                 $whtaxamt = ($amt * $whvat) / 100 ?? 0;
                 $netamt = $vatamt - $whtaxamt + $amt;
 
-                $this->invoiceDetails[$index]['vatamt'] = $vatamt;
-                $this->invoiceDetails[$index]['whtaxamt'] = $whtaxamt;
+                $this->invoiceDetails[$index]['vatamt'] = number_format($vatamt,2,'.','');
+                $this->invoiceDetails[$index]['whtaxamt'] = number_format($whtaxamt,2,'.'.'');
                 $this->invoiceDetails[$index]['netamt'] = number_format($netamt, 2,'.',''); 
             }
         }
@@ -130,6 +130,10 @@ class Invoice extends Component
             $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
             $period = $start . " - " . $end;
         }
+        // elseif($ps_group->begin_date == '8' && $ps_group->end_date == '7'){
+        //     $carbon_date = Carbon::parse($this->invoiceDate)
+        //     $start = $carbon_date->copy()->subMonth()->setDay()->format('d/m/Y');
+        // }
         else{
             $carbon_date = Carbon::parse($this->invoiceDate);
             $period = $carbon_date->copy()->day($ps_group->begin_date)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day($ps_group->end_date)->format('d/m/Y');
@@ -150,9 +154,9 @@ class Invoice extends Component
             ,'period' => $period ?? 0
             ,'amt'=>$amt
             ,'vat'=>$product_service->ps_vat
-            ,'vatamt'=>$vatamt
+            ,'vatamt'=>number_format((float)$vatamt,2,'.','')
             ,'whvat'=>$wh_tax
-            ,'whtaxamt' => $whamt 
+            ,'whtaxamt' => number_format((float)$whamt,2,'.','') 
             ,'netamt'=>number_format((float)$netamt, 2, '.', '') 
             ,'remark'=>''];
             $check = false;
@@ -168,9 +172,9 @@ class Invoice extends Component
             ,'period' => $period
             ,'amt'=>$amt
             ,'vat'=>$product_service->ps_vat
-            ,'vatamt'=>$vatamt
+            ,'vatamt'=>number_format((float)$vatamt,2,'.','')
             ,'whvat'=>$wh_tax
-            ,'whtaxamt' => $whamt 
+            ,'whtaxamt' => number_format((float)$whamt,2,'.','') 
             ,'netamt'=> number_format((float)$netamt, 2, '.', '') 
             ,'remark'=>''];
             $check = false;
@@ -401,8 +405,8 @@ class Invoice extends Component
             ,'amt'=>$amt
             ,'vat'=>$product_service->ps_vat
             ,'vatamt'=>$vatamt
-            ,'whvat'=>$wh_tax
-            ,'whtaxamt' => $whamt 
+            ,'whvat'=>number_format((float)$wh_tax,2,'.'.'')
+            ,'whtaxamt' => number_format((float)$whamt,2,'.','') 
             ,'netamt'=>number_format((float)$netamt, 2, '.', '')   
             ,'remark'=>''];
             $check = false;
