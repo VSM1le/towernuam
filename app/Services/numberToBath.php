@@ -91,4 +91,86 @@ class numberToBath
     
         return $text;
     }
+    function numberToWords($number) {
+        $units = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+        $teens = ['eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+        $tens = ['', 'ten', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+        $thousands = ['', 'thousand', 'million', 'billion'];
+    
+        if ($number == 0) {
+            return 'zero';
+        }
+    
+        // Format the number to always have two decimal places
+        $number = number_format($number, 2, '.', '');
+    
+        $numberParts = explode('.', strval($number));
+        $integerPart = intval($numberParts[0]);
+        $fractionalPart = intval($numberParts[1]);
+    
+        $integerStr = strval($integerPart);
+        $length = strlen($integerStr);
+        $parts = [];
+        $chunkCount = ceil($length / 3);
+    
+        for ($i = 0; $i < $chunkCount; $i++) {
+            $chunk = substr($integerStr, -3);
+            $integerStr = substr($integerStr, 0, -3);
+            array_unshift($parts, $chunk);
+        }
+    
+        $words = [];
+    
+        foreach ($parts as $index => $chunk) {
+            $chunk = str_pad($chunk, 3, '0', STR_PAD_LEFT);
+            $hundredsDigit = (int)$chunk[0];
+            $tensDigit = (int)$chunk[1];
+            $unitsDigit = (int)$chunk[2];
+    
+            $chunkWords = [];
+    
+            if ($hundredsDigit > 0) {
+                $chunkWords[] = $units[$hundredsDigit] . ' hundred';
+            }
+    
+            if ($tensDigit > 1) {
+                $chunkWords[] = $tens[$tensDigit];
+                if ($unitsDigit > 0) {
+                    $chunkWords[] = $units[$unitsDigit];
+                }
+            } elseif ($tensDigit == 1) {
+                if ($unitsDigit > 0) {
+                    $chunkWords[] = $teens[$unitsDigit - 1];
+                } else {
+                    $chunkWords[] = 'ten';
+                }
+            } else {
+                if ($unitsDigit > 0) {
+                    $chunkWords[] = $units[$unitsDigit];
+                }
+            }
+    
+            if (!empty($chunkWords) && !empty($thousands[$chunkCount - $index - 1])) {
+                $chunkWords[] = $thousands[$chunkCount - $index - 1];
+            }
+    
+            $words = array_merge($words, $chunkWords);
+        }
+    
+        $integerWords = implode(' ', $words);
+    
+        $fractionalWords = '';
+        if ($fractionalPart > 0) {
+            $tensPart = (int)($fractionalPart / 10);
+            $unitsPart = $fractionalPart % 10;
+            
+            $fractionalWords = $tens[$tensPart];
+            if ($unitsPart > 0) {
+                $fractionalWords .= ' ' . $units[$unitsPart];
+            }
+            $fractionalWords .= ' satang';
+        }
+    
+        return trim($integerWords) . ' baht' . ($fractionalWords ? ' ' . trim($fractionalWords) : '');
+    }
 }

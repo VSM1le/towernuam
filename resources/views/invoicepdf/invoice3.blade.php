@@ -55,7 +55,7 @@
             margin-left: 50px;
         }
         .company-details {
-            padding: 10px 20px;
+            padding: 10px 5px;
         }
         .company-details h2, .company-details h4, .company-details p {
             margin: 5px 0;
@@ -121,67 +121,67 @@
 </head>
 <body>
     <div class="invoice-container">
-        <table class="header">
+        <table class="header" style="padding-bottom:15px">
             <tr>
-                <td>
-                    <img src="{{ asset('/nuam.jpg') }}" alt="Company Logo">
+                <td style="vertical-align: top; ">
+                    <img style="margin-left:30px" src="{{ asset('/nuam.jpg') }}" alt="Company Logo">
                 </td>
-                <td class="company-details">
-                    <h2 style="margin: 0px">บริษัท นวม จำกัด</h2>
-                    <h4 style="margin: 0px">NUAM CO., LTD</h4>
-                    <p style="margin: 0px">185/2 ซอยสุขุมวิท 31 ถนนสุขุมวิท แขวงคลองตันเหนือ เขตวัฒนา กรุงเทพมหานคร</p>
-                    <p style="margin: 0px">185/2 Soi Sukhumvit 31 Rd. Nort Khlongton, Watthana, Bangkok, Thailand 10110</p>
-                    <p style="margin: 0px">Tel: 0-2264-2245-7 Fax: 0-2264-2248</p>
-                    <p style="margin: 0px">เลขประจำตัวผู้เสียภาษี 0105565185083&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;สำนักงานใหญ่(Head Office)</p>
+                <td class="company-details" style="vertical-align: top;">
+                    <p style="margin: 0px; font-weight: bold; font-size:24px;line-height:19px">บริษัท นวม จำกัด</p>
+                    <p style="margin: 0px; font-weight: bold; font-size:20px;line-height:10px;">NUAM CO., LTD</p>
+                    <p style="margin: -1px">185/2 ซอยสุขุมวิท 31 ถนนสุขุมวิท แขวงคลองตันเหนือ เขตวัฒนา กรุงเทพมหานคร</p>
+                    <p style="margin: -1px">185/2 Soi Sukhumvit 31 Rd. Nort Khlongton, Watthana, Bangkok, Thailand 10110</p>
+                    <p style="margin: -1px">Tel: 0-2264-2245-7 Fax: 0-2264-2248</p>
+                    <p style="margin: -1px">เลขประจำตัวผู้เสียภาษี 0105565185083&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;สำนักงานใหญ่(Head Office)</p>
                 </td>
                 <td class="blank-column">
                     <p><span class="page-number"></span></p>
                 </td>
             </tr>
         </table>
-        <div class="invoice-details">
-            <p style="margin: 0px;font-size:18px"><strong>ใบแจ้งหนี้</strong></p>
-            <p style="margin: 0px;font-size:18px"><strong>COPY INVOICE</strong></p>
-            <p style="margin: 0px;font-size:18px"><strong>(สำเนา)</strong></p>
+        <div class="invoice-details" style="padding-bottom: 8px">
+            <p style="margin: -5px;font-size:20px;line-height:10px;"><strong>ใบแจ้งหนี้</strong></p>
+            <p style="margin: -5px;font-size:20px;line-height:18px"><strong>COPY INVOICE</strong></p>
+            <p style="margin: -5px;font-size:20px;line-height:15px"><strong>(สำเนา)</strong></p>
         </div>
         <table style="width:100%; border: 1px solid #000; border-collapse: collapse;">
             <tbody>
                 <tr >
                     <td style="width:544px; vertical-align:top;">
-                    <p style="font-size: 17px">เลขที่สัญญา&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {{$Invoices->customerrental->custr_contract_no }}</p> 
-                    <p style="font-size: 17px; margin:0px">ชื่อลูกค้า&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->customer->cust_name_th }} </p>
+                    <p style="font-size: 18px; line-height:13px">เลขที่สัญญา&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {{$Invoices->customerrental->custr_contract_no }}<br>CONTRACT NO.</p> 
+                    <p style="font-size: 18px; margin:0px;line-height:13px">ชื่อลูกค้า&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->customer->cust_name_th }}<br>ACCOUNT NAME </p>
                     </td>
 
                     <td style="height: 2px; border:1px solid #000; margin:0px; vertical-align:top">
-                        <p style="font-size: 17px">วันที่</p>
-                        <p style="font-size: 17px">Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ \Carbon\Carbon::parse($Invoices->inv_date)->format('d/m/Y') }}</p>
+                        <p style="font-size: 18px">วันที่</p>
+                        <p style="font-size: 18px">Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ \Carbon\Carbon::parse($Invoices->inv_date)->format('d/m/Y') }}</p>
                     </td>
                 </tr>
                 <tr>
                     <td style="height:60px; vertical-align:top;">
-                    <p style="font-size: 17px">ที่อยู่&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                    <p style="font-size: 18px">ที่อยู่&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
                         {{
                         implode(" ", array_slice(explode(" ", $Invoices->customer->cust_address_th1), 0, 6))
                         }}</p>   
-                    <p style="font-size: 17px">Address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <p style="font-size: 18px">Address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         {{
                         implode(" ", array_slice(explode(" ", $Invoices->customer->cust_address_th1),6))
                         }}
                         </p>   
                     </td>
                     <td style="vertical-align:top;width: 40%; border:1px solid #000; margin:0px;">
-                        <p style="font-size: 17px">เลชที่ใบแจ้งหนี้</p>
-                        <p style="font-size: 17px">No.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->inv_no }}</p>
+                        <p style="font-size: 18px">เลชที่ใบแจ้งหนี้</p>
+                        <p style="font-size: 18px">No.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->inv_no }}</p>
                     </td>
                 </tr>
                 <tr>
-                    <td style="height: 60px; vertical-align:top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;{{ $Invoices->customer->cust_taxid }}&nbsp;
+                    <td style="height: 60px; vertical-align:top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;{{ $Invoices->customer->cust_taxid }}&nbsp;
                         {{ $Invoices->customer->cust_branch }}
                     </td>
                     <td style="vertical-align:top; width: 40%; border:1px solid #000; margin:0px;">
-                        <p style="font-size: 17px">กำหนดชำระภายในวันที่</p>
-                       <p style="font-size: 17px;">DUE DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{\Carbon\Carbon::parse($Invoices->invd_duedate)->format('d/m/Y')}}</p> 
+                        <p style="font-size: 18px">กำหนดชำระภายในวันที่</p>
+                       <p style="font-size: 18px;">DUE DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{\Carbon\Carbon::parse($Invoices->invd_duedate)->format('d/m/Y')}}</p> 
                     </td>
                 </tr>
             </tbody>
@@ -200,27 +200,27 @@
                 <tr style="height: 200px;">
                     <td style="height:390px;width: 280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ( $Invoices->invoicedetail as $invoice )
-                            <p>{{ $invoice->invd_product_name }}</p>
+                            <p style="font-size:18px">{{ $invoice->invd_product_name }}</p>
                         @endforeach
                     </td>
                     <td style="width: 140px; text-align: center; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
                         @foreach ( $Invoices->invoicedetail as $invoice )
-                            <p>{{ $invoice->invd_period }}</p>
+                            <p style="font-size: 18px">{{ $invoice->invd_period }}</p>
                         @endforeach
                        </td>
                     <td style="width:100px;text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
                          @foreach ( $Invoices->invoicedetail as $invoice )
-                            <p >{{ number_format($invoice->invd_amt,2,'.',',') }}</p>
+                            <p style="font-size: 18px" >{{ number_format($invoice->invd_amt,2,'.',',') }}</p>
                         @endforeach
                     </td>
                     <td style="text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
                          @foreach ( $Invoices->invoicedetail as $invoice )
-                            <p >{{ number_format($invoice->invd_vat_amt,2,'.',',')}}</p>
+                            <p style="font-size: 18px" >{{ number_format($invoice->invd_vat_amt,2,'.',',')}}</p>
                         @endforeach
                     </td>
                     <td style="text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
                          @foreach ( $Invoices->invoicedetail as $invoice )
-                            <p >{{ number_format($invoice->invd_net_amt,2,'.',',')}}</p>
+                            <p style="font-size: 18px" >{{ number_format($invoice->invd_net_amt,2,'.',',')}}</p>
                         @endforeach
                     </td>
                 </tr>
@@ -228,13 +228,13 @@
                     <td></td>
                     <td style="border-left: none"></td>
                     <td style="text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;border-left:1px solid #000">
-                           <p >{{ number_format($Invoices->invoicedetail->sum('invd_amt'),2,'.',',') }}</p>
+                           <p style="font-size: 18px">{{ number_format($Invoices->invoicedetail->sum('invd_amt'),2,'.',',') }}</p>
                    </td>
-                   <td style=";text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
-                           <p >{{ number_format($Invoices->invoicedetail->sum('invd_vat_amt'),2,'.',',') }}</p>
+                   <td style="text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
+                           <p style="font-size: 18px" >{{ number_format($Invoices->invoicedetail->sum('invd_vat_amt'),2,'.',',') }}</p>
                    </td>
-                   <td style=";text-align: right; border-bottom: 1px solid #000;vertical-align:top;">
-                           <p >{{ number_format($Invoices->invoicedetail->sum('invd_net_amt'),2,'.',',') }}</p>
+                   <td style="text-align: right; border-bottom: 1px solid #000;vertical-align:top;">
+                           <p style="font-size: 18px">{{ number_format($Invoices->invoicedetail->sum('invd_net_amt'),2,'.',',') }}</p>
                    </td>
                 </tr>
             </tbody>
@@ -242,12 +242,12 @@
        <table class="adjacent-table">
         <tr>
              <td style="width:58.5%; height:30px; text-align:center;">
-                <p>({{ $bath }})</p>
+                <p style="font-size: 18px">({{ $bath }})</p>
              </td>
              <td style="width: 29.6%; text-align:center; line-height:8px">
-                <p>รวมเป็นเงิน<br style="">TOTAL AMOUNT</p>
+                <p style="font-size: 16px">รวมเป็นเงิน<br style="">TOTAL AMOUNT</p>
              </td>
-             <td style="border-left: 1px solid #000;text-align:right;">{{ number_format($Invoices->invoicedetail->sum('invd_net_amt'),2,'.',',') }}</td>
+             <td style="border-left: 1px solid #000;text-align:right;font-size:18px">{{ number_format($Invoices->invoicedetail->sum('invd_net_amt'),2,'.',',') }}</td>
         </tr>
         </table>
         <table class="adjacent-table2">

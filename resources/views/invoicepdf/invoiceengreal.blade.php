@@ -200,7 +200,7 @@
                 <tr style="height: 200px;">
                     <td style="height:390px;width: 280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ( $Invoices->invoicedetail as $invoice )
-                            <p style="font-size:18px">{{ $invoice->invd_product_name }}</p>
+                            <p style="font-size:18px">{{ App\Models\ProductService::where('ps_code', $invoice->invd_product_code)->pluck('ps_name_en')->first() }}</p>
                         @endforeach
                     </td>
                     <td style="width: 140px; text-align: center; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
@@ -242,7 +242,7 @@
        <table class="adjacent-table">
         <tr>
              <td style="width:58.5%; height:30px; text-align:center;">
-                <p style="font-size: 18px">({{ $bath }})</p>
+                <p style="font-size: 18px; line-height:0.5">({{ $bath }})</p>
              </td>
              <td style="width: 29.6%; text-align:center; line-height:8px">
                 <p style="font-size: 16px">รวมเป็นเงิน<br style="">TOTAL AMOUNT</p>

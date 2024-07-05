@@ -130,10 +130,12 @@ class Invoice extends Component
             $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
             $period = $start . " - " . $end;
         }
-        // elseif($ps_group->begin_date == '8' && $ps_group->end_date == '7'){
-        //     $carbon_date = Carbon::parse($this->invoiceDate)
-        //     $start = $carbon_date->copy()->subMonth()->setDay()->format('d/m/Y');
-        // }
+        elseif($ps_group->begin_date == '8' && $ps_group->end_date == '7'){
+            $carbon_date = Carbon::parse($this->invoiceDate);
+            $start = $carbon_date->copy()->subMonth()->day(4)->format('d/m/Y');
+            $end = $carbon_date->copy()->day(3)->format('d/m/Y');
+            $period = $start . " - " . $end;
+        }
         else{
             $carbon_date = Carbon::parse($this->invoiceDate);
             $period = $carbon_date->copy()->day($ps_group->begin_date)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day($ps_group->end_date)->format('d/m/Y');
@@ -516,7 +518,6 @@ public function closeEditModal(){
      $this->showEditInvoice = false;
         $this->reset(['editPsGroup','editCustomerCode','editcustomerrents','editRental','editInvoiceDate','editInvoiceDetails']);
         $this->resetValidation();
-        return redirect()->route('dashboard');
 }
 
     public function exportPdf($id){
@@ -529,6 +530,24 @@ public function closeEditModal(){
         $bath = $number->baht_text($invoice->invoicedetail->sum('invd_net_amt'));
         $html1 = view('invoicepdf.invoice4', ['Invoices' => $invoice, 'bath' => $bath])->render();
         $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
+        
+        // Combine the HTML and add a page break
+        $combinedHtml = $html1 . $html2;
+        $pdf = PDF::loadHTML($combinedHtml);
+       return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, $invoice->inv_no . '.pdf'); 
+    } 
+      public function exportEngPdf($id){
+        $number = new numberToBath;
+        
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        $invoice = InvoiceHeader::where('id',$id)->with(['invoicedetail','customerrental','customer'])->first();
+        $bath = $number->numberToWords($invoice->invoicedetail->sum('invd_net_amt'));
+        $html1 = view('invoicepdf.invoiceengreal', ['Invoices' => $invoice, 'bath' => $bath])->render();
+        $html2 = view('invoicepdf.invoiceengcopy', ['Invoices' => $invoice, 'bath' => $bath])->render();
         
         // Combine the HTML and add a page break
         $combinedHtml = $html1 . $html2;
