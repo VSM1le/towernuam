@@ -278,6 +278,7 @@
                                         <input wire:model="invoiceDetails.{{ $index }}.vat" 
                                         wire:change="updateInvoiceDetail({{ $index }}, 'vat', $event.target.value)" 
                                         type="number" 
+                                        step="0.01" 
                                         class="w-12 p-2 border border-gray-300 text-xs rounded" 
                                         
                                         />     
@@ -286,19 +287,20 @@
                                         @endif 
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.vatamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />
+                                        <input wire:model="invoiceDetails.{{ $index }}.vatamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" step="0.01" disabled />
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.whvat" 
                                         wire:change="updateInvoiceDetail({{ $index }}, 'whvat', $event.target.value)"
                                         type="number" 
+                                        step="0.01"
                                         class="w-14 p-2 border border-gray-300 text-xs rounded" />     
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.whtaxamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />     
+                                        <input wire:model="invoiceDetails.{{ $index }}.whtaxamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" step="0.01" disabled />     
                                     </td>
                                     <td scope="row" class="px-2py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.netamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />     
+                                        <input wire:model="invoiceDetails.{{ $index }}.netamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" step="0.01" disabled />     
                                     </td>
                                      <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.remark" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" />     
@@ -476,6 +478,7 @@
                                         <input wire:model="editInvoiceDetails.{{ $index }}.amt" 
                                         wire:change="updateEditInvoiceDetail({{ $index }}, 'amt', $event.target.value)" 
                                         type="number" 
+                                        step="0.01" 
                                         class="w-full p-2 border border-gray-300 text-xs rounded" 
                                          />
 
@@ -484,24 +487,26 @@
                                         <input wire:model="editInvoiceDetails.{{ $index }}.vat" 
                                         wire:change="updateEditInvoiceDetail({{ $index }}, 'vat', $event.target.value)" 
                                         type="number" 
+                                        step="0.01" 
                                         class="w-12 p-2 border border-gray-300 text-xs rounded" 
                                         
                                         />     
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="editInvoiceDetails.{{ $index }}.vatamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />
+                                        <input wire:model="editInvoiceDetails.{{ $index }}.vatamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" step="0.01"  disabled />
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="editInvoiceDetails.{{ $index }}.whvat" 
                                         wire:change="updateEditInvoiceDetail({{ $index }}, 'whvat', $event.target.value)"
                                         type="number" 
+                                        step="0.01"
                                         class="w-14 p-2 border border-gray-300 text-xs rounded" />     
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="editInvoiceDetails.{{ $index }}.whtaxamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />     
+                                        <input wire:model="editInvoiceDetails.{{ $index }}.whtaxamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" step="0.01" disabled />     
                                     </td>
                                     <td scope="row" class="px-2py-4 font-medium text-gray-900 ">
-                                        <input wire:model="editInvoiceDetails.{{ $index }}.netamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" disabled />     
+                                        <input wire:model="editInvoiceDetails.{{ $index }}.netamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded"  step="0.01"  disabled />     
                                     </td>
                                      <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="editInvoiceDetails.{{ $index }}.remark" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" />     
