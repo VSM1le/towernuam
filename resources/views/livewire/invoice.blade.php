@@ -36,7 +36,7 @@
                                 class="flex justify-between items-center font-semibold text-lg after:absolute after:right-5 after:text-2xl after:text-gray-400 hover:after:text-gray-950 peer-checked:after:transform peer-checked:after:rotate-45">
                                 <div class="flex">
                                     <h2 class="w-8 h-8 bg-sky-300 text-white flex justify-center items-center rounded-sm mr-3">{{ $index + 1 }}</h2>
-                                    <h3>{{ $pland->inv_no}} {{ $pland->customer->cust_name_th}} {{ $pland->customerrental->custr_contract_no}}</h3>
+                                    <h3>{{ $pland->inv_no}} {{ $pland->customer->cust_name_th}} {{ $pland->customerrental->custr_contract_no ?? null}}</h3>
                                     <h3 class="ml-1"></h3>
                                 </div>
                                 <div class="flex">
@@ -281,7 +281,7 @@
                                         <input wire:model="invoiceDetails.{{ $index }}.vat" 
                                         wire:change="updateInvoiceDetail({{ $index }}, 'vat', $event.target.value)" 
                                         type="number" 
-                                        step="0.01" 
+                                         
                                         class="w-12 p-2 border border-gray-300 text-xs rounded" 
                                         
                                         />     
@@ -290,18 +290,22 @@
                                         @endif 
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.vatamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" step="0.01" disabled />
+                                        <input wire:model="invoiceDetails.{{ $index }}.vatamt" 
+                                        type="number" class="w-full p-2 border border-gray-300 text-xs rounded" 
+                                        step="0.01" disabled />
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.whvat" 
                                         wire:change="updateInvoiceDetail({{ $index }}, 'whvat', $event.target.value)"
                                         type="number" 
-                                        step="0.01"
+                                        
                                         class="w-14 p-2 border border-gray-300 text-xs rounded" />     
                                     </td>
-                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.whtaxamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" step="0.01" disabled />     
-                                    </td>
+                                  <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="invoiceDetails.{{ $index }}.whtaxamt" 
+                                        type="number" class="w-full p-2 border border-gray-300 text-xs rounded" 
+                                        step="0.01" disabled />
+                                    </td> 
                                     <td scope="row" class="px-2py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.netamt" type="number" class="w-full p-2 border border-gray-300 text-xs rounded" step="0.01" disabled />     
                                     </td>
@@ -490,7 +494,6 @@
                                         <input wire:model="editInvoiceDetails.{{ $index }}.vat" 
                                         wire:change="updateEditInvoiceDetail({{ $index }}, 'vat', $event.target.value)" 
                                         type="number" 
-                                        step="0.01" 
                                         class="w-12 p-2 border border-gray-300 text-xs rounded" 
                                         
                                         />     
@@ -502,7 +505,6 @@
                                         <input wire:model="editInvoiceDetails.{{ $index }}.whvat" 
                                         wire:change="updateEditInvoiceDetail({{ $index }}, 'whvat', $event.target.value)"
                                         type="number" 
-                                        step="0.01"
                                         class="w-14 p-2 border border-gray-300 text-xs rounded" />     
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">

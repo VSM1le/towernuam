@@ -79,14 +79,14 @@ class Invoice extends Component
             if ($field == 'amt' || $field == 'vat' || $field == 'whvat') {
                 $amt = $this->invoiceDetails[$index]['amt'] ?? 0;
                 $vat = $this->sanitizeNumericValue($this->invoiceDetails[$index]['vat'] ?? 0); // Sanitize vat value
-                $whvat = $this->sanitizeNumericValue($this->invoiceDetails[$index]['whvat'] ?? 0); // Sanitize whvat value
+                $whvat = $this->sanitizeNumericValue($this->invoiceDetails[$index]['whvat'] ?? 0);// Sanitize whvat value
 
                 $vatamt = ($amt * $vat) / 100 ?? 0;
                 $whtaxamt = ($amt * $whvat) / 100 ?? 0;
-                $netamt = $vatamt - $whtaxamt + $amt;
-
+                $netamt = $vatamt + $amt;
+                
                 $this->invoiceDetails[$index]['vatamt'] = number_format($vatamt,2,'.','');
-                $this->invoiceDetails[$index]['whtaxamt'] = number_format($whtaxamt,2,'.'.'');
+                $this->invoiceDetails[$index]['whtaxamt'] = number_format($whtaxamt,2,'.','');
                 $this->invoiceDetails[$index]['netamt'] = number_format($netamt, 2,'.',''); 
             }
         }
@@ -111,7 +111,6 @@ class Invoice extends Component
     public function addline(){
        $this->validate([
             'invoiceDate' => ['required'],
-            'rental' => ['required'],
             'customerCode'  => ['required'],
             'service' => ['required'],
             'psGroup' => ['required'],
@@ -141,15 +140,14 @@ class Invoice extends Component
             $period = $carbon_date->copy()->day($ps_group->begin_date)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day($ps_group->end_date)->format('d/m/Y');
         }
         
-       if($customer_rent->customer->cust_gov_flag == 1){
+       if(Customer::where('id',$this->customerCode)->pluck('cust_gov_flag')->first() == 1){
             $wh_tax = $product_service->gov_whtax;
        } 
-        
-        if($product_service->ps_code == "1001" || $product_service->ps_code == "1010"){
+        if(($product_service->ps_code == "1001" || $product_service->ps_code == "1010") && !is_null($customer_rent)){
             $amt = $customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm;
             $vatamt = ($amt * $product_service->ps_vat)/100;
             $whamt = ($amt * $wh_tax)/100;
-            $netamt = $amt + $vatamt - $whamt;
+            $netamt = $amt + $vatamt ;
             $this->invoiceDetails[] = 
             ['pscode'=> $product_service->ps_code
             ,'psname' => $product_service->ps_name_th
@@ -163,11 +161,11 @@ class Invoice extends Component
             ,'remark'=>''];
             $check = false;
         }
-        if($product_service->ps_code == '1020'){
+        if($product_service->ps_code == '1020' && !is_null($customer_rent)){
             $amt = $customer_rent->custr_area_sqm * $customer_rent->custr_service_fee;
             $vatamt = ($amt * $product_service->ps_vat)/100;
             $whamt = ($amt * $wh_tax)/100;
-            $netamt = $amt + $vatamt - $whamt;
+            $netamt = $amt + $vatamt; 
             $this->invoiceDetails[] = 
             ['pscode'=> $product_service->ps_code
             ,'psname' => $product_service->ps_name_th
@@ -204,7 +202,6 @@ class Invoice extends Component
         $this->validate([
             'psGroup' => ['required'],
             'invoiceDate' => ['required'],
-            'rental' => ['required'],
             'customerCode'  => ['required'],
             'service' => ['required'],  
             'dueDate' => ['required'],
@@ -294,7 +291,7 @@ class Invoice extends Component
 
                 $vatamt = ($amt * $vat) / 100 ?? 0;
                 $whtaxamt = ($amt * $whvat) / 100 ?? 0;
-                $netamt = $vatamt - $whtaxamt + $amt;
+                $netamt = $vatamt + $amt;
 
                 $this->editInvoiceDetails[$index]['vatamt'] = number_format($vatamt,2,'.','');
                 $this->editInvoiceDetails[$index]['whtaxamt'] = number_format($whtaxamt,2,'.','');
@@ -345,7 +342,6 @@ class Invoice extends Component
     public function editAdd(){
         $this->validate([
             'editInvoiceDate' => ['required'],
-            'editRental' => ['required'],
             'editCustomerCode'  => ['required'],
             'service' => ['required'],
             'editPsGroup' => ['required'],
@@ -369,15 +365,15 @@ class Invoice extends Component
             $period = $carbon_date->copy()->day($ps_group->begin_date)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day($ps_group->end_date)->format('d/m/Y');
         }
         
-       if($customer_rent->customer->cust_gov_flag == 1){
+       if(Customer::where('id',$this->editCustomerCode)->pluck('cust_gov_flag')->first() == 1){
             $wh_tax = $product_service->gov_whtax;
        } 
         
-        if($product_service->ps_code == "1001" || $product_service->ps_code == "1010"){
+        if(($product_service->ps_code == "1001" || $product_service->ps_code == "1010") && !is_null($customer_rent)){
             $amt = $customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm;
             $vatamt = ($amt * $product_service->ps_vat)/100;
             $whamt = ($amt * $wh_tax)/100;
-            $netamt =$amt + $vatamt - $whamt;
+            $netamt =$amt + $vatamt ;
             $this->editInvoiceDetails[] = 
             [
             'id' => null,
@@ -393,11 +389,11 @@ class Invoice extends Component
             ,'remark'=>''];
             $check = false;
         }
-        if($product_service->ps_code == '1020'){
+        if($product_service->ps_code == '1020' && !is_null($customer_rent)){
             $amt = $customer_rent->custr_area_sqm * $customer_rent->custr_service_fee;
             $vatamt = ($amt * $product_service->ps_vat)/100;
             $whamt = ($amt * $wh_tax)/100;
-            $netamt =$amt + $vatamt - $whamt;
+            $netamt =$amt + $vatamt ;
             $this->editInvoiceDetails[] = 
             [
             'id' => null,
@@ -441,7 +437,6 @@ class Invoice extends Component
 {
     $this->validate([
         'editInvoiceDate' => ['required'],
-        'editRental' => ['required'],
         'editCustomerCode'  => ['required'],
         'editPsGroup' => ['required'],
         'editDueDate' => ['required'],
@@ -457,7 +452,7 @@ class Invoice extends Component
 
     $header->update([
         'customer_id' => $this->editCustomerCode,
-        'customer_rental_id' => $this->editRental,
+        'customer_rental_id' => !empty($this->editRental) ? $this->editRental : null,
         'inv_date' => $this->editInvoiceDate,
         'invd_duedate' => $this->editDueDate,
         'ps_group_id' => $this->editPsGroup,
