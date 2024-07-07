@@ -15,6 +15,6 @@ class InvoiceDetail extends Model
                             'invd_vat_percent','invd_receipt_flag','invd_receip_amt','created_by','updated_by','invd_product_name','invd_period'];
 
     public function invoiceheader():BelongsTo{
-        return $this->belongsTo(InvoiceHeader::class);
+        return $this->belongsTo(InvoiceHeader::class,'invoice_header_id');
     }
 }

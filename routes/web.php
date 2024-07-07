@@ -9,6 +9,9 @@ Route::view('/', 'welcome');
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+Route::view('receipt', 'receipt')
+    ->middleware(['auth', 'verified'])
+    ->name('receipt');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
