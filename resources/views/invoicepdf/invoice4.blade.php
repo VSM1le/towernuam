@@ -162,11 +162,11 @@
                     <td style="height:60px; vertical-align:top;">
                     <p style="font-size: 18px">ที่อยู่&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
                         {{
-                        implode(" ", array_slice(explode(" ", $Invoices->customer->cust_address_th1), 0, 7))
+                        $Invoices->customer->cust_address_th1
                         }}</p>   
                     <p style="font-size: 18px">Address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         {{
-                        implode(" ", array_slice(explode(" ", $Invoices->customer->cust_address_th1),7))
+                        $Invoices->customer->cust_address_th2
                         }}
                          {{$Invoices->customer->cust_zipcode}}
                         </p>   
