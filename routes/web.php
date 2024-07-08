@@ -6,9 +6,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
 
+Route::get('',fn () =>to_route('dashboard'));
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
 Route::view('receipt', 'receipt')
     ->middleware(['auth', 'verified'])
     ->name('receipt');

@@ -49,29 +49,19 @@
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                          @enderror
                 </div>
-               
-                 <div class="w-48 ml-5">
-                    <label for="rental" class="text-xs">Contact</label>
-                        <label class="w-40 text-sm font-medium text-gray-900"></label>
-                        <select id= "rental" wire:model.live=""
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                            <option value="">Select Contact</option>
-                             {{-- @if (!is_null($customerCode))
-                            @foreach ( $customerrents as $rental )
-                                <option value="{{ $rental->id}}">{{ $rental->custr_contract_no}} : {{ $rental->custr_unit }}</option>
-                            @endforeach 
-                            @endif --}}
-                        </select>
-                    @error('') 
-                    <span class="text-red-500 text-xs">{{ $message }}</span> 
-                    @enderror 
-                </div> 
-                <div class="w-48 ml-5">
-                    <label for="duedate" class="text-xs">Due Date</label>
-                    <input id="duedate" wire:model="" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
-                    @error('') 
-                        <span class="text-red-500 text-xs">{{ $message }}</span> 
-                    @enderror 
+                <div class="flex content-center ml-5 border border-slate-500 bg-white">
+                    <div class="flex items-center pl-5">
+                        <input id="default-radio-1" type="radio" value="cash" wire:model="paymentType"  name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="default-radio-1" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Cash</label>
+                    </div>
+                    <div class="flex items-center ml-5">
+                        <input id="default-radio-2" type="radio" value="tran" wire:model="paymentType" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="default-radio-2" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Transfer money</label>
+                    </div>
+                     <div class="flex items-center ml-5 pr-5">
+                        <input id="default-radio-3" type="radio" value="cheq" wire:model="paymentType" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="default-radio-3" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Cheque</label>
+                    </div>
                 </div>
             </div>
         </div> 
@@ -92,7 +82,7 @@
                             <th scope="col" class="px-2 py-3">Paid Amount</th>
                             <th scope="col" class="px-2 py-3">Paid</th>
                             <th scope="col" class="px-2 py-3">Action</th>
-
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -122,11 +112,14 @@
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.receiptamt" 
                                         type="number" 
+                                        step="0.01" 
                                         class="w-full p-2 border border-gray-300 text-xs rounded text-right" disabled/>     
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.receiptamt" 
+                                        <input wire:model="invoiceDetails.{{ $index }}.paid" 
+                                        wire:change="updateInvoiceDetails({{ $index}})"
                                         type="number" 
+                                        step="0.01" 
                                         class="w-full p-2 border border-gray-300 text-xs rounded text-right"/>     
                                     </td>
                                 
@@ -148,23 +141,45 @@
    
     <div class="bg-gray-100 w-full flex justify-between p-4">
         <div class="flex">
-        {{-- <button type="button" wire:click="" class="text-white bg-slate-700 hover:bg-slate-800 focus:ring-4 focus:outline-none focus:ring-slate-300 font-medium rounded-lg text-sm px-5 py-2.5">Clear</button>
-            <form>   
-                <input class="ml-2 block w-full text-sm text-slate-500
-                file:mr-4 file:py-2.5 file:px-5 file:rounded-md
-                file:border-0 file:text-sm file:font-semibold
-                file:bg-pink-200 file:text-pink-700
-                hover:file:bg-pink-300" type="file" wire:model="">
-                <button type="button" wire:click="" class="text-white bg-slate-700 hover:bg-slate-800 focus:ring-4 focus:outline-none focus:ring-slate-300 font-medium rounded-lg text-sm px-5 py-2.5">Import</button>
-            </form> 
-            <button type="button" wire:click="" class="ml-2 text-white bg-orange-400 hover:bg-orange-500 focus:ring-4 focus:outline-none focus:ring-orange-200 font-medium rounded-lg text-sm px-5 py-2.5">Check</button> --}}
+            <div class="flex">
+                <div class="w-48">
+                    <label  class="text-xs">Cheque Bank</label>
+                    <input  
+                    :disabled="$disable == true"
+                    wire:model=""  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    @error('') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
+                <div class="w-48 ml-5">
+                    <label for="vdate" class="text-xs">Branch</label>
+                    <input id="vdate" wire:model=""  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    @error('') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
+                <div class="w-48 ml-5">
+                    <label for="vdate" class="text-xs">NO.</label>
+                    <input id="vdate" wire:model=""  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    @error('') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
+                <div class="w-48 ml-5">
+                    <label for="vdate" class="text-xs">Date</label>
+                    <input id="vdate" wire:model="" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    @error('') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
+            </div>
         </div>
         
-        <div>
+        <div class="content-center">
         <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Create Invoice</button>
         </div>
     </div>
 </form>
-</div>
+</d
 {{-- @endif  --}}
 </div>

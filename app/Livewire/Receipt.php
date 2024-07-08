@@ -11,11 +11,38 @@ class Receipt extends Component
 {
     public $receiptDate = null;
     public $customerCode = null;
-    public $invoiceDetails ; 
-
+    public $paymentType = "cash";
+    public $bank = null;
+    public $branch = null;
+    public $no = null;
+    public $chequeDate = null;
+    public $invoiceDetails ;
+    public $sumCheque = 0; 
+    public $disable = true;
      #[Computed()]
     public function customers(){
         return Customer::all();
+    }
+
+    public function updatedPaymenttype($value){
+        if ($value === 'cheq') {
+            // If the value is 'cheq', enable the input field
+            $this->disable = false;
+        } else {
+            // If the value is not 'cheq', disable the input field
+            $this->disable = true;
+        }
+        $this->bank = null;
+        $this->branch = null;
+        $this->no = null;
+        $this->chequeDate = null;
+    }
+
+    public function updateInvoiceDetails($index){
+        if($this->invoiceDetails[$index]['paid'] == ""){
+            $this->invoiceDetails[$index]['paid'] = 0;
+        }
+        $this->sumCheque = $this->sumCheque + $this->invoiceDetails[$index]['paid'] ?? 0;
     }
 
     public function updatedCustomerCode() {
@@ -39,7 +66,7 @@ class Receipt extends Component
                     'tax' => $detail->invd_vat_amt,
                     'whtax' => $detail->invd_wh_tax_amt,
                     'receiptamt' => $detail->invd_receipt_amt ?? 0,
-                    'paid' => ''
+                    'paid' => 0
                 ];
                 }
                 dump($this->invoiceDetails);
