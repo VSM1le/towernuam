@@ -127,8 +127,8 @@
                     <img style="margin-left:30px" src="{{ asset('/nuam.jpg') }}" alt="Company Logo">
                 </td>
                 <td class="company-details" style="vertical-align: top;">
-                    <p style="margin: 0px; font-weight: bold; font-size:24px;line-height:15px">บริษัท นวม จำกัด</p>
-                    <p style="margin: 0px; font-weight: bold; font-size:20px;line-height:15px;">NUAM CO., LTD</p>
+                    <p style="margin: 0px; font-weight: bold; font-size:24px;line-height:15px;padding-left:19%">บริษัท นวม จำกัด</p>
+                    <p style="margin: 0px; font-weight: bold; font-size:20px;line-height:15px;padding-left:21%">NUAM CO., LTD</p>
                     <p style="margin: -1px">185/2 ซอยสุขุมวิท 31 ถนนสุขุมวิท แขวงคลองตันเหนือ เขตวัฒนา กรุงเทพมหานคร</p>
                     <p style="margin: -1px">185/2 Soi Sukhumvit 31 Rd. Nort Khlongton, Watthana, Bangkok, Thailand 10110</p>
                     <p style="margin: -1px">Tel: 0-2264-2245-7 Fax: 0-2264-2248</p>
@@ -140,9 +140,9 @@
             </tr>
         </table>
         <div class="invoice-details" style="padding-bottom: 8px">
-            <p style="margin: -5px;font-size:20px;line-height:10px;"><strong>ใบแจ้งหนี้</strong></p>
-            <p style="margin: -5px;font-size:20px;line-height:18px"><strong>ORIGINAL INVOICE</strong></p>
-            <p style="margin: -5px;font-size:20px;line-height:15px"><strong>(สำเนา)</strong></p>
+            <p style="margin: -5px;font-size:24px;line-height:10px;"><strong>ใบแจ้งหนี้</strong></p>
+            <p style="margin: -5px;font-size:24px;line-height:18px"><strong>ORIGINAL INVOICE</strong></p>
+            <p style="margin: -5px;font-size:24px;line-height:18px"><strong>(สำเนา)</strong></p>
         </div>
         <table style="width:100%; border: 1px solid #000; border-collapse: collapse;">
             <tbody>
@@ -172,7 +172,7 @@
                         </p>   
                     </td>
                     <td style="vertical-align:top;width: 40%; border:1px solid #000; margin:0px;">
-                        <p style="font-size: 18px">เลชที่ใบแจ้งหนี้</p>
+                        <p style="font-size: 18px">เลขที่ใบแจ้งหนี้</p>
                         <p style="font-size: 18px">No.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->inv_no }}</p>
                     </td>
                 </tr>
