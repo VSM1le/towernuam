@@ -207,7 +207,7 @@ class Invoice extends Component
             'dueDate' => ['required'],
         ]);
         $prefix = 'I'.$this->tower.'S';
-        $year = Carbon::now()->year;
+        $year = Carbon::parse($this->invoiceDate)->format('Y');
         $datePart = substr($year,-2) . Carbon::parse($this->invoiceDate)->format('m');
 
         $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();

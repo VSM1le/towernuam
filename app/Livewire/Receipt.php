@@ -4,8 +4,10 @@ namespace App\Livewire;
 
 use App\Models\Customer;
 use App\Models\InvoiceDetail;
+use App\Models\InvoiceHeader;
+use App\Models\ReceiptHeader;
+use Carbon\Carbon;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class Receipt extends Component
@@ -19,7 +21,7 @@ class Receipt extends Component
     public $invoiceDetails ;
     public $sumCheque = 0; 
     public $disable = true;
-    public $checkWh = false;
+    public $tower = "A";
 
      #[Computed()]
     public function customers(){
@@ -40,20 +42,6 @@ class Receipt extends Component
         $this->sumCheque = $this->sumCheque + $this->invoiceDetails[$index]['paid'] ?? 0;
     }
 
-    public function updatedCheckWh(){
-        if($this->invoiceDetails){
-            if($this->checkWh){
-                foreach($this->invoiceDetails as $index => $detail){
-                    $this->invoiceDetails[$index]['netamt'] += $this->invoiceDetails[$index]['whtax'];
-                }
-            }
-            else{
-                foreach($this->invoiceDetails as $index => $detail){
-                    $this->invoiceDetails[$index]['netamt'] -= $this->invoiceDetails[$index]['whtax'];
-                }
-            }
-        }
-    }
 
      public function updatedPaymentType()
     {
@@ -74,10 +62,7 @@ class Receipt extends Component
 
             if(!is_null($detail_invoices)){
                 foreach($detail_invoices as $detail){
-                    $amt = $detail->invd_net_amt;
-                    if($this->checkWh == true){
                         $amt = $detail->invd_net_amt - $detail->invd_wh_tax_amt ?? 0;
-                    }
                     $this->invoiceDetails[] = 
                     [
                     'id' => $detail->id,
@@ -85,7 +70,8 @@ class Receipt extends Component
                     'contact' => $detail->invoiceheader->customerrental->custr_contract_no ?? null,
                     'procode'=> $detail->invd_product_code,
                     'proname'=> $detail->invd_product_name,
-                    'netamt' => $amt,
+                    'perwh' =>  $detail->invd_wh_tax_percent,
+                    'netamt' => number_format((float)$amt, 2, '.', '') ,
                     'whtax' => $detail->invd_wh_tax_amt,
                     'tax' => $detail->invd_vat_amt,
                     'whtax' => $detail->invd_wh_tax_amt,
@@ -101,6 +87,40 @@ class Receipt extends Component
      public function removeItem($index){
        unset($this->invoiceDetails[$index]);
        $this->invoiceDetails = array_values($this->invoiceDetails);
+    }
+
+    public function createReceipt(){
+
+
+        $prefix = 'R'.$this->tower.'S';
+        $year = Carbon::parse($this->receiptDate)->format("Y");
+        $datePart = substr($year,-2) . Carbon::parse($this->receiptDate)->format('m');
+
+        $lastInvoice = ReceiptHeader::where('rec_no', 'like', $prefix . $datePart . '%')->orderBy('rec_no', 'desc')->first();
+
+        if (is_null($lastInvoice)) {
+            $recNo = $prefix . $datePart . '0001';
+        } else {
+            $lastNumber = (int)substr($lastInvoice->inv_no, -4);
+            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            $recNo = $prefix . $datePart . $newNumber;
+        }
+
+        $create_receipt = InvoiceHeader::create([
+
+        ]) ;
+        foreach($this->invoiceDetails as $detail){
+            $flag = "Pati";
+            if($detail['netamt'] <= $detail['paid'] )
+            {
+                $flag = "Yes";
+            }
+            InvoiceDetail::where('id',$detail['id'])->update([
+                "invd_receipt_flag" => $flag,
+                "invd_invd_receipt_amt" => $detail['paid']
+            ]);
+            
+        }
     }
 
     public function render()

@@ -63,10 +63,6 @@
                         <label for="default-radio-3" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Cheque</label>
                     </div>
                 </div>
-                <div class="flex items-center ps-4 border border-slate-500 bg-white rounded dark:border-gray-700 ml-5 pr-5">
-                    <input id="bordered-checkbox-1" type="checkbox" value="true" wire:model.live="checkWh" name="bordered-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                    <label for="bordered-checkbox-1" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Withhoding Tax</label>
-                </div>
             </div>
         </div> 
         <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
@@ -82,6 +78,7 @@
                             <th scope="col" class="px-2 py-3">Contract</th>
                             <th scope="col" class="px-2 py-3">Product code</th>
                             <th scope="col" class="px-2 py-3">Product name</th>
+                            <th scope="col" class="px-2 py-3">Percent Wh</th>
                             <th scope="col" class="px-2 py-3">Wh Tax</th>
                             <th scope="col" class="px-2 py-3">Net Amt</th>
                             <th scope="col" class="px-2 py-3">Paid Amount</th>
@@ -107,9 +104,13 @@
                                         <input wire:model="invoiceDetails.{{ $index }}.proname" type="text" class="w-48 p-2 border border-gray-300 text-xs rounded" disabled/>
                                     </td>
                                      <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
-                                        <input wire:model="invoiceDetails.{{ $index }}.whtax" 
+                                        <input wire:model="invoiceDetails.{{ $index }}.perwh" 
                                         type="number" 
-                                        step="0.01" 
+                                        class="w-14 p-2 border border-gray-300 text-xs rounded" 
+                                        disabled />     
+                                    </td>
+                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="invoiceDetails.{{ $index }}.whtax" 
                                         class="w-full p-2 border border-gray-300 text-xs rounded text-right" 
                                          disabled
                                          />
@@ -190,7 +191,12 @@
             </div>
         </div>
         
-        <div class="content-center">
+        <div class="w-48 ml-5">
+            <label for="vdate" class="text-xs">Sum</label>
+            <input id="vdate" wire:model.live="sumCheque"  class="w-full p-2 border border-gray-300 text-sm rounded" disabled /> 
+        </div>
+
+        <div class="content-center ">
         <button type="submit" 
         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
         Create Receipt 
@@ -198,6 +204,6 @@
         </div>
     </div>
 </form>
-</d
+</div>
 {{-- @endif  --}}
 </div>
