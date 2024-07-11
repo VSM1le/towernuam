@@ -12,12 +12,12 @@ use Livewire\Component;
 
 class Receipt extends Component
 {
-    public $receiptDate = null;
+    public $receiptDate ;
     public $customerCode = null;
 
     public $paymentType = "cash";
 
-    public $cheque = ['bank' => "",'branch' => "",'chequeDate' => " ",'no' => ""];
+    public $cheque = ['bank' => "",'branch' => "",'chequeDate' => null,'no' => ""];
     public $invoiceDetails ;
     public $sumCheque = 0; 
     public $disable = true;
@@ -36,10 +36,17 @@ class Receipt extends Component
     } 
 
     public function updateInvoiceDetails($index){
-        if($this->invoiceDetails[$index]['paid'] == ""){
+        $this->sumCheque = 0;
+
+        if ($this->invoiceDetails[$index]['paid'] == "") {
             $this->invoiceDetails[$index]['paid'] = 0;
         }
-        $this->sumCheque = $this->sumCheque + $this->invoiceDetails[$index]['paid'] ?? 0;
+
+        foreach ($this->invoiceDetails as $detail) {
+            if ($detail['netamt'] <= $detail['paid']) {
+                $this->sumCheque += $detail['paid'] ?? 0;
+            }
+        }
     }
 
 
@@ -90,37 +97,67 @@ class Receipt extends Component
     }
 
     public function createReceipt(){
-
+        $this->validate([
+            'receiptDate' => ['required', 'date'],
+            'customerCode' => ['required'],
+            'sumCheque' => ['required', 'numeric', 'min:0'],
+            'paymentType' => ['required'],
+            'cheque.bank' => ['required_if:paymentType,cheq'],
+            'cheque.branch' => ['required_if:paymentType,cheq'],
+            'cheque.no' => ['required_if:paymentType,cheq'],
+            'cheque.chequeDate' => ['required_if:paymentType,cheq', 'nullable', 'date'],
+        ],
+        [
+            'cheque.bank.required_if' => 'Bank is required.',
+            'cheque.no.required_if' => 'Bank No. is required.',
+            'cheque.chequeDate.required_if' => 'Cheque Date is required.',
+            'cheque.branch.required_if' => 'branch is required.'
+        ]);
 
         $prefix = 'R'.$this->tower.'S';
         $year = Carbon::parse($this->receiptDate)->format("Y");
         $datePart = substr($year,-2) . Carbon::parse($this->receiptDate)->format('m');
 
-        $lastInvoice = ReceiptHeader::where('rec_no', 'like', $prefix . $datePart . '%')->orderBy('rec_no', 'desc')->first();
+        $lastReceipt= ReceiptHeader::where('rec_no', 'like', $prefix . $datePart . '%')->orderBy('rec_no', 'desc')->first();
 
-        if (is_null($lastInvoice)) {
+        if (is_null($lastReceipt)) {
             $recNo = $prefix . $datePart . '0001';
         } else {
-            $lastNumber = (int)substr($lastInvoice->inv_no, -4);
+            $lastNumber = (int)substr($lastReceipt->rec_no, -4);
             $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
             $recNo = $prefix . $datePart . $newNumber;
         }
 
-        $create_receipt = InvoiceHeader::create([
+        $create_receipt = ReceiptHeader::create([
+            'rec_no' => $recNo,
+            'customer_id' => $this->customerCode,
+            'rec_date' => $this->receiptDate,
+            'rec_status' => "Yes",
+            'rec_payment_amt' => $this->sumCheque,
+            'rec_payment_type' => $this->paymentType,
+            'rec_bank' => $this->cheque['bank'] ?? null,
+            'rec_branch' => $this->cheque['branch'] ?? null,
+            'rec_cheque_no' => $this->cheque['no'] ?? null,
+            'rec_cheque_date' => $this->cheque['chequeDate'] ?? null,
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
+        ]);
 
-        ]) ;
-        foreach($this->invoiceDetails as $detail){
-            $flag = "Pati";
-            if($detail['netamt'] <= $detail['paid'] )
-            {
-                $flag = "Yes";
-            }
-            InvoiceDetail::where('id',$detail['id'])->update([
+        foreach ($this->invoiceDetails as $detail) {
+            $flag = ($detail['netamt'] <= $detail['paid']) ? "Yes" : "Partial";
+            InvoiceDetail::where('id', $detail['id'])->update([
                 "invd_receipt_flag" => $flag,
-                "invd_invd_receipt_amt" => $detail['paid']
+                "invd_receipt_amt" => $detail['paid'],
             ]);
-            
-        }
+
+            if ($flag == "Yes") {
+                $create_receipt->receiptdetail()->create([
+                    'invoice_detail_id' => $detail['id'],
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
+            }
+        } 
     }
 
     public function render()

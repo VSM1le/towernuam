@@ -29,8 +29,8 @@
             <div class="flex">
                 <div class="w-48">
                     <label for="vdate" class="text-xs">Receipt date</label>
-                    <input id="vdate" wire:model="" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
-                    @error('') 
+                    <input id="vdate" wire:model="receiptDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    @error('receiptDate') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
                 </div>
@@ -45,7 +45,7 @@
                             <option value="{{$customer->id}}">{{$customer->cust_code}} : {{$customer->cust_name_th}}</option>
                         @endforeach
                         </select>
-                          @error('') 
+                          @error('customerCode') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                          @enderror
                 </div>
@@ -163,28 +163,28 @@
                     wire:change="updateCheque('bank')"
                     /> 
 
-                    @error('') 
+                    @error('cheque.bank') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
                 </div>
                 <div class="w-48 ml-5">
                     <label for="vdate" class="text-xs">Branch</label>
                     <input id="vdate" wire:model="cheque.branch"  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
-                    @error('') 
+                    @error('cheque.branch') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
                 </div>
                 <div class="w-48 ml-5">
                     <label for="vdate" class="text-xs">NO.</label>
                     <input id="vdate" wire:model="cheque.no"  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
-                    @error('') 
+                    @error('cheque.no') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
                 </div>
                 <div class="w-48 ml-5">
                     <label for="vdate" class="text-xs">Date</label>
                     <input id="vdate" wire:model="cheque.chequeDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
-                    @error('') 
+                    @error('cheque.chequeDate') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
                 </div>
@@ -197,7 +197,8 @@
         </div>
 
         <div class="content-center ">
-        <button type="submit" 
+        <button  
+        wire:click="createReceipt"
         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
         Create Receipt 
         </button>
