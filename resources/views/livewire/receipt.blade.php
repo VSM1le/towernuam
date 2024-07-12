@@ -318,7 +318,7 @@
         </div>
         
         <div class="w-48 ml-5">
-            <label for="vdate" class="text-xs">Sum</label>
+            <label for="vdate" class="text-xs">Total Amount</label>
             <input id="vdate" wire:model.live="sumCheque"  class="w-full p-2 border border-gray-300 text-sm rounded text-right" 
             type="number"
             step="0.01"

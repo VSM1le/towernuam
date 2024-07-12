@@ -168,7 +168,7 @@ class Receipt extends Component
 
                 $create_receipt->receiptdetail()->create([
                     'invoice_detail_id' => $detail['id'],
-                    'rec_pay' => $detail['paid'],
+                    'rec_pay' => $detail['receiptamt'] + $detail['paid'],
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
