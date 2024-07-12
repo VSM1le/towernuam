@@ -122,7 +122,7 @@
                                                 {{ $listitem->invoicedetail->invd_wh_tax_amt}}
                                             </td>
                                             <td class="px-6 py-4">
-                                                {{ $listitem->invoicedetail->invd_receipt_amt}}
+                                                {{ $listitem->rec_pay}}
                                             </td>
                                         </tr>   
                                     @endforeach 

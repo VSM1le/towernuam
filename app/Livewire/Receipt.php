@@ -163,12 +163,12 @@ class Receipt extends Component
             $flag = ($detail['netamt'] <= $detail['paid'] + $detail['receiptamt']) ? "Yes" : "Partial";
             InvoiceDetail::where('id', $detail['id'])->update([
                 "invd_receipt_flag" => $flag,
-                "invd_receipt_amt" => $detail['paid'],
+                "invd_receipt_amt" =>round($detail['receiptamt'] +  $detail['paid'],2),
             ]);
 
                 $create_receipt->receiptdetail()->create([
                     'invoice_detail_id' => $detail['id'],
-                    'rec_pay' => $detail['receiptamt'] + $detail['paid'],
+                    'rec_pay' => + $detail['paid'],
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
@@ -196,7 +196,7 @@ class Receipt extends Component
 
     public function render()
     {
-        $receipt = ReceiptHeader::with(['customer','receiptdetail'])->paginate(10);
+        $receipt = ReceiptHeader::with(['customer','receiptdetail'])->orderBy('rec_no','desc')->paginate(10);
         return view('livewire.receipt', compact('receipt'));
     }
 }
