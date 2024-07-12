@@ -207,8 +207,8 @@
                             <th scope="col" class="px-2 py-3">Percent Wh</th>
                             <th scope="col" class="px-2 py-3">Wh Tax</th>
                             <th scope="col" class="px-2 py-3">Net Amt</th>
-                            <th scope="col" class="px-2 py-3">Paid Amount</th>
-                            <th scope="col" class="px-2 py-3">Paid</th>
+                            <th scope="col" class="px-2 py-3">Paid Amt</th>
+                            <th scope="col" class="px-2 py-3">Pay</th>
                             <th scope="col" class="px-2 py-3">Action</th>
                             
                         </tr>
@@ -319,7 +319,10 @@
         
         <div class="w-48 ml-5">
             <label for="vdate" class="text-xs">Sum</label>
-            <input id="vdate" wire:model.live="sumCheque"  class="w-full p-2 border border-gray-300 text-sm rounded" disabled /> 
+            <input id="vdate" wire:model.live="sumCheque"  class="w-full p-2 border border-gray-300 text-sm rounded text-right" 
+            type="number"
+            step="0.01"
+            disabled /> 
         </div>
 
         <div class="content-center ">

@@ -40,17 +40,16 @@ class Receipt extends Component
     } 
 
     public function updateInvoiceDetails($index){
-        $this->sumCheque = 0;
 
+        $this->sumCheque = 0;
         if ($this->invoiceDetails[$index]['paid'] == "") {
             $this->invoiceDetails[$index]['paid'] = 0;
         }
 
         foreach ($this->invoiceDetails as $detail) {
-            if ($detail['netamt'] <= $detail['paid']) {
-                $this->sumCheque += $detail['paid'] ?? 0;
-            }
+            $this->sumCheque += $detail['paid'] ?? 0;
         }
+         $this->sumCheque = round($this->sumCheque,2);
     }
 
 
@@ -66,6 +65,7 @@ class Receipt extends Component
     public function updatedCustomerCode() {
         $this->invoiceDetails = null;
         if(!is_null($this->customerCode)){
+            $this->sumCheque = 0;
             $detail_invoices = InvoiceDetail::with('invoiceheader')->whereNot('invd_receipt_flag','Yes')
             ->whereHas('invoiceheader',function($query){
                 $query->where('inv_status','USE')->where('customer_id',$this->customerCode);
@@ -73,7 +73,7 @@ class Receipt extends Component
 
             if(!is_null($detail_invoices)){
                 foreach($detail_invoices as $detail){
-                        $amt = $detail->invd_net_amt - $detail->invd_wh_tax_amt ?? 0;
+                        $amt = round($detail->invd_net_amt - $detail->invd_wh_tax_amt,2) ?? 0;
                     $this->invoiceDetails[] = 
                     [
                     'id' => $detail->id,
@@ -82,23 +82,33 @@ class Receipt extends Component
                     'procode'=> $detail->invd_product_code,
                     'proname'=> $detail->invd_product_name,
                     'perwh' =>  $detail->invd_wh_tax_percent,
-                    'netamt' => number_format((float)$amt, 2, '.', '') ,
+                    'netamt' => $amt,
                     'whtax' => $detail->invd_wh_tax_amt,
                     'tax' => $detail->invd_vat_amt,
                     'whtax' => $detail->invd_wh_tax_amt,
                     'receiptamt' => $detail->invd_receipt_amt ?? 0,
-                    'paid' => 0
-                ];
+                    'paid' => round($amt - $detail->invd_receipt_amt, 2)   
+                    ];
+                    $this->sumCheque +=  $amt - $detail->invd_receipt_amt;
                 }
-                dump($this->invoiceDetails);
+                $this->sumCheque = round($this->sumCheque,2);
+            
             }
         }
     }
 
-     public function removeItem($index){
-       unset($this->invoiceDetails[$index]);
-       $this->invoiceDetails = array_values($this->invoiceDetails);
-    }
+    public function removeItem($index)
+    {
+        unset($this->invoiceDetails[$index]);
+
+        $this->invoiceDetails = array_values($this->invoiceDetails);
+
+        $this->sumCheque = 0;
+        foreach ($this->invoiceDetails as $detail) {
+            $this->sumCheque += $detail['paid'] ?? 0;
+        }
+        $this->sumCheque = round($this->sumCheque,2);
+    } 
 
     public function createReceipt(){
         $this->validate([
@@ -106,6 +116,7 @@ class Receipt extends Component
             'customerCode' => ['required'],
             'sumCheque' => ['required', 'numeric', 'min:0'],
             'paymentType' => ['required'],
+            'invoiceDetails' => ['required', 'array'],
             'cheque.bank' => ['required_if:paymentType,cheq'],
             'cheque.branch' => ['required_if:paymentType,cheq'],
             'cheque.no' => ['required_if:paymentType,cheq'],
@@ -117,21 +128,6 @@ class Receipt extends Component
             'cheque.chequeDate.required_if' => 'Cheque Date is required.',
             'cheque.branch.required_if' => 'branch is required.'
         ]);
-
-         $hasValidDetail = false;
-        foreach ($this->invoiceDetails as $detail) {
-            if ($detail['paid'] >= $detail['netamt']) {
-                $hasValidDetail = true;
-                break;
-            }
-        }
-
-            // If no valid InvoiceDetail, return or handle the error
-        if (!$hasValidDetail) {
-            session()->flash('error', 'No valid invoice details found for creating a receipt.');
-            $this->closeCreateReceipt();
-            return;
-        }
 
 
         $prefix = 'R'.$this->tower.'S';
@@ -164,20 +160,22 @@ class Receipt extends Component
         ]);
 
         foreach ($this->invoiceDetails as $detail) {
-            $flag = ($detail['netamt'] <= $detail['paid']) ? "Yes" : "Partial";
+            $flag = ($detail['netamt'] <= $detail['paid'] + $detail['receiptamt']) ? "Yes" : "Partial";
             InvoiceDetail::where('id', $detail['id'])->update([
                 "invd_receipt_flag" => $flag,
                 "invd_receipt_amt" => $detail['paid'],
             ]);
 
-            if ($flag == "Yes") {
                 $create_receipt->receiptdetail()->create([
                     'invoice_detail_id' => $detail['id'],
+                    'rec_pay' => $detail['paid'],
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
-            }
+            
         } 
+        $this->closeCreateReceipt();
+        return redirect()->route('receipt');
     }
 
     public function openCreateReceipt(){
@@ -186,6 +184,12 @@ class Receipt extends Component
 
      public function closeCreateReceipt(){
         $this->showCreateReceipt = false;
+        $this->receiptDate = null;
+        $this->customerCode = null;
+        $this->paymentType = "cash";
+        $this->cheque = ['bank' => "", 'branch' => "", 'chequeDate' => null, 'no' => ""];
+        $this->invoiceDetails = [];
+        $this->sumCheque = 0;
         $this->resetValidation();
        
     }
