@@ -1,25 +1,151 @@
 <div>
      <div class="flex justify-end">
             <button type="button"
-            wire:click = ""  
+            wire:click = "openCreateReceipt"  
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
             Create Receipt</button>
     </div>
     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg"> 
+        @if (session()->has('success'))
+            <div class="flex items-center p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800 mb-1" role="alert">
+                <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                </svg>
+                <span class="sr-only">Info</span>
+                <div>
+                  <span class="font-medium">Success alert! </span> {{ session('success') }}
+                </div>
+              </div>
+              @endif
+              @if (session()->has('error'))
+              <div class="flex items-center p-4 mb-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300 dark:border-yellow-800 mb-1" role="alert">
+                <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                </svg>
+                <span class="sr-only">Info</span>
+                <div>
+                  <span class="font-medium">Warning alert! </span>{{ session('error') }}
+                </div>
+              </div>
+              @endif
             <div class="p-6 text-gray-900 dark:text-gray-100">
-                  
+                   @foreach ($receipt as $index => $pland)
+                    <div wire:key="items-{{ $index }}" class="wrapper relative ">
+                        <div x-data="{ isOpen: false }" @click="isOpen = !isOpen" class="tab px-5 py-2 border-2   
+                            bg-slate-100 shadow-lg relative mb-4 rounded-md cursor-pointer">
+                            <div 
+                                class="flex justify-between items-center font-semibold text-lg after:absolute after:right-5 after:text-2xl after:text-gray-400 hover:after:text-gray-950 peer-checked:after:transform peer-checked:after:rotate-45">
+                                <div class="flex">
+                                    <h2 class="w-8 h-8 bg-sky-300 text-white flex justify-center items-center rounded-sm mr-3">{{ $index + 1 }}</h2>
+                                    <h3>{{ $pland->rec_no}} {{ $pland->customer->cust_name_th ?? null}} {{ strtoupper($pland->rec_payment_type)}}</h3>
+                                    <h3 class="ml-1"></h3>
+                                </div>
+                                <div class="flex">
+                                     {{-- <button wire:click.stop="exportEngPdf({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                       PDF ENG
+                                    </button>
+                                    <button wire:click.stop="exportPdf({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                       PDF TH
+                                    </button>
+                                    <button wire:click.stop="openEditInvoice({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                       EDIT 
+                                    </button> --}}
+                                </div>
+                            </div>
+                            {{-- Accordion content --}}
+                            <div x-show="isOpen" class="answer justify-center mt-5 h-full mr-9"> 
+                                <div  @click.stop class="overflow-x-auto"> 
+                                <table  class="m-6 w-full overflow-x-auto  text-sm text-left rtl:text-right text-gray-500 ">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3">
+                                                No.
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invoice Number
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                               Product Name
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                               Product Code 
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd Amount
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd vat percent
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd vat amount
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd whtax percent
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Invd whtax amount
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Paid amount 
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                     @foreach ($pland->receiptdetail as $listitem)
+                                        <tr class="bg-white border-b hover:bg-gray-50">
+                                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
+                                                {{ $loop->iteration }}
+                                            </th>
+                                            
+                                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                                                {{ $listitem->invoicedetail->invoiceheader->inv_no}}
+                                            </th>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invoicedetail->invd_product_name}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invoicedetail->invd_product_code }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invoicedetail->invd_amt}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invoicedetail->invd_vat_percent}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{$listitem->invoicedetail->invd_vat_amt}}
+                                            </td>
+                                            
+                                            <td class="px-6 py-4">
+                                                {{$listitem->invoicedetail->invd_wh_tax_percent}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invoicedetail->invd_wh_tax_amt}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->invoicedetail->invd_receipt_amt}}
+                                            </td>
+                                        </tr>   
+                                    @endforeach 
+                                </table>
+                                 </div>
+                            </div>
+                            {{-- End Accordion content --}}
+                        </div>    
+                    </div>
+                @endforeach
+                    
             </div>
     </div>
 
 
 
 
-     {{-- @if($showCreateInvoice) --}}
-    <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click=""></div>
+     @if($showCreateReceipt)
+    <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeCreateReceipt"></div>
     <form wire:submit.prevent="" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '800px', 'max-width' : '1500px' }">
         <div class="bg-blue-700 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
             <div class="text-xl font-bold">Create Receipt</div>
-            <button wire:click="closeCreateInvoice" type="button" class="focus:outline-none">
+            <button wire:click="closeCreateReceipt" type="button" class="focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -206,5 +332,5 @@
     </div>
 </form>
 </div>
-{{-- @endif  --}}
+@endif 
 </div>

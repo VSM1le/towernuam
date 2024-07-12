@@ -9,9 +9,11 @@ use App\Models\ReceiptHeader;
 use Carbon\Carbon;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Receipt extends Component
 {
+    use WithPagination;
     public $receiptDate ;
     public $customerCode = null;
 
@@ -22,6 +24,8 @@ class Receipt extends Component
     public $sumCheque = 0; 
     public $disable = true;
     public $tower = "A";
+
+    public $showCreateReceipt = false;
 
      #[Computed()]
     public function customers(){
@@ -114,6 +118,22 @@ class Receipt extends Component
             'cheque.branch.required_if' => 'branch is required.'
         ]);
 
+         $hasValidDetail = false;
+        foreach ($this->invoiceDetails as $detail) {
+            if ($detail['paid'] >= $detail['netamt']) {
+                $hasValidDetail = true;
+                break;
+            }
+        }
+
+            // If no valid InvoiceDetail, return or handle the error
+        if (!$hasValidDetail) {
+            session()->flash('error', 'No valid invoice details found for creating a receipt.');
+            $this->closeCreateReceipt();
+            return;
+        }
+
+
         $prefix = 'R'.$this->tower.'S';
         $year = Carbon::parse($this->receiptDate)->format("Y");
         $datePart = substr($year,-2) . Carbon::parse($this->receiptDate)->format('m');
@@ -160,8 +180,19 @@ class Receipt extends Component
         } 
     }
 
+    public function openCreateReceipt(){
+        $this->showCreateReceipt = true;
+    }
+
+     public function closeCreateReceipt(){
+        $this->showCreateReceipt = false;
+        $this->resetValidation();
+       
+    }
+
     public function render()
     {
-        return view('livewire.receipt');
+        $receipt = ReceiptHeader::with(['customer','receiptdetail'])->paginate(10);
+        return view('livewire.receipt', compact('receipt'));
     }
 }
