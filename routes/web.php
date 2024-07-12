@@ -31,10 +31,10 @@ Route::view('invoice', 'invoicepdf.invoice1')
 
 Route::get('invoice3', function () {
     $number = new numberToBath;
-    $invoice = InvoiceHeader::where('id',16)->with(['invoicedetail','customerrental','customer'])->first();
+    $invoice = InvoiceHeader::where('id',22)->with(['invoicedetail','customerrental','customer'])->first();
     $bath = $number->baht_text($invoice->invoicedetail->sum('invd_net_amt'));
 
-    return view('invoicepdf.invoice3', [
+    return view('invoicepdf.invoice1', [
         'Invoices' => $invoice,
         'bath' => $bath,
     ]);

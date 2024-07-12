@@ -6,7 +6,10 @@ use App\Models\Customer;
 use App\Models\InvoiceDetail;
 use App\Models\InvoiceHeader;
 use App\Models\ReceiptHeader;
+use App\Services\numberToBath;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Dompdf\Options;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -193,6 +196,24 @@ class Receipt extends Component
         $this->resetValidation();
        
     }
+    public function exportPdf($id){
+        $number = new numberToBath;
+        
+        // $options = new Options();
+        // $options->set('isHtml5ParserEnabled', true);
+        // $options->set('isRemoteEnabled', true);
+        $invoice = InvoiceHeader::where('id','22')->with(['invoicedetail','customerrental','customer'])->first();
+        $bath = $number->baht_text($invoice->invoicedetail->sum('invd_net_amt'));
+        $html1 = view('invoicepdf.invoice1', ['Invoices' => $invoice, 'bath' => $bath])->render();
+        // $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
+        
+        // Combine the HTML and add a page break
+        $combinedHtml = $html1; 
+        $pdf = PDF::loadHTML($combinedHtml);
+       return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, $invoice->inv_no . '.pdf'); 
+    } 
 
     public function render()
     {
