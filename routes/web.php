@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\InvoiceHeader;
+use App\Models\ReceiptHeader;
 use App\Services\numberToBath;
 use Illuminate\Support\Facades\Route;
 
@@ -31,11 +32,11 @@ Route::view('invoice', 'invoicepdf.invoice1')
 
 Route::get('invoice3', function () {
     $number = new numberToBath;
-    $invoice = InvoiceHeader::where('id',1)->with(['invoicedetail','customerrental','customer'])->first();
-    $bath = $number->baht_text($invoice->invoicedetail->sum('invd_net_amt'));
-
+    $receipt= ReceiptHeader::where('id',3)->with(['receiptdetail','customer'])->first();
+   $bath = $number->baht_text(round($receipt->receiptdetail->pluck('invoicedetail.invd_net_amt')
+                        ->sum(),2)); 
     return view('invoicepdf.invoice1', [
-        'Invoices' => $invoice,
+        'Receipt' => $receipt,
         'bath' => $bath,
     ]);
 })->middleware(['auth'])->name('invoice');    

@@ -197,21 +197,21 @@ class Receipt extends Component
     }
     public function exportPdf($id){
         $number = new numberToBath;
-        
+        $sum = 0; 
         // $options = new Options();
         // $options->set('isHtml5ParserEnabled', true);
         // $options->set('isRemoteEnabled', true);
-        $invoice = InvoiceHeader::where('id',1)->with(['invoicedetail','customerrental','customer'])->first();
-        $bath = $number->baht_text($invoice->invoicedetail->sum('invd_net_amt'));
-        $html1 = view('invoicepdf.invoice1', ['Invoices' => $invoice, 'bath' => $bath])->render();
+        $receipt= ReceiptHeader::where('id',$id)->with(['receiptdetail','customer'])->first();
+
+        $bath = $number->baht_text(round($receipt->receiptdetail->pluck('invoicedetail.invd_net_amt')
+                        ->sum(),2)); 
+        $html1 = view('invoicepdf.invoice1', ['Receipt' => $receipt, 'bath' => $bath])->render();
         // $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
-        
-        // Combine the HTML and add a page break
         $combinedHtml = $html1; 
         $pdf = PDF::loadHTML($combinedHtml);
        return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
-        }, $invoice->inv_no . '.pdf'); 
+        }, $receipt->rec_no . '.pdf'); 
     } 
 
     public function render()
