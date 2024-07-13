@@ -148,22 +148,22 @@
             <tbody>
                 <tr >
                     <td style="width:544px; vertical-align:top;">
-                    <p style="font-size: 18px; line-height:13px">ได้รับเงินจาก&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <p style="font-size: 18px; line-height:1">ได้รับเงินจาก&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         {{$Invoices->customerrental->custr_contract_no ?? null }}<br>Received From</p> 
                     </td>
 
                     <td style="height: 2px; border:1px solid #000; margin:0px; vertical-align:top">
-                        <p style="font-size: 18px">เลขที่ใบเสร็จ</p>
-                        <p style="font-size: 18px">No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ \Carbon\Carbon::parse($Invoices->inv_date)->format('d/m/Y') }}</p>
+                        <p style="font-size: 18px; line-height:0.8">เลขที่ใบเสร็จ</p>
+                        <p style="font-size: 18px; line-height:0.8">No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ \Carbon\Carbon::parse($Invoices->inv_date)->format('d/m/Y') }}</p>
                     </td>
                 </tr>
                 <tr>
-                    <td style="height:60px; vertical-align:top;">
+                    <td style="height:10px; vertical-align:top;">
                     <p style="font-size: 18px">ที่อยู่&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
                         {{
                         $Invoices->customer->cust_address_th1
                         }}</p>   
-                    <p style="font-size: 18px">Address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <p style="font-size: 18px; line-height:0.8">Address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         {{
                         $Invoices->customer->cust_address_th2
                         }}
@@ -171,17 +171,17 @@
                         </p>   
                     </td>
                     <td style="vertical-align:top;width: 40%; border:1px solid #000; margin:0px;">
-                        <p style="font-size: 18px">วันที่</p>
-                        <p style="font-size: 18px">Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->inv_no }}</p>
+                        <p style="font-size: 18px; line-height:0.8">วันที่</p>
+                        <p style="font-size: 18px; line-height:0.8">Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->inv_no }}</p>
                     </td>
                 </tr>
                 <tr>
-                    <td style="height: 60px; vertical-align:top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;{{ $Invoices->customer->cust_taxid }}&nbsp;
+                    <td style="height: 40px; vertical-align:top; font-size:18px;line-height:0.5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;{{ $Invoices->customer->cust_taxid }}&nbsp;
                         {{ $Invoices->customer->cust_branch }}
                     </td>
                     <td style="vertical-align:top; width: 40%; border:1px solid #000; margin:0px;">
-                        <p style="font-size: 18px">แปลนเลขที่</p>
-                       <p style="font-size: 18px;">Plan No.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{\Carbon\Carbon::parse($Invoices->invd_duedate)->format('d/m/Y')}}</p> 
+                        <p style="font-size: 18px; line-height:0.8">แปลนเลขที่</p>
+                       <p style="font-size: 18px;line-height:0.8">Plan No.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{\Carbon\Carbon::parse($Invoices->invd_duedate)->format('d/m/Y')}}</p> 
                     </td>
                 </tr>
             </tbody>
@@ -197,22 +197,22 @@
             </thead>
             <tbody>
                 <tr style="height: 200px;">
-                    <td style="height:250px;width: 280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
+                    <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ( $Invoices->invoicedetail as $invoice )
                             <p style="font-size:18px">{{ $invoice->invd_product_name }}</p>
                         @endforeach
                     </td>
-                    <td style="width:100px;text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
+                    <td style="width:100px;text-align: right; border-right:1px solid #000;vertical-align:top;">
                          @foreach ( $Invoices->invoicedetail as $invoice )
                             <p style="font-size: 18px" >{{ number_format($invoice->invd_amt,2,'.',',') }}</p>
                         @endforeach
                     </td>
-                    <td style="text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
+                    <td style="text-align: right; border-right:1px solid #000;vertical-align:top;width:100px">
                          @foreach ( $Invoices->invoicedetail as $invoice )
                             <p style="font-size: 18px" >{{ number_format($invoice->invd_vat_amt,2,'.',',')}}</p>
                         @endforeach
                     </td>
-                    <td style="text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
+                    <td style="text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;width:100px">
                          @foreach ( $Invoices->invoicedetail as $invoice )
                             <p style="font-size: 18px" >{{ number_format($invoice->invd_net_amt,2,'.',',')}}</p>
                         @endforeach
@@ -221,21 +221,24 @@
             </tbody>
             <tbody>
                 <tr style="border:1px solid #000">
-                    <td style="height:100px;border:1px solid #000">
-
+                    <td style="height:100px;border:1px solid #000; vertical-align:top;font-size:18px">
+                        <p style="font-size: 18px;line-height:0.8">มูลที่ยกเว้นภาษีมูลค่าเพิ่ม</p>
+                        <p style="font-size:18px;line-height:0.8">มูลค่าที่รวมภาษีมูลค่าเพิ่ม</p>
+                        <p style="font-size:18px;line-height:0.8">-มูลค่าที่เสียภาษีมูลค่าเพิ่ม</p>
+                        <p style="font-size:18px;line-height:0.8">-ภาาีมูลค่าเพิ่ม</p> 
+                        <p style="font-size:18px;line-height:0.8">มูลค่าที่ไม่อยู่ในข้อบังคับภาษีมูลค่าเพิ่ม</p>
                     </td>
                     <td style="border:1px solid #000">
 
                     </td>
                     <td style="border:1px solid #000">
-
                     </td>
                     <td style="border:1px solid #000">
 
                     </td>
                 </tr>
                 <tr>
-                   <td style="border:1px solid #000">
+                   <td style="border:1px solid #000;height:20px">
 
                     </td>
                     <td style="border:1px solid #000">
@@ -252,61 +255,125 @@
         </table>
           <table class="details-table">
             <tr>
-                <td>
-                    <p>ชำระโดย</p>
-                    <p>Payment of</p>
+                <td style="vertical-align: top;line-height:0.5">
+                    <p style="font-size: 18px">ชำระโดย</p>
+                    <p style="font-size: 18px">Payment of</p>
                 </td>
-                <td>
-                    <input type="checkbox">
-                    <p>เงินสด</p>
-                    <p>Cash</p>
+                <td style="vertical-align:top;">
+                  <span style="display: inline-block;">
+                    <input value="value" type="checkbox">
+                </span>
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px">เงินสด<br>cash</p>
+                </span> 
                 </td>
+                <td style="vertical-align:top;">
+                  <span style="display: inline-block;">
+                    <input value="value" type="checkbox">
+                </span>
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px">เงินโอน</p>
+                </span> 
+                </td> 
                 <td>
-                    <input type="checkbox">
-                    <p>เช็คธนาคาร</p>
-                    <p>Cheque of Bank</p>
+                    <p style="font-size: 18px"></p>
                 </td>
-                <td>
-                    <input type="checkbox">
-                    <p>เช็คธนาคาร</p>
-                    <p>Cheque No.</p>
-                </td>
+                
             </tr>
-        </table>
-        <table class="details-table">
             <tr>
                 <td>
-                    <p>บาท(Baht) :</p>
-                    <p>หมายเหตุ (Remark) :</p>
-                    <p>฿23,232,323</p>
+
                 </td>
-                <td class="signature-cell">
-                    <p>ในนาม</p>
-                    <p>For</p>
-                    <table class="signature-grid">
-                        <tbody>
-                            <tr>
-                                <td class="signature-cell"> </td>
-                            </tr>
-                            <tr>
-                                <td class="signature-cell">วันที่</td>
-                            </tr>
-                        </tbody>
+                <td style="vertical-align:top;">
+                  <span style="display: inline-block;">
+                    <input value="value" type="checkbox">
+                </span>
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px;">เช็คธนาคาร<br>Cheque No.</p>
+                </span> 
+                </td> 
+                 <td style="vertical-align:top;width:120px">
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px">สาขา<br>Branch</p>
+                </span> 
+                </td>
+                 <td style="vertical-align:top;">
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px">เลขที่<br>NO.</p>
+                </span> 
+                </td>
+                 <td style="vertical-align:top;">
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px">วันที่<br>Date</p>
+                </span> 
+                </td>
+               <td style="vertical-align:top;">
+                <span style="display: inline-block; margin-left: 5px; line-height: 0.5;">
+                    <p style="display: inline; margin: 0; font-size: 18px;">จำนวน<br>Amount</p>
+                </span>
+                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
+                    
+                </span>
+                </td> 
+            </tr>
+            <tr>
+               <td>
+                </td> 
+                 <td style="vertical-align:top;">
+                  <span style="display: inline-block;">
+                    <input value="value" type="checkbox">
+                </span>
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px">ภาษีหัก ณ ที่จ่าย<br>Withholding Tax</p>
+                </span> 
+                </td> 
+            </tr>
+        </table>
+        {{-- <table style="border-collapse: collapse;" >
+            <tr >
+                <td style="border:solid 1px #000; height:60px;width:100px;margin:0;padding:0;text-align:center">
+                    <p>ผู้รันเงิน</p>
+                    <p>Collector</p>
+                </td>
+                <td style="border:solid 1px #000; height:60px;width:100px;margin:0;padding:0;text-align:center">
+                    <p>การเงิน</p>
+                    <p>Cashier</p>
+                </td>
+            </tr>
+            <tr style="margin:0">
+                 <td style="border: solid 1px #000;margin:0;padding:0; height:50px;text-align:center" >
+                    <p></p>
+                    <p></p>
+                </td> 
+                <td style="border: solid 1px #000;margin:0;padding:0" >
+                    <p></p>
+                    <p></p>
+                </td> 
+            </tr>
+        </table> --}}
+        <table class="outer-table">
+            <tr>
+                <td>
+                    <table style="border-collapse:collapse">
+                        <tr >
+                            <td class="bordered" style="height: 50px; width: 100px;border:solid 1px #000; text-align:center;line-height:0.8">
+                                <p>ผู้รันเงิน</p>
+                                <p>Collector</p>
+                            </td>
+                            <td class="bordered" style="height: 50px; width: 100px;border:solid 1px #000;text-align:center;line-height:0.8">
+                                <p>การเงิน</p>
+                                <p>Cashier</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 40px; border:solid 1px #000"></td>
+                            <td style="border:solid 1px #000"></td>
+                        </tr>
                     </table>
                 </td>
-                <td class="signature-cell">
-                    <p>ผู้รับเงิน</p>
-                    <p>Receiver</p>
-                    <table class="signature-grid">
-                        <tbody>
-                            <tr>
-                                <td class="signature-cell"> </td>
-                            </tr>
-                            <tr>
-                                <td class="signature-cell">วันที่</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <td class="text-container" style="padding-left: 10px;">
+                    <p style="font-size: 15px">หมายเหตุ: ในกรณีชำระเป็น ใบเส็จรับเงินและใบกำกับภาษีฉบับนี้จะสมบูรณ์ต่อเมื่อบริษัทฯ ได้รับเงินตามเช็คแล้ว</p>
+                    <p style="font-size: 15px">REMARK: If payment is made by cheque. This receipt will be valid cheque has been cleared by the bank.</p>
                 </td>
             </tr>
         </table>

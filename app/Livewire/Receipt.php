@@ -202,7 +202,7 @@ class Receipt extends Component
         // $options = new Options();
         // $options->set('isHtml5ParserEnabled', true);
         // $options->set('isRemoteEnabled', true);
-        $invoice = InvoiceHeader::where('id','22')->with(['invoicedetail','customerrental','customer'])->first();
+        $invoice = InvoiceHeader::where('id',1)->with(['invoicedetail','customerrental','customer'])->first();
         $bath = $number->baht_text($invoice->invoicedetail->sum('invd_net_amt'));
         $html1 = view('invoicepdf.invoice1', ['Invoices' => $invoice, 'bath' => $bath])->render();
         // $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
