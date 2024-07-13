@@ -88,7 +88,6 @@ class Receipt extends Component
                     'netamt' => $amt,
                     'whtax' => $detail->invd_wh_tax_amt,
                     'tax' => $detail->invd_vat_amt,
-                    'whtax' => $detail->invd_wh_tax_amt,
                     'receiptamt' => $detail->invd_receipt_amt ?? 0,
                     'paid' => round($amt - $detail->invd_receipt_amt, 2)   
                     ];
