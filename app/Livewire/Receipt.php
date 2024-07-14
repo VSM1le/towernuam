@@ -202,11 +202,21 @@ class Receipt extends Component
         // $options->set('isHtml5ParserEnabled', true);
         // $options->set('isRemoteEnabled', true);
         $receipt= ReceiptHeader::where('id',$id)->with(['receiptdetail','customer'])->first();
-
+        $receiptDetails = $receipt->receiptdetail->map(function ($detail){
+        $detail->calculated_vat = round(($detail->rec_pay * $detail->invoicedetail->invd_vat_percent) / 100,2);
+        $detail->gross = round($detail->rec_pay - ($detail->rec_pay * $detail->invoicedetail->invd_vat_percent / 100),2);
+        $detail->whtax = round(($detail->rec_pay * $detail->invoicedetail->invd_wh_tax_percent) / 100 , 2);
+        return $detail;
+        });
         $bath = $number->baht_text(round($receipt->receiptdetail->pluck('invoicedetail.invd_net_amt')
                         ->sum(),2)); 
-        $html1 = view('invoicepdf.invoice1', ['Receipt' => $receipt, 'bath' => $bath])->render();
+        $html1 = view('invoicepdf.invoice1', [
+        'Receipt' => $receipt,
+        'receiptdetails' => $receiptDetails,
+        'bath' => $bath,
+        ]);
         // $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
+        
         $combinedHtml = $html1; 
         $pdf = PDF::loadHTML($combinedHtml);
        return response()->streamDownload(function () use ($pdf) {

@@ -245,67 +245,70 @@
             <tbody>
                 <tr style="height: 200px;">
                     <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
-                        @foreach ( $Receipt->receiptdetail as $receipt)
-                            <p style="font-size:18px">{{ $receipt->invoicedetail->invd_product_name}}</p>
+                        @foreach ( $Receipt->receiptdetail as $index => $receipt)
+                           <p style="font-size:18px; position: relative;">
+                            {{$index + 1 }}. {{ $receipt->invoicedetail->invd_product_name}}
+                            <span style="position: absolute; right: 15px;">
+                                {{ $receipt->invoicedetail->invoiceheader->inv_no }}
+                            </span>
+                            </p> 
                         @endforeach
                     </td>
-                    <td style="width:100px;text-align: right; border-right:1px solid #000;vertical-align:top;">
-                         @foreach ( $Receipt->receiptdetail as $receipt)
-                            <p style="font-size: 18px" >{{ number_format($receipt->invoicedetail->invd_amt,2,'.',',') }}</p>
+                   <td style="vertical-align: top; width: 100px; text-align: right; border-right: 1px solid #000;">
+                        @foreach ( $receiptdetails as $receiptdetail)
+                            <p style="font-size: 18px; margin: 0;">{{ number_format($receiptdetail->gross,2,'.',',') }}</p>
+                        @endforeach
+                    </td> 
+                    <td style="text-align: right; border-right:1px solid #000;vertical-align:top;width:100px">
+                         @foreach ( $receiptdetails as $receiptdetail)
+                            <p style="font-size: 18px" >{{ number_format($receiptdetail->calculated_vat,2,'.',',')}}</p>
                         @endforeach
                     </td>
                     <td style="text-align: right; border-right:1px solid #000;vertical-align:top;width:100px">
                          @foreach ( $Receipt->receiptdetail as $receipt)
-                            <p style="font-size: 18px" >{{ number_format($receipt->invoicedetail->invd_vat_amt,2,'.',',')}}</p>
-                        @endforeach
-                    </td>
-                    <td style="text-align: right; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;width:100px">
-                         @foreach ( $Receipt->receiptdetail as $receipt)
-                            <p style="font-size: 18px" >{{ number_format($receipt->invoicedetail->invd_net_amt,2,'.',',')}}</p>
+                            <p style="font-size: 18px" >{{ number_format($receipt->rec_pay,2,'.',',')}}</p>
                         @endforeach
                     </td>
                 </tr>
             </tbody>
             <tbody>
-                <tr style="border:1px solid #000">
+                <tr style="">
                    <td style="height:100px;border:1px solid #000; vertical-align:top;font-size:18px">
                         <p style="font-size: 18px;line-height:0.8">
                             มูลค่าที่ได้รับยกเว้นภาษีมูลค่าเพิ่ม
-                            <span style="float: right;clear:both">
-                                {{ number_format($Receipt->receiptdetail
+                            <span style="float: right;clear:both;padding-right:15px">
+                                {{ number_format($receiptdetails
                                     ->filter(function ($detail) {
                                         return $detail->invoicedetail->invd_vat_percent == 0;
                                     })
-                                    ->pluck('invoicedetail.invd_amt')
+                                    ->pluck('gross')
                                     ->sum(), 2, '.', ',') }}
                             </span> 
                         </p>
                         <p style="font-size:18px;line-height:0.8">มูลค่าที่รวมภาษีมูลค่าเพิ่ม
-                            <span style="float: right;clear:both;">
+                            <span style="float: right;clear:both;padding-right:15px">
                                 {{ number_format($Receipt->receiptdetail
                                     ->filter(function ($detail) {
                                         return $detail->invoicedetail->invd_vat_percent != 0;
                                     })
-                                    ->pluck('invoicedetail.invd_net_amt')
-                                    ->sum(), 2, '.', ',') }}
+                                    ->sum('rec_pay'), 2, '.', ',') }}
                             </span>
                         </p>
                         <p style="font-size:18px;line-height:0.8">
                             -มูลค่าที่เสียภาษีมูลค่าเพิ่ม
-                            <span style="float: right;clear:both;">
-                                {{ number_format($Receipt->receiptdetail
+                            <span style="float: right;clear:both;padding-right:15px">
+                                {{ number_format($receiptdetails
                                     ->filter(function ($detail) {
                                         return $detail->invoicedetail->invd_vat_percent != 0;
                                     })
-                                    ->pluck('invoicedetail.invd_amt')
-                                    ->sum(), 2, '.', ',') }}
+                                    ->sum('gross'), 2, '.', ',') }}
                             </span>
                         </p>
                         <p style="font-size:18px;line-height:0.8">
                             -ภาษีมูลค่าเพิ่ม
-                            <span style="float: right;clear:both;">
-                                {{ number_format($Receipt->receiptdetail
-                                    ->pluck('invoicedetail.invd_vat_amt')
+                            <span style="float: right;clear:both;padding-right:15px">
+                                {{ number_format($receiptdetails
+                                    ->pluck('calculated_vat')
                                     ->sum(), 2, '.', ',') }}
                             </span>
                         </p>
@@ -313,12 +316,12 @@
                             มูลค่าที่ไม่อยู่ในข้อบังคับภาษีมูลค่าเพิ่ม
                         </p>
                     </td> 
-                    <td style="border:1px solid #000">
+                    <td style="border-right:solid 1px #000">
 
                     </td>
-                    <td style="border:1px solid #000">
+                    <td style="border-right:solid 1px #000">
                     </td>
-                    <td style="border:1px solid #000">
+                    <td style="">
 
                     </td>
                 </tr>
@@ -327,16 +330,16 @@
                         <p style="font-size: 18px">{{ $bath }} </p>
                     </td>
                     <td style="border:1px solid #000; text-align:right">
-                        <p style="font-size: 18px">{{  number_format($Receipt->receiptdetail->pluck('invoicedetail.invd_amt')
+                        <p style="font-size: 18px">{{  number_format($receiptdetails->pluck('gross')
                         ->sum(),2,'.',',') }}</p>
                     </td>
                     <td style="border:1px solid #000; text-align:right">
-                    <p style="font-size: 18px">{{  number_format($Receipt->receiptdetail->pluck('invoicedetail.invd_vat_amt')
+                    <p style="font-size: 18px">{{  number_format($receiptdetails->pluck('calculated_vat')
                         ->sum(),2,'.',',') }}</p>
                     </td>
                     </td>
                     <td style="border:1px solid #000; text-align:right">
-                         <p style="font-size: 18px">{{  number_format($Receipt->receiptdetail->pluck('invoicedetail.invd_net_amt')
+                         <p style="font-size: 18px">{{  number_format($Receipt->receiptdetail->pluck('rec_pay')
                         ->sum(),2,'.',',') }}</p> 
                     </td> 
                 </tr>
@@ -344,11 +347,11 @@
         </table>
           <table class="details-table">
             <tr>
-                <td style="vertical-align: top;line-height:0.5">
+                <td style="vertical-align: top;line-height:0.5; width:100px">
                     <p style="font-size: 18px">ชำระโดย</p>
                     <p style="font-size: 18px">Payment of</p>
                 </td>
-                <td style="vertical-align:top;">
+                <td style="vertical-align:top;width:150px">
                   <span style="display: inline-block;">
                     <input  type="checkbox" {{ $Receipt->rec_payment_type == 'cash' ? 'checked' : ''}}>
                 </span>
@@ -361,7 +364,7 @@
                         @endif 
                 </span>
                 </td>
-                <td style="vertical-align:top;width:150px">
+                <td style="vertical-align:top;width:">
                   <span style="display: inline-block;">
                     <input  type="checkbox" {{ $Receipt->rec_payment_type == 'tran' ? 'checked' : ''}}>
                 </span>
@@ -376,7 +379,7 @@
                 </span>
                 </td> 
             </tr>
-            <tr>
+            {{-- <tr>
                 <td>
 
                 </td>
@@ -388,7 +391,7 @@
                     <p style="display: inline; margin: 0; font-size:18px;">เช็คธนาคาร<br>Cheque No.</p>
                 </span>
                 <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
-                   
+                  {{ $Receipt->rec_bank }}
                 </span>
                 </td> 
                  <td style="vertical-align:top;">
@@ -396,7 +399,7 @@
                     <p style="display: inline; margin: 0; font-size:18px">สาขา<br>Branch</p>
                 </span>
                 <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
-                    
+                  {{ $Receipt->rec_branch}}
                 </span>
                 </td>
                  <td style="vertical-align:top;">
@@ -404,7 +407,7 @@
                     <p style="display: inline; margin: 0; font-size:18px">เลขที่<br>NO.</p>
                 </span>
                 <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
-                   
+                     {{ $Receipt->rec_no}}
                 </span>
                 </td>
                  <td style="vertical-align:top;">
@@ -439,44 +442,92 @@
                     <p style="display: inline; margin: 0; font-size:18px">ภาษีหัก ณ ที่จ่าย<br>Withholding Tax</p>
                 </span> 
                  <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
-                   {{ number_format($Receipt->receiptdetail->pluck('invoicedetail.invd_wh_tax_amt')
+                   {{ number_format($receiptdetails->pluck('whtax')
+                            ->sum(),2,'.',',') }}
+                </span>
+                </td> 
+            </tr> --}}
+        </table>
+        <table>
+             <tr>
+                {{-- <td style="width:117px">
+
+                </td> --}}
+                <td style="vertical-align:top;min-width:150px">
+                  <span style="display: inline-block;">
+                    <input value="value" type="checkbox" {{ $Receipt->rec_payment_type == 'cheq' ? 'checked':'' }}>
+                </span>
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px;">เช็คธนาคาร<br>Cheque No.</p>
+                </span>
+                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
+                  {{ $Receipt->rec_bank }}
+                </span>
+                </td> 
+                 <td style="vertical-align:top;min-width:150px">
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px">สาขา<br>Branch</p>
+                </span>
+                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
+                  {{ $Receipt->rec_branch}}
+                </span>
+                </td>
+                 <td style="vertical-align:top;min-width:150px">
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px">เลขที่<br>NO.</p>
+                </span>
+                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
+                     {{ $Receipt->rec_cheque_no}}
+                </span>
+                </td>
+                 <td style="vertical-align:top;min-width:150px">
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px">วันที่<br>Date</p>
+                </span> 
+                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
+                   {{ $Receipt->rec_cheque_date  }}
+                </span>
+                </td>
+               <td style="vertical-align:top;min-width:150px">
+                <span style="display: inline-block; margin-left: 5px; line-height: 0.5;">
+                    <p style="display: inline; margin: 0; font-size: 18px;">จำนวน<br>Amount</p>
+                </span>
+                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
+                    @if ($Receipt->rec_payment_type == "cheq")
+                           {{ number_format($Receipt->rec_payment_amt,2,'.',',')  }} 
+                    @endif
+                </span>
+                </td> 
+            </tr>
+        </table>
+        <table>
+            <tr>
+                 <td style="vertical-align:top;">
+                  <span style="display: inline-block;">
+                    <input value="value" type="checkbox" {{
+                        $Receipt->receiptdetail->pluck('invoicedetail.invd_wh_tax_amt')
+                            ->sum() > 0 ? 'checked' : ''     }}>
+                </span>
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
+                    <p style="display: inline; margin: 0; font-size:18px">ภาษีหัก ณ ที่จ่าย<br>Withholding Tax</p>
+                </span> 
+                 <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px; margin-left:10px">
+                   {{ number_format($receiptdetails->pluck('whtax')
                             ->sum(),2,'.',',') }}
                 </span>
                 </td> 
             </tr>
         </table>
-        {{-- <table style="border-collapse: collapse;" >
-            <tr >
-                <td style="border:solid 1px #000; height:60px;width:100px;margin:0;padding:0;text-align:center">
-                    <p>ผู้รันเงิน</p>
-                    <p>Collector</p>
-                </td>
-                <td style="border:solid 1px #000; height:60px;width:100px;margin:0;padding:0;text-align:center">
-                    <p>การเงิน</p>
-                    <p>Cashier</p>
-                </td>
-            </tr>
-            <tr style="margin:0">
-                 <td style="border: solid 1px #000;margin:0;padding:0; height:50px;text-align:center" >
-                    <p></p>
-                    <p></p>
-                </td> 
-                <td style="border: solid 1px #000;margin:0;padding:0" >
-                    <p></p>
-                    <p></p>
-                </td> 
-            </tr>
-        </table> --}}
         <table class="outer-table">
             <tr>
                 <td>
                     <table style="border-collapse:collapse">
                         <tr >
-                            <td class="bordered" style="height: 50px; width: 100px;border:solid 1px #000; text-align:center;line-height:0.8">
+                            <td class="bordered" style="height: 40px; width: 100px;border:solid 1px #000; text-align:center;line-height:0.8">
                                 <p>ผู้รันเงิน</p>
                                 <p>Collector</p>
                             </td>
-                            <td class="bordered" style="height: 50px; width: 100px;border:solid 1px #000;text-align:center;line-height:0.8">
+                            <td class="bordered" style="height: 40px; width: 100px;border:solid 1px #000;text-align:center;line-height:0.8">
                                 <p>การเงิน</p>
                                 <p>Cashier</p>
                             </td>

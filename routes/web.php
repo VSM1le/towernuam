@@ -30,13 +30,21 @@ Route::view('invoice', 'invoicepdf.invoice1')
 //     ->name('invoice');
 
 
-Route::get('invoice3', function () {
+Route::get('invoice3/{id}', function ($id) {
     $number = new numberToBath;
-    $receipt= ReceiptHeader::where('id',3)->with(['receiptdetail','customer'])->first();
+    $receipt= ReceiptHeader::where('id',$id)->with(['receiptdetail','customer'])->first();
    $bath = $number->baht_text(round($receipt->receiptdetail->pluck('invoicedetail.invd_net_amt')
                         ->sum(),2)); 
+
+    $receiptDetails = $receipt->receiptdetail->map(function ($detail){
+        $detail->calculated_vat = round(($detail->rec_pay * $detail->invoicedetail->invd_vat_percent) / 100,2);
+        $detail->gross = round($detail->rec_pay - ($detail->rec_pay * $detail->invoicedetail->invd_vat_percent / 100),2);
+        $detail->whtax = round(($detail->rec_pay * $detail->invoicedetail->invd_wh_tax_percent) / 100 , 2);
+        return $detail;
+    });
     return view('invoicepdf.invoice1', [
         'Receipt' => $receipt,
+        'receiptdetails' => $receiptDetails,
         'bath' => $bath,
     ]);
 })->middleware(['auth'])->name('invoice');    

@@ -200,8 +200,8 @@
             <tbody>
                 <tr style="height: 200px;">
                     <td style="height:390px;width: 280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
-                        @foreach ( $Invoices->invoicedetail as $invoice )
-                            <p style="font-size:18px">{{ $invoice->invd_product_name }}</p>
+                        @foreach ( $Invoices->invoicedetail as $index => $invoice )
+                            <p style="font-size:18px">{{ $index + 1}}. {{ $invoice->invd_product_name }}</p>
                         @endforeach
                     </td>
                     <td style="width: 140px; text-align: center; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">
