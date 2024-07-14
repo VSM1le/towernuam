@@ -143,6 +143,9 @@ class Invoice extends Component
        if(Customer::where('id',$this->customerCode)->pluck('cust_gov_flag')->first() == 1){
             $wh_tax = $product_service->gov_whtax;
        } 
+       if(Customer::where('id',$this->customerCode)->pluck('cust_gov_flag')->first() == 3){
+            $wh_tax = 0;
+       }
         if(($product_service->ps_code == "1001" || $product_service->ps_code == "1010") && !is_null($customer_rent)){
             $amt = $customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm;
             $vatamt = ($amt * $product_service->ps_vat)/100;

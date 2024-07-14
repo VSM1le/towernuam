@@ -208,16 +208,12 @@ class Receipt extends Component
         $detail->whtax = round(($detail->rec_pay * $detail->invoicedetail->invd_wh_tax_percent) / 100 , 2);
         return $detail;
         });
-        $bath = $number->baht_text(round($receipt->receiptdetail->pluck('invoicedetail.invd_net_amt')
-                        ->sum(),2)); 
-        $html1 = view('invoicepdf.invoice1', [
-        'Receipt' => $receipt,
-        'receiptdetails' => $receiptDetails,
-        'bath' => $bath,
-        ]);
+        $bath = $number->baht_text($receipt->rec_payment_amt);
+        $html1 = view('invoicepdf.invoice1', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath]);
+        $html2 = view('invoicepdf.invoice2', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath]);
         // $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
         
-        $combinedHtml = $html1; 
+        $combinedHtml = $html1 . $html2; 
         $pdf = PDF::loadHTML($combinedHtml);
        return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
