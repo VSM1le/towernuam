@@ -223,7 +223,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="height: 40px; vertical-align:top; font-size:18px;line-height:0.5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;{{ $Receipt->customer->cust_taxid }}&nbsp;
+                    <td style="height: 40px; vertical-align:top; font-size:18px;line-height:0.8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;{{ $Receipt->customer->cust_taxid }}&nbsp;
                         {{ $Receipt->customer->cust_branch }}
                     </td>
                     <td style="vertical-align:top; width: 40%; border:1px solid #000; margin:0px;">
@@ -345,108 +345,40 @@
                 </tr>
             </tbody>    
         </table>
-          <table class="details-table">
+        <table class="details-table">
             <tr>
                 <td style="vertical-align: top;line-height:0.5; width:100px">
                     <p style="font-size: 18px">ชำระโดย</p>
                     <p style="font-size: 18px">Payment of</p>
                 </td>
                 <td style="vertical-align:top;width:150px">
-                  <span style="display: inline-block;">
-                    <input  type="checkbox" {{ $Receipt->rec_payment_type == 'cash' ? 'checked' : ''}}>
-                </span>
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px">เงินสด<br>cash</p>
-                </span> 
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;line-height:1;padding-bottom:10px">
-                     @if ($Receipt->rec_payment_type == "cash")
-                           {{  number_format($Receipt->rec_payment_amt,2,'.',',')  }} 
+                    <span style="display: inline-block;">
+                        <input  type="checkbox" {{ $Receipt->rec_payment_type == 'cash' ? 'checked' : ''}}>
+                    </span>
+                    <span style="display: inline-block; margin-left: 5px;line-height:0.5;position: relative;">
+                        <p style="display: absolute; margin: 0; font-size:18px">เงินสด<br>cash</p>
+                    </span> 
+                    <span style="margin-left: 10px; vertical-align: top; font-size: 18px;line-height:1;position:relative;top:-10px">
+                        @if ($Receipt->rec_payment_type == "cash")
+                            {{  number_format($Receipt->rec_payment_amt,2,'.',',')  }} 
                         @endif 
-                </span>
-                </td>
-                <td style="vertical-align:top;width:">
-                  <span style="display: inline-block;">
-                    <input  type="checkbox" {{ $Receipt->rec_payment_type == 'tran' ? 'checked' : ''}}>
-                </span>
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px">เงินโอน<br>-</p>
-                </span> 
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;line-height:1;padding-bottom:10px">
-                     @if ($Receipt->rec_payment_type == "tran")
-                           {{  number_format($Receipt->rec_payment_amt,2,'.',',')  }} 
-                        @endif 
-                        
-                </span>
-                </td> 
-            </tr>
-            {{-- <tr>
-                <td>
-
+                    </span>
                 </td>
                 <td style="vertical-align:top;">
-                  <span style="display: inline-block;">
-                    <input value="value" type="checkbox" {{ $Receipt->rec_payment_type == 'cheq' ? 'checked':'' }}>
-                </span>
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px;">เช็คธนาคาร<br>Cheque No.</p>
-                </span>
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
-                  {{ $Receipt->rec_bank }}
-                </span>
-                </td> 
-                 <td style="vertical-align:top;">
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px">สาขา<br>Branch</p>
-                </span>
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
-                  {{ $Receipt->rec_branch}}
-                </span>
-                </td>
-                 <td style="vertical-align:top;">
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px">เลขที่<br>NO.</p>
-                </span>
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
-                     {{ $Receipt->rec_no}}
-                </span>
-                </td>
-                 <td style="vertical-align:top;">
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px">วันที่<br>Date</p>
-                </span> 
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
-                   {{ $Receipt->rec_cheque_date  }}
-                </span>
-                </td>
-               <td style="vertical-align:top;">
-                <span style="display: inline-block; margin-left: 5px; line-height: 0.5;">
-                    <p style="display: inline; margin: 0; font-size: 18px;">จำนวน<br>Amount</p>
-                </span>
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;line-height:1">
-                    @if ($Receipt->rec_payment_type == "cheq")
-                           {{ number_format($Receipt->rec_payment_amt,2,'.',',')  }} 
-                    @endif
-                </span>
+                    <span style="display: inline-block;">
+                        <input  type="checkbox" {{ $Receipt->rec_payment_type == 'tran' ? 'checked' : ''}}>
+                    </span>
+                    <span style="display: inline-block; margin-left: 5px;line-height:0.5;position:relative">
+                        <p style="display: absolute; margin: 0; font-size:18px">เงินโอน<br>T/T</p>
+                    </span> 
+                    <span style=" margin-left: 10px; vertical-align: top; font-size: 18px;line-height:1; line-height:0;position:relative;top:-10px">
+                        @if ($Receipt->rec_payment_type == "tran")
+                            {{  number_format($Receipt->rec_payment_amt,2,'.',',')  }} 
+                            @endif 
+                    </span>
                 </td> 
             </tr>
-            <tr>
-               <td>
-                </td> 
-                 <td style="vertical-align:top;">
-                  <span style="display: inline-block;">
-                    <input value="value" type="checkbox" {{
-                        $Receipt->receiptdetail->pluck('invoicedetail.invd_wh_tax_amt')
-                            ->sum() > 0 ? 'checked' : ''     }}>
-                </span>
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px">ภาษีหัก ณ ที่จ่าย<br>Withholding Tax</p>
-                </span> 
-                 <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
-                   {{ number_format($receiptdetails->pluck('whtax')
-                            ->sum(),2,'.',',') }}
-                </span>
-                </td> 
-            </tr> --}}
+         
         </table>
         <table>
              <tr>
@@ -457,42 +389,42 @@
                   <span style="display: inline-block;">
                     <input value="value" type="checkbox" {{ $Receipt->rec_payment_type == 'cheq' ? 'checked':'' }}>
                 </span>
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px;">เช็คธนาคาร<br>Cheque No.</p>
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5;position: relative;">
+                    <p style="margin: 0; font-size:18px;">เช็คธนาคาร<br>Cheque No.</p>
                 </span>
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
+                <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position:relative;top:-10px">
                   {{ $Receipt->rec_bank }}
                 </span>
                 </td> 
                  <td style="vertical-align:top;min-width:150px">
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px">สาขา<br>Branch</p>
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5;position: relative;">
+                    <p style="margin: 0; font-size:18px">สาขา<br>Branch</p>
                 </span>
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
+                <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative;top:-10px">
                   {{ $Receipt->rec_branch}}
                 </span>
                 </td>
                  <td style="vertical-align:top;min-width:150px">
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px">เลขที่<br>NO.</p>
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5;position:relative;">
+                    <p style="margin: 0; font-size:18px">เลขที่<br>NO.</p>
                 </span>
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
+                <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
                      {{ $Receipt->rec_cheque_no}}
                 </span>
                 </td>
                  <td style="vertical-align:top;min-width:150px">
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px">วันที่<br>Date</p>
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5;position:relative;">
+                    <p style="margin: 0; font-size:18px">วันที่<br>Date</p>
                 </span> 
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
+                <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
                    {{ $Receipt->rec_cheque_date  }}
                 </span>
                 </td>
                <td style="vertical-align:top;min-width:150px">
-                <span style="display: inline-block; margin-left: 5px; line-height: 0.5;">
-                    <p style="display: inline; margin: 0; font-size: 18px;">จำนวน<br>Amount</p>
+                <span style="display: inline-block; margin-left: 5px; line-height: 0.5;position:relative">
+                    <p style="margin: 0; font-size: 18px;">จำนวน<br>Amount</p>
                 </span>
-                <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px;">
+                <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
                     @if ($Receipt->rec_payment_type == "cheq")
                            {{ number_format($Receipt->rec_payment_amt,2,'.',',')  }} 
                     @endif
@@ -508,12 +440,12 @@
                         $Receipt->receiptdetail->pluck('invoicedetail.invd_wh_tax_amt')
                             ->sum() > 0 ? 'checked' : ''     }}>
                 </span>
-                <span style="display: inline-block; margin-left: 5px;line-height:0.5">
-                    <p style="display: inline; margin: 0; font-size:18px">ภาษีหัก ณ ที่จ่าย<br>Withholding Tax</p>
+                <span style="display: inline-block; margin-left: 5px; line-height: 0.5;position:relative">
+                    <p style="margin: 0; font-size:18px">ภาษีหัก ณ ที่จ่าย<br>Withholding Tax</p>
                 </span> 
-                 <span style="display: inline-block; margin-left: 10px; vertical-align: top; font-size: 18px; margin-left:10px">
-                   {{ number_format($receiptdetails->pluck('whtax')
-                            ->sum(),2,'.',',') }}
+                 <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
+                   {{ number_format($receiptdetails
+                            ->sum('whpay'),2,'.',',') }}
                 </span>
                 </td> 
             </tr>
@@ -543,7 +475,7 @@
                     <p style="font-size: 15px">REMARK: If payment is made by cheque. This receipt will be valid cheque has been cleared by the bank.</p>
                 </td>
             </tr>
-        </table>
+        </table> 
     </div>
 </body>
 </html>

@@ -58,7 +58,7 @@ class Invoice extends Component
 
     public function updatedCustomerCode(){
         $this->rental = null;
-        $this->invoiceDetails = null;
+        $this->invoiceDetails = [];
           if (!is_null($this->customerCode)) {
             $this->customerrents = CustomerRental::where('customer_id',$this->customerCode)->get();
         } else {
@@ -569,17 +569,6 @@ public function closeEditModal(){
         ->orderBy('id', 'desc')
         ->paginate(10);
 
-        // if ($this->startDate && $this->endDate) {
-        //     $startDate = Carbon::parse($this->startDate)->startOfDay();
-        //     $endDate = Carbon::parse($this->endDate)->endOfDay();
-
-        //     $query->whereBetween('inv_date', [$startDate, $endDate]);
-        // }
-        // if ($this->customer){
-        //     $query->where('customer_id',$this->customer);
-        // }
-
-        // $invoices = $query
         return view('livewire.invoice',compact('invoices'));
     }
 }

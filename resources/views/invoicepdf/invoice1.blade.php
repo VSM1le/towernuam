@@ -223,7 +223,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="height: 40px; vertical-align:top; font-size:18px;line-height:0.5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;{{ $Receipt->customer->cust_taxid }}&nbsp;
+                    <td style="height: 40px; vertical-align:top; font-size:18px;line-height:0.8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;{{ $Receipt->customer->cust_taxid }}&nbsp;
                         {{ $Receipt->customer->cust_branch }}
                     </td>
                     <td style="vertical-align:top; width: 40%; border:1px solid #000; margin:0px;">
@@ -444,8 +444,8 @@
                     <p style="margin: 0; font-size:18px">ภาษีหัก ณ ที่จ่าย<br>Withholding Tax</p>
                 </span> 
                  <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
-                   {{ number_format($receiptdetails->pluck('whtax')
-                            ->sum(),2,'.',',') }}
+                   {{ number_format($receiptdetails
+                            ->sum('whpay'),2,'.',',') }}
                 </span>
                 </td> 
             </tr>

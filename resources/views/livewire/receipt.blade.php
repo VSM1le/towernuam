@@ -37,7 +37,8 @@
                                 class="flex justify-between items-center font-semibold text-lg after:absolute after:right-5 after:text-2xl after:text-gray-400 hover:after:text-gray-950 peer-checked:after:transform peer-checked:after:rotate-45">
                                 <div class="flex">
                                     <h2 class="w-8 h-8 bg-sky-300 text-white flex justify-center items-center rounded-sm mr-3">{{ $index + 1 }}</h2>
-                                    <h3>{{ $pland->rec_no}} {{ $pland->customer->cust_name_th ?? null}} {{ strtoupper($pland->rec_payment_type)}}</h3>
+                                    <h3>{{ $pland->rec_no}} {{ $pland->customer->cust_name_th ?? null}} {{ strtoupper($pland->rec_payment_type)}} 
+                                        WH: {{$pland->receiptdetail->sum('whpay') ?? 0}}</h3>
                                     <h3 class="ml-1"></h3>
                                 </div>
                                 <div class="flex">
@@ -209,6 +210,7 @@
                             <th scope="col" class="px-2 py-3">Net Amt</th>
                             <th scope="col" class="px-2 py-3">Paid Amt</th>
                             <th scope="col" class="px-2 py-3">Pay</th>
+                            <th scope="col" class="px-2 py-3">Wh Pay</th>
                             <th scope="col" class="px-2 py-3">Action</th>
                             
                         </tr>
@@ -257,7 +259,14 @@
                                     </td>
                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="invoiceDetails.{{ $index }}.paid" 
-                                        wire:change="updateInvoiceDetails({{ $index}})"
+                                        wire:change="updateInvoiceDetails({{ $index}},'paid')"
+                                        type="number" 
+                                        step="0.01" 
+                                        class="w-full p-2 border border-gray-300 text-xs rounded text-right"/>     
+                                    </td>
+                                      <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="invoiceDetails.{{ $index }}.whpay" 
+                                        wire:change="updateInvoiceDetails({{ $index}},'whpay')"
                                         type="number" 
                                         step="0.01" 
                                         class="w-full p-2 border border-gray-300 text-xs rounded text-right"/>     
@@ -320,6 +329,13 @@
         <div class="w-48 ml-5">
             <label for="vdate" class="text-xs">Total Amount</label>
             <input id="vdate" wire:model.live="sumCheque"  class="w-full p-2 border border-gray-300 text-sm rounded text-right" 
+            type="number"
+            step="0.01"
+            disabled /> 
+        </div>
+         <div class="w-48 ml-5">
+            <label for="vdate" class="text-xs">Wh amount</label>
+            <input id="vdate" wire:model.live="sumWh"  class="w-full p-2 border border-gray-300 text-sm rounded text-right" 
             type="number"
             step="0.01"
             disabled /> 

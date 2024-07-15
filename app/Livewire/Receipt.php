@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\InvoiceDetail;
 use App\Models\InvoiceHeader;
 use App\Models\ReceiptHeader;
+use App\Models\ReciptDetail;
 use App\Services\numberToBath;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -27,6 +28,7 @@ class Receipt extends Component
     public $sumCheque = 0; 
     public $disable = true;
     public $tower = "A";
+    public $sumWh = 0;
 
     public $showCreateReceipt = false;
 
@@ -42,17 +44,26 @@ class Receipt extends Component
         }
     } 
 
-    public function updateInvoiceDetails($index){
-
-        $this->sumCheque = 0;
-        if ($this->invoiceDetails[$index]['paid'] == "") {
-            $this->invoiceDetails[$index]['paid'] = 0;
+    public function updateInvoiceDetails($index,$field){
+        
+        if ($this->invoiceDetails[$index][$field] == "") {
+            $this->invoiceDetails[$index][$field] = 0;
         }
-
+        if($field == 'paid'){
+        $this->sumCheque = 0;    
         foreach ($this->invoiceDetails as $detail) {
             $this->sumCheque += $detail['paid'] ?? 0;
         }
-         $this->sumCheque = round($this->sumCheque,2);
+        $this->sumCheque = round($this->sumCheque,2);
+        }
+        else{
+            $this->sumWh = 0;
+            foreach($this->invoiceDetails as $detail){
+                $this->sumWh += $detail[$field] ?? 0;
+            }
+            $this->sumWh = round($this->sumWh,2);
+        }
+         
     }
 
 
@@ -77,6 +88,10 @@ class Receipt extends Component
             if(!is_null($detail_invoices)){
                 foreach($detail_invoices as $detail){
                         $amt = round($detail->invd_net_amt - $detail->invd_wh_tax_amt,2) ?? 0;
+                        $whamount = round($detail->invd_wh_tax_amt - ReciptDetail::where('invoice_detail_id',$detail->id)
+                        ->whereHas('receiptheader',function ($query){
+                            $query->where('rec_status','!=' ,'No');
+                        })->sum('whpay') ?? 0,2);
                     $this->invoiceDetails[] = 
                     [
                     'id' => $detail->id,
@@ -86,12 +101,14 @@ class Receipt extends Component
                     'proname'=> $detail->invd_product_name,
                     'perwh' =>  $detail->invd_wh_tax_percent,
                     'netamt' => $amt,
-                    'whtax' => $detail->invd_wh_tax_amt,
+                    'whtax' => $whamount,
                     'tax' => $detail->invd_vat_amt,
                     'receiptamt' => $detail->invd_receipt_amt ?? 0,
-                    'paid' => round($amt - $detail->invd_receipt_amt, 2)   
+                    'paid' => round($amt - $detail->invd_receipt_amt, 2), 
+                    'whpay' =>$whamount, 
                     ];
                     $this->sumCheque +=  $amt - $detail->invd_receipt_amt;
+                    $this->sumWh += $whamount;
                 }
                 $this->sumCheque = round($this->sumCheque,2);
             
@@ -108,7 +125,9 @@ class Receipt extends Component
         $this->sumCheque = 0;
         foreach ($this->invoiceDetails as $detail) {
             $this->sumCheque += $detail['paid'] ?? 0;
+            $this->sumWh += $detail['whpay'] ?? 0;
         }
+        $this->sumWh = round($this->sumWh,2);
         $this->sumCheque = round($this->sumCheque,2);
     } 
 
@@ -170,7 +189,8 @@ class Receipt extends Component
 
                 $create_receipt->receiptdetail()->create([
                     'invoice_detail_id' => $detail['id'],
-                    'rec_pay' => + $detail['paid'],
+                    'rec_pay' =>  $detail['paid'],
+                    'whpay' => $detail['whpay'], 
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
