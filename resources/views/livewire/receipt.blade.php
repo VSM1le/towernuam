@@ -42,9 +42,9 @@
                                     <h3 class="ml-1"></h3>
                                 </div>
                                 <div class="flex">
-                                     {{-- <button wire:click.stop="exportEngPdf({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                     <button wire:click.stop="exportEngPdf({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
                                        PDF ENG
-                                    </button> --}}
+                                    </button>
                                     <button wire:click.stop="exportPdf({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
                                        PDF TH
                                     </button>

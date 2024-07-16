@@ -240,6 +240,31 @@ class Receipt extends Component
         }, $receipt->rec_no . '.pdf'); 
     } 
 
+     public function exportEngPdf($id){
+        $number = new numberToBath;
+        $sum = 0; 
+        // $options = new Options();
+        // $options->set('isHtml5ParserEnabled', true);
+        // $options->set('isRemoteEnabled', true);
+        $receipt= ReceiptHeader::where('id',$id)->with(['receiptdetail','customer'])->first();
+        $receiptDetails = $receipt->receiptdetail->map(function ($detail){
+        $detail->gross = round($detail->rec_pay * (100 / (100 + $detail->invoicedetail->invd_vat_percent)),2);
+        $detail->calculated_vat = round($detail->rec_pay - $detail->gross,2);
+        $detail->whtax = round(($detail->rec_pay * $detail->invoicedetail->invd_wh_tax_percent) / 100 , 2);
+        return $detail;
+        });
+        $bath = $number->numberToWords($receipt->rec_payment_amt);
+        $html1 = view('invoicepdf.receipteng1', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath]);
+        $html2 = view('invoicepdf.receipteng2', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath]);
+        // $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
+        
+        $combinedHtml = $html1 . $html2; 
+        $pdf = PDF::loadHTML($combinedHtml);
+       return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, $receipt->rec_no . '.pdf'); 
+    } 
+
     public function render()
     {
         $receipt = ReceiptHeader::with(['customer','receiptdetail'])->orderBy('rec_no','desc')->paginate(10);
