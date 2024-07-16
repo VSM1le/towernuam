@@ -471,7 +471,7 @@
                     </table>
                 </td>
                 <td class="text-container" style="padding-left: 10px;">
-                    <p style="font-size: 15px">หมายเหตุ: ในกรณีชำระเป็น ใบเส็จรับเงินและใบกำกับภาษีฉบับนี้จะสมบูรณ์ต่อเมื่อบริษัทฯ ได้รับเงินตามเช็คแล้ว</p>
+                    <p style="font-size: 15px">หมายเหตุ: ในกรณีชำระเป็นเช็ค ใบเสร็จรับเงินและใบกำกับภาษีฉบับนี้จะสมบูรณ์ต่อเมื่อบริษัทฯ ได้รับเงินตามเช็คแล้ว</p>
                     <p style="font-size: 15px">REMARK: If payment is made by cheque. This receipt will be valid cheque has been cleared by the bank.</p>
                 </td>
             </tr>
