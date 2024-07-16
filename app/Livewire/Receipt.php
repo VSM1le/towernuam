@@ -223,8 +223,8 @@ class Receipt extends Component
         // $options->set('isRemoteEnabled', true);
         $receipt= ReceiptHeader::where('id',$id)->with(['receiptdetail','customer'])->first();
         $receiptDetails = $receipt->receiptdetail->map(function ($detail){
-        $detail->calculated_vat = round(($detail->rec_pay * $detail->invoicedetail->invd_vat_percent) / 100,2);
-        $detail->gross = round($detail->rec_pay - ($detail->rec_pay * $detail->invoicedetail->invd_vat_percent / 100),2);
+        $detail->gross = round($detail->rec_pay * (100 / (100 + $detail->invoicedetail->invd_vat_percent)),2);
+        $detail->calculated_vat = round($detail->rec_pay - $detail->gross,2);
         $detail->whtax = round(($detail->rec_pay * $detail->invoicedetail->invd_wh_tax_percent) / 100 , 2);
         return $detail;
         });
