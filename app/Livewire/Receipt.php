@@ -87,7 +87,7 @@ class Receipt extends Component
 
             if(!is_null($detail_invoices)){
                 foreach($detail_invoices as $detail){
-                        $amt = round($detail->invd_net_amt - $detail->invd_wh_tax_amt,2) ?? 0;
+                        $amt = round($detail->invd_net_amt - $detail->invd_receipt_amt) ?? 0;
                         $whamount = round($detail->invd_wh_tax_amt - ReciptDetail::where('invoice_detail_id',$detail->id)
                         ->whereHas('receiptheader',function ($query){
                             $query->where('rec_status','!=' ,'No');
@@ -104,10 +104,10 @@ class Receipt extends Component
                     'whtax' => $whamount,
                     'tax' => $detail->invd_vat_amt,
                     'receiptamt' => $detail->invd_receipt_amt ?? 0,
-                    'paid' => round($amt - $detail->invd_receipt_amt, 2), 
+                    'paid' => $amt, 
                     'whpay' =>$whamount, 
                     ];
-                    $this->sumCheque +=  $amt - $detail->invd_receipt_amt;
+                    $this->sumCheque +=  $amt;
                     $this->sumWh += $whamount;
                 }
                 $this->sumCheque = round($this->sumCheque,2);
