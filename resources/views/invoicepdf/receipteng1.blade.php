@@ -201,7 +201,7 @@
 
                     <td style="height: 2px; border:1px solid #000; margin:0px; vertical-align:top">
                         <p style="font-size: 18px; line-height:0.8">เลขที่ใบเสร็จ</p>
-                        <p style="font-size: 18px; line-height:0.8">No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{$Receipt->rec_no}}</p>
+                        <p style="font-size: 18px; line-height:0.8">No.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{$Receipt->rec_no}}</p>
                     </td>
                 </tr>
                 <tr>
