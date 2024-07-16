@@ -129,7 +129,7 @@
                 <td class="company-details" style="vertical-align: top;padding-left:30%">
                     <p style="margin: 0px; font-weight: bold; font-size:24px;line-height:19px;">บริษัท นวม จำกัด</p>
                     <p style="margin: 0px; font-weight: bold; font-size:20px;line-height:10px;">NUAM CO., LTD</p>
-                    <p style="margin: -1px">185/2 ซอยสุขุมวิท 31 ถนนสุขุมวิท แขวงคลองตันเหนือ เขตวัฒนา กรุงเทพมหานคร</p>
+                    <p style="margin: -1px">185/2 ซอยสุขุมวิท 31 ถนนสุขุมวิท แขวงคลองตันเหนือ เขตวัฒนา กรุงเทพมหานคร 10110</p>
                     <p style="margin: -1px">185/2 Soi Sukhumvit 31 Rd. Nort Khlongton, Watthana, Bangkok, Thailand 10110</p>
                     <p style="margin: -1px">Tel: 0-2264-2245-7 Fax: 0-2264-2248</p>
                     <p style="margin: -1px">เลขประจำตัวผู้เสียภาษี 0105565185083&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;สำนักงานใหญ่(Head Office)</p>
