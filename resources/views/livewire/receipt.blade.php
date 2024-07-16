@@ -137,7 +137,7 @@
                
             </div>
                <div class="m-3">
-                    {{ $invoices->links() }}
+                    {{ $receipt->links() }}
                 </div>  
     </div>
 
