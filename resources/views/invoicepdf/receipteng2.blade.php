@@ -327,7 +327,7 @@
                 </tr>
                 <tr style="">
                    <td style="border:1px solid #000;">
-                        <p style="font-size: 18px">{{ $bath }} </p>
+                        <p style="font-size: 18px; line-height:0.5">{{ $bath }} </p>
                     </td>
                     <td style="border:1px solid #000; text-align:right">
                         <p style="font-size: 18px">{{  number_format($receiptdetails->pluck('gross')

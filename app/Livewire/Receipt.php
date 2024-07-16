@@ -110,6 +110,7 @@ class Receipt extends Component
                     $this->sumCheque +=  $amt;
                     $this->sumWh += $whamount;
                 }
+                $this->sumWh = round($this->sumWh,2);
                 $this->sumCheque = round($this->sumCheque,2);
             
             }
