@@ -295,7 +295,7 @@
                             </span>
                         </p>
                         <p style="font-size:18px;line-height:0.8">
-                            -มูลค่าที่เสียภาษีมูลค่าเพิ่ม
+                            &nbsp;&nbsp;&nbsp;&nbsp;-มูลค่าที่เสียภาษีมูลค่าเพิ่ม
                             <span style="float: right;clear:both;padding-right:15px">
                                 {{ number_format($receiptdetails
                                     ->filter(function ($detail) {
@@ -305,7 +305,7 @@
                             </span>
                         </p>
                         <p style="font-size:18px;line-height:0.8">
-                            -ภาษีมูลค่าเพิ่ม
+                            &nbsp;&nbsp;&nbsp;&nbsp;-ภาษีมูลค่าเพิ่ม
                             <span style="float: right;clear:both;padding-right:15px">
                                 {{ number_format($receiptdetails
                                     ->pluck('calculated_vat')
@@ -377,14 +377,6 @@
                             @endif 
                     </span>
                 </td> 
-            </tr>
-         
-        </table>
-        <table>
-             <tr>
-                {{-- <td style="width:117px">
-
-                </td> --}}
                 <td style="vertical-align:top;min-width:150px">
                   <span style="display: inline-block;">
                     <input value="value" type="checkbox" {{ $Receipt->rec_payment_type == 'cheq' ? 'checked':'' }}>
@@ -396,6 +388,11 @@
                   {{ $Receipt->rec_bank }}
                 </span>
                 </td> 
+            </tr>
+         
+        </table>
+        <table>
+             <tr>
                  <td style="vertical-align:top;min-width:150px">
                 <span style="display: inline-block; margin-left: 5px;line-height:0.5;position: relative;">
                     <p style="margin: 0; font-size:18px">สาขา<br>Branch</p>

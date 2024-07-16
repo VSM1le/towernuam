@@ -46,9 +46,13 @@
                                     <button wire:click.stop="exportPdf({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
                                        PDF TH
                                     </button>
-                                    <button wire:click.stop="openEditInvoice({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                    @if ($pland->invoicedetail->every(function ($detail) {
+                                            return $detail->invd_receipt_flag === 'No';
+                                        }))
+                                    <button wire:click.stop="openEditInvoice({{ $pland->id }})"  class="text-white bg-yellow-500 hover:bg-yellow-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
                                        EDIT 
-                                    </button>
+                                    </button> 
+                                     @endif
                                 </div>
                             </div>
                             {{-- Accordion content --}}
@@ -373,7 +377,7 @@
     @if($showEditInvoice)
     <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeEditModal"></div> 
     <form wire:submit.prevent="editInvoice" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '800px', 'max-width' : '1500px' }">
-        <div class="bg-blue-700 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
+        <div class="bg-yellow-500 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
             <div class="text-xl font-bold">Edit Invoice {{ $editInvoices->inv_no }}</div>
             <button wire:click="closeEditModal" type="button" class="focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -554,7 +558,7 @@
         </div>
         
         <div>
-        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Save</button>
+        <button type="submit" class="text-white bg-yellow-500 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5">Save</button>
         </div>
     </div>
 </form>
