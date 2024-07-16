@@ -134,8 +134,11 @@
                         </div>    
                     </div>
                 @endforeach
-                    
+               
             </div>
+               <div class="m-3">
+                    {{ $invoices->links() }}
+                </div>  
     </div>
 
 
