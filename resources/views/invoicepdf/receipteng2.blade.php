@@ -456,7 +456,7 @@
                     <table style="border-collapse:collapse">
                         <tr >
                             <td class="bordered" style="height: 40px; width: 100px;border:solid 1px #000; text-align:center;line-height:0.8">
-                                <p>ผู้รันเงิน</p>
+                                <p>ผู้รับเงิน</p>
                                 <p>Collector</p>
                             </td>
                             <td class="bordered" style="height: 40px; width: 100px;border:solid 1px #000;text-align:center;line-height:0.8">
