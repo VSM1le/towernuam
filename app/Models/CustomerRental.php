@@ -42,7 +42,8 @@ class CustomerRental extends Model
         'custr_end_date',
         'custr_active',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'custr_contract_no_real',
     ];
 
     public function invoiceheader():HasMany{
