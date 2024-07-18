@@ -148,14 +148,30 @@
             <tbody>
                 <tr >
                     <td style="width:544px; vertical-align:top;">
-                    <p style="font-size: 18px; line-height:13px">เลขที่สัญญา&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {{$Invoices->customerrental->custr_contract_no ?? null }}<br>CONTRACT NO.</p> 
-                    <p style="font-size: 18px; margin:0px;line-height:13px">ชื่อลูกค้า&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->customer->cust_name_th }}<br>ACCOUNT NAME </p>
+                      <table style="width: 100%; border-collapse: collapse;margin:0">
+                        <tr>
+                            <td style="vertical-align: top; font-size: 18px;width:19%; ">
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">เลขที่สัญญา</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">CONTRACT NO.</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">ชื่อลูกค้า</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">ACCOUNT NAME</p>
+                            </td>
+                            <td style="vertical-align: top; font-size: 18px;width:43% ">
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Invoices->customerrental->custr_contract_no ?? null }}</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;"><br></p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Invoices->customer->cust_name_th }}</p>
+
+                            </td>
+                            <td style="vertical-align: top; font-size: 18px; ;">
+                                <p style="margin: 0; font-size: 18px; line-height: 0.7;">แปลนเลขที่ {{ $Invoices->inv_unite }}</p>
+                            </td>
+                        </tr>
+                    </table> 
                     </td>
 
                     <td style="height: 2px; border:1px solid #000; margin:0px; vertical-align:top">
                         <p style="font-size: 18px">วันที่</p>
-                        <p style="font-size: 18px">Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ \Carbon\Carbon::parse($Invoices->inv_date)->format('d/m/Y') }}</p>
+                        <p style="font-size: 18px;line-height:0.8">Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ \Carbon\Carbon::parse($Invoices->inv_date)->format('d/m/Y') }}</p>
                     </td>
                 </tr>
                 <tr>

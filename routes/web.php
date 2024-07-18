@@ -46,7 +46,15 @@ Route::get('invoice3/{id}', function ($id) {
         'Receipt' => $receipt,
         'receiptdetails' => $receiptDetails,
         'bath' => $bath,
-    ]);
-})->middleware(['auth'])->name('invoice');    
+    ]);})->middleware(['auth'])->name('invoice');    
+
+Route::get('invoice/{id}', function ($id) {
+    $number = new numberToBath;
+     $invoice = InvoiceHeader::where('id',$id)->with(['invoicedetail','customerrental','customer'])->first();
+ $bath = $number->numberToWords($invoice->invoicedetail->sum('invd_net_amt'));
+    return view('invoicepdf.invoice4', [
+        'Invoices' => $invoice,
+        'bath' => $bath,
+    ]);})->middleware(['auth'])->name('invoice');   
 
 require __DIR__.'/auth.php';
