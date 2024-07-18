@@ -195,8 +195,21 @@
             <tbody>
                 <tr >
                     <td style="width:544px; vertical-align:top;">
-                    <p style="font-size: 18px; line-height:1">ได้รับเงินจาก&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {{$Receipt->customer->cust_name_th ?? null }}<br>Received From</p> 
+                   <table style="width: 100%; border-collapse: collapse;margin:0">
+                        <tr>
+                            <td style="vertical-align: top; font-size: 18px;width:19%; ">
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">ได้รับเงินจาก</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">Received From</p>
+                            </td>
+                            <td style="vertical-align: top; font-size: 18px;width:49% ">
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Receipt->customer->cust_name_th ?? null }}</p>
+                            </td>
+                            <td style="vertical-align: top; font-size: 18px; ;">
+                                <p style="margin: 0; font-size: 18px; line-height: 0.7;">เลขที่สัญญา {{ $Receipt->receiptdetail->first()->invoicedetail->invoiceheader
+                                ->customerrental->custr_contract_no}}</p>
+                            </td>
+                        </tr>
+                    </table>  
                     </td>
 
                     <td style="height: 2px; border:1px solid #000; margin:0px; vertical-align:top">
@@ -227,8 +240,18 @@
                         {{ $Receipt->customer->cust_branch }}
                     </td>
                     <td style="vertical-align:top; width: 40%; border:1px solid #000; margin:0px;">
-                        <p style="font-size: 18px; line-height:0.8">แปลนเลขที่</p>
-                       <p style="font-size: 18px;line-height:0.8">Plan No.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p> 
+                      <table style="width: 100%; border-collapse: collapse;margin:0">
+                        <tr>
+                            <td style="vertical-align: top; font-size: 18px;width:19%; ">
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">แปลนเลขที่</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">Plan No.</p>
+                            </td>
+                            <td style="vertical-align: top; font-size: 18px;width:49% ">
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Receipt->receiptdetail->first()->invoicedetail->invoiceheader
+                                ->inv_unite }}</p>
+                            </td>
+                        </tr>
+                    </table>  
                     </td>
                 </tr>
             </tbody>
