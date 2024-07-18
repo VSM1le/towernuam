@@ -148,8 +148,12 @@
             <tbody>
                 <tr >
                     <td style="width:544px; vertical-align:top;">
-                    <p style="font-size: 18px; line-height:13px">เลขที่สัญญา&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {{-- <p style="font-size: 18px; line-height:13px">เลขที่สัญญา&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {{$Invoices->customerrental->custr_contract_no ?? null }}<br>CONTRACT NO.</p>  --}}
+                    <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
+                        <p style="font-size: 18px;">เลขที่สัญญา&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         {{$Invoices->customerrental->custr_contract_no ?? null }}<br>CONTRACT NO.</p> 
+                    </span>
                     <p style="font-size: 18px; margin:0px;line-height:13px">ชื่อลูกค้า&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $Invoices->customer->cust_name_th }}<br>ACCOUNT NAME </p>
                     </td>
 

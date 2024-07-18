@@ -212,7 +212,7 @@ class Invoice extends Component
         $prefix = 'I'.$this->tower.'S';
         $year = Carbon::parse($this->invoiceDate)->format('Y');
         $datePart = substr($year,-2) . Carbon::parse($this->invoiceDate)->format('m');
-
+        $unite = CustomerRental::where('id',$this->rental)->first();
         $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
 
         if (is_null($lastInvoice)) {
@@ -231,6 +231,7 @@ class Invoice extends Component
             'invd_duedate' => $this->dueDate,
             'ps_group_id' => $this->psGroup,
             'inv_status' => 'USE',
+            'inv_unite' => $unite->custr_unit, 
             'inv_tower' => $this->tower,
             'created_by' => auth()->id(),
             'updated_by' => auth()->id(),
