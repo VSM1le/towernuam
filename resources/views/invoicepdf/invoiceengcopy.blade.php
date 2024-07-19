@@ -141,7 +141,7 @@
         </table>
         <div class="invoice-details" style="padding-bottom: 8px">
             <p style="margin: -5px;font-size:24px;line-height:10px;"><strong>ใบแจ้งหนี้</strong></p>
-            <p style="margin: -5px;font-size:24px;line-height:18px"><strong>ORIGINAL INVOICE</strong></p>
+            <p style="margin: -5px;font-size:24px;line-height:18px"><strong>COPY INVOICE</strong></p>
             <p style="margin: -5px;font-size:24px;line-height:18px"><strong>(สำเนา)</strong></p>
         </div>
         <table style="width:100%; border: 1px solid #000; border-collapse: collapse;">
