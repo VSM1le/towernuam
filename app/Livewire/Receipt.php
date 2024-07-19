@@ -257,7 +257,6 @@ class Receipt extends Component
         return $detail;
         });
         $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2);
-        dd($realAmount);
         $bath = $number->numberToWords($receipt->rec_payment_amt);
         $html1 = view('invoicepdf.receipteng1', 
         ['Receipt' => $receipt,
