@@ -326,7 +326,7 @@ class Invoice extends Component
                     'whvat' => $invoice->invd_wh_tax_percent,
                     'whtaxamt' => $invoice->invd_wh_tax_amt,
                     'netamt' => $invoice->invd_net_amt,
-                    'remark' => $invoice->invd_remark,
+                    'remark' => $invoice->invd_remake,
                 ];
             }
             $this->showEditInvoice = true;
