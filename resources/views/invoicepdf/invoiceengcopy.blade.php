@@ -163,7 +163,7 @@
 
                             </td>
                             <td style="vertical-align: top; font-size: 18px; ;">
-                                <p style="margin: 0; font-size: 18px; line-height: 0.7;">แปลนเลขที่ {{ $Invoices->inv_unite }}</p>
+                                <p style="margin: 0; font-size: 18px; line-height: 0.7;">แปลนเลขที่ {{ $Invoices->inv_unite ?? $Invoices->customerrental->custr_unit }}</p>
                             </td>
                         </tr>
                     </table> 

@@ -248,7 +248,8 @@
                             </td>
                             <td style="vertical-align: top; font-size: 18px;width:49% ">
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Receipt->receiptdetail->first()->invoicedetail->invoiceheader
-                                ->inv_unite }}</p>
+                                ->inv_unite ?? $Receipt->receiptdetail->first()->invoicedetail->invoiceheader
+                                ->customerrental->custr_unit }}</p>
                             </td>
                         </tr>
                     </table>  
