@@ -243,7 +243,7 @@
                     <table style="width: 100%; border-collapse: collapse;margin:0">
                         <tr>
                             <td style="vertical-align: top; font-size: 18px;width:19%; ">
-                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">แปลนเลขที่</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">พื้นที่เลขที่</p>
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;">Plan No.</p>
                             </td>
                             <td style="vertical-align: top; font-size: 18px;width:49% ">
@@ -272,6 +272,9 @@
                         @foreach ( $Receipt->receiptdetail as $index => $receipt)
                            <p style="font-size:18px; position: relative;">
                             {{$index + 1 }}. {{App\Models\ProductService::where('ps_code', $receipt->invoicedetail->invd_product_code)->pluck('ps_name_en')->first() }} 
+                             @if ($receipt->invoicedetail->invd_remake)
+                                 - {{ $receipt->invoicedetail->invd_remake  }} 
+                                @endif
                             <span style="position: absolute; right: 15px;">
                                 {{ $receipt->invoicedetail->invoiceheader->inv_no }}
                             </span>

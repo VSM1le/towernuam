@@ -163,7 +163,7 @@
 
                             </td>
                             <td style="vertical-align: top; font-size: 18px; ;">
-                                <p style="margin: 0; font-size: 18px; line-height: 0.7;">แปลนเลขที่ {{ $Invoices->inv_unite ?? $Invoices->customerrental->custr_unit }}</p>
+                                <p style="margin: 0; font-size: 18px; line-height: 0.7;">พื้นที่เลขที่ {{ $Invoices->inv_unite ?? $Invoices->customerrental->custr_unit }}</p>
                             </td>
                         </tr>
                     </table> 
@@ -217,7 +217,11 @@
                 <tr style="height: 200px;">
                     <td style="height:390px;width: 280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ( $Invoices->invoicedetail as $index => $invoice )
-                            <p style="font-size:18px">{{$index + 1}}. {{ App\Models\ProductService::where('ps_code', $invoice->invd_product_code)->pluck('ps_name_en')->first() }}</p>
+                            <p style="font-size:18px">{{$index + 1}}. {{ App\Models\ProductService::where('ps_code', $invoice->invd_product_code)->pluck('ps_name_en')->first() }}
+                            @if ($invoice->invd_remake)
+                             - {{ $invoice->invd_remake  }} 
+                            @endif
+                            </p>
                         @endforeach
                     </td>
                     <td style="width: 140px; text-align: center; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">

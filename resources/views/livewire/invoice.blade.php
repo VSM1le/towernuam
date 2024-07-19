@@ -131,7 +131,7 @@
                                                 {{ $listitem->invd_net_amt}}
                                             </td>
                                                <td class="px-6 py-4">
-                                                {{ $listitem->remark}}
+                                                {{ $listitem->invd_remake}}
                                             </td>
                                         </tr>   
                                     @endforeach 
