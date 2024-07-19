@@ -124,6 +124,7 @@ class Receipt extends Component
         $this->invoiceDetails = array_values($this->invoiceDetails);
 
         $this->sumCheque = 0;
+        $this->sumWh = 0;
         foreach ($this->invoiceDetails as $detail) {
             $this->sumCheque += $detail['paid'] ?? 0;
             $this->sumWh += $detail['whpay'] ?? 0;
