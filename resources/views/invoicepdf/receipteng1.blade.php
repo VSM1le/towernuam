@@ -384,7 +384,7 @@
                     </span> 
                     <span style="margin-left: 10px; vertical-align: top; font-size: 18px;line-height:1;position:relative;top:-10px">
                         @if ($Receipt->rec_payment_type == "cash")
-                            {{  number_format($Receipt->rec_payment_amt,2,'.',',')  }} 
+                            {{  number_format($real,2,'.',',')  }} 
                         @endif 
                     </span>
                 </td>
@@ -397,7 +397,7 @@
                     </span> 
                     <span style=" margin-left: 10px; vertical-align: top; font-size: 18px;line-height:1; line-height:0;position:relative;top:-10px">
                         @if ($Receipt->rec_payment_type == "tran")
-                            {{  number_format($Receipt->rec_payment_amt,2,'.',',')  }} 
+                            {{  number_format($real,2,'.',',')  }} 
                             @endif 
                     </span>
                 </td> 
@@ -447,7 +447,7 @@
                 </span>
                 <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
                     @if ($Receipt->rec_payment_type == "cheq")
-                           {{ number_format($Receipt->rec_payment_amt,2,'.',',')  }} 
+                           {{ number_format($real,2,'.',',')  }} 
                     @endif
                 </span>
                 </td> 

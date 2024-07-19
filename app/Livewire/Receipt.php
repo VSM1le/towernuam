@@ -230,9 +230,10 @@ class Receipt extends Component
         $detail->whtax = round(($detail->rec_pay * $detail->invoicedetail->invd_wh_tax_percent) / 100 , 2);
         return $detail;
         });
+        $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2);
         $bath = $number->baht_text($receipt->rec_payment_amt);
-        $html1 = view('invoicepdf.invoice1', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath]);
-        $html2 = view('invoicepdf.invoice2', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath]);
+        $html1 = view('invoicepdf.invoice1', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath,'real' => $realAmount]);
+        $html2 = view('invoicepdf.invoice2', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath,'real' => $realAmount]);
         // $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
         
         $combinedHtml = $html1 . $html2; 
@@ -255,9 +256,20 @@ class Receipt extends Component
         $detail->whtax = round(($detail->rec_pay * $detail->invoicedetail->invd_wh_tax_percent) / 100 , 2);
         return $detail;
         });
+        $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2);
+        dd($realAmount);
         $bath = $number->numberToWords($receipt->rec_payment_amt);
-        $html1 = view('invoicepdf.receipteng1', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath]);
-        $html2 = view('invoicepdf.receipteng2', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath]);
+        $html1 = view('invoicepdf.receipteng1', 
+        ['Receipt' => $receipt,
+        'receiptdetails' => $receiptDetails,
+        'bath' => $bath,
+        'real' => $realAmount]);
+
+        $html2 = view('invoicepdf.receipteng2',
+         ['Receipt' => $receipt,
+         'receiptdetails' => $receiptDetails,
+         'bath' => $bath,
+         'real' => $realAmount]);
         // $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
         
         $combinedHtml = $html1 . $html2; 
