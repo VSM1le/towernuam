@@ -157,7 +157,7 @@
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;">ACCOUNT NAME</p>
                             </td>
                             <td style="vertical-align: top; font-size: 18px;width:43% ">
-                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Invoices->customerrental->custr_contract_no ?? null }}</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Invoices->customerrental->custr_contract_no_real ?? "-" }}</p>
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;"><br></p>
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Invoices->customer->cust_name_th }}</p>
 
