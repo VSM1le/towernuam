@@ -16,6 +16,13 @@ Route::view('dashboard', 'dashboard')
 Route::view('receipt', 'receipt')
     ->middleware(['auth', 'verified'])
     ->name('receipt');
+Route::view('customer', 'customer')
+    ->middleware(['auth', 'verified'])
+    ->name('customer');
+
+Route::view('contract' ,'custrent')
+    ->middleware(['auth'])
+    ->name('contract');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])

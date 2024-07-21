@@ -37,6 +37,7 @@ class Invoice extends Component
     public $showEditInvoice = false;
 
     public $editInvoices = null;
+    public $editInvoiceNumber = null;
     public $editInvoiceDetails = [];
     public $editPsGroup = null;
     public $editInvoiceDate = null;
@@ -309,6 +310,7 @@ class Invoice extends Component
         $this->editInvoices = InvoiceHeader::with('invoicedetail')->where('id', $id)->first();
         if ($this->editInvoices) {
             $this->editPsGroup = $this->editInvoices->ps_group_id;
+            $this->editInvoiceNumber = $this->editInvoices->inv_no;
             $this->editInvoiceDate = $this->editInvoices->inv_date;
             $this->editCustomerCode = $this->editInvoices->customer_id;
             $this->editcustomerrents = CustomerRental::where('customer_id', $this->editCustomerCode)->get();
@@ -456,10 +458,12 @@ class Invoice extends Component
 
     $header->update([
         'customer_id' => $this->editCustomerCode,
+        'inv_no' => $this->editInvoiceNumber,
         'customer_rental_id' => !empty($this->editRental) ? $this->editRental : null,
         'inv_date' => $this->editInvoiceDate,
         'invd_duedate' => $this->editDueDate,
         'ps_group_id' => $this->editPsGroup,
+        'inv_unite' => CustomerRental::where('id',$this->editRental)->pluck('custr_unit') ?? null,
         'updated_by' => auth()->id(),
     ]);
 
