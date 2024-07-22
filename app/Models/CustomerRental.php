@@ -14,6 +14,7 @@ class CustomerRental extends Model
     protected $table = 'customer_rentals';
     protected $fillable = [
         'cust_code',
+        'customer_id',
         'custr_no',
         'custr_contract_no',
         'custr_tower',
