@@ -44,7 +44,7 @@
                         @foreach ($rentals as $rental)
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                             <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                {{$rental->customer->cust_code}}
+                                {{$rental->customer->cust_code}}  
                             </th>
                             <td class="px-6 py-4">
                                {{ $rental->custr_contract_no}} 
@@ -68,13 +68,16 @@
                                 {{ $rental->custr_contract_year }}
                             </td>
                             <td class="px-6 py-4">
-                                <button wire:click="" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
+                                <button wire:click="openEditContract({{ $rental->id }})" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
                             </td>
                         </tr>
                          @endforeach
                     </tbody>
                 </table>
             </div>    
+        </div>
+        <div class="m-3">
+            {{ $rentals->links() }}
         </div>
     </div>
 
@@ -83,8 +86,8 @@
     <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeEditContract"></div>
     <form wire:submit.prevent="editContract" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 
      :style="{ 'max-height': '550px', 'max-width' : '600px' }">
-        <div class="bg-blue-700 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
-            <div class="text-xl font-bold">Create Contract</div>
+        <div class="bg-yellow-500 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
+            <div class="text-xl font-bold">Edit Contract</div>
             <button wire:click="closeEditContract" type="button" class="focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -171,13 +174,14 @@
             <div class="flex">
             </div>
             <div>
-            <button type="submit" 
-            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Save</button>
+         <button type="submit" 
+        class="text-white bg-yellow-500 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5">Save</button>
             </div>
         </div>
     </form>
     </div>
     @endif 
+
     @if($showCreateContract)
     <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeCreateContract"></div>
     <form wire:submit.prevent="createContract" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 

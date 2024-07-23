@@ -51,19 +51,21 @@ class Cusrent extends Component
             'custr_equipment_fee' => $this->equipFee,
             'custr_begin_date2' => $this->startDate,
             'custr_end_date2' => $this->endDate,
+            'custr_contract_year' => $this->year,
             'created_by' => auth()->id(),
             'updated_by' => auth()->id(),
         ]);
+        $this->closeCreateContract();
     }
     public function closeCreateContract(){
         $this->showCreateContract = false;
-        $this->reset(['contractNumber','contractrNumber','customerId','unit','areaSqm','rentalFee','serviceFee','equipFee','startDate','endDate','year']);
+        $this->reset(['contractNumber','contractRNumber','customerId','unit','areaSqm','rentalFee','serviceFee','equipFee','startDate','endDate','year']);
     }
 
     public function openEditContract($id){
      
         $this->editId = $id;
-        $contract = CustomerRental::where('id',$id)->get();
+        $contract = CustomerRental::where('id',$id)->first();
         $this->customerId = $contract->customer_id;
         $this->contractNumber = $contract->custr_contract_no;
         $this->contractRNumber = $contract->custr_contract_no_real; 
@@ -74,14 +76,13 @@ class Cusrent extends Component
         $this->equipFee = $contract->custr_equipment_fee;
         $this->startDate = $contract->custr_begin_date2;
         $this->endDate = $contract->custr_end_date2;
-    
+        $this->year = $contract->custr_contract_year;
         $this->showEditContract = true;
     } 
 
     public function editContract(){
         CustomerRental::where('id',$this->editId)->update([
             'customer_id' => $this->customerId,
-            'custr_no' => 1,
             'custr_contract_no' => $this->contractNumber,
             'custr_contract_no_real' => $this->contractRNumber,
             'custr_tower' => $this->tower,
@@ -92,19 +93,19 @@ class Cusrent extends Component
             'custr_equipment_fee' => $this->equipFee,
             'custr_begin_date2' => $this->startDate,
             'custr_end_date2' => $this->endDate,
-            'created_by' => auth()->id(),
+            'custr_contract_year' => $this->year,
             'updated_by' => auth()->id(),
         ]);
     }
 
     public function closeEditContract(){
-        $this->reset(['contractNumber','contractrNumber','customerId','unit','areaSqm','rentalFee','serviceFee','equipFee','startDate','endDate','year','editId']);
+        $this->reset(['contractNumber','contractRNumber','customerId','unit','areaSqm','rentalFee','serviceFee','equipFee','startDate','endDate','year','editId']);
         $this->showEditContract = false;
     }
 
     public function render()
     {
-        $rentals = CustomerRental::paginate(10);
+        $rentals = CustomerRental::orderBy('updated_at','desc')->paginate(10);
         return view('livewire.cusrent',compact('rentals'));
     }
 }
