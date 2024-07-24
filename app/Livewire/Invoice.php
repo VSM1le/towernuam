@@ -47,6 +47,9 @@ class Invoice extends Component
     public $deleteItem;
     public $editcustomerrents = [];
 
+    public $showDeleteInvoice = false;
+    public $cancelInvoice;
+    public $invRemark = null;
     public $startDate;
     public $endDate;
     public $customer;
@@ -521,6 +524,22 @@ public function closeEditModal(){
      $this->showEditInvoice = false;
         $this->reset(['editPsGroup','editCustomerCode','editcustomerrents','editRental','editInvoiceDate','editInvoiceDetails']);
         $this->resetValidation();
+}
+
+public function openCancelInvoice($id){
+    $this->showDeleteInvoice = true;
+    $this->cancelInvoice = $id;
+}
+public function cancelInvoiceModal(){
+    InvoiceHeader::where('id',$this->cancelInvoice)->update([
+        'inv_status' => 'CANCEL',
+        'inv_remark' => $this->invRemark,
+    ]);
+    $this->closeCancelInvoice();
+}
+public function closeCancelInvoice(){
+    $this->showDeleteInvoice = false;
+    $this->reset(['cancelInvoice','invRemark']);
 }
 
     public function exportPdf($id){

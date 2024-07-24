@@ -117,9 +117,30 @@
             border-collapse: collapse;
             margin-top: 0px; /* Adjusts overlap of the borders */
         }
+          .cancel-overlayi {
+            position: fixed; 
+            top: 250;
+            left: 0;
+            width: 100%;
+            height: 100%;
+              color: rgba(255, 0, 0); 
+            opacity:0.5;
+            font-size: 10em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 9999; 
+            pointer-events: none; 
+        } 
     </style>
 </head>
 <body>
+     @if($Invoices->inv_status)
+        <div class="cancel-overlayi">CANCEL
+             <p style="font-size: 30px;">{{ $Invoices->inv_remark }}</p>
+        </div>
+    @endif 
     <div class="invoice-container">
         <table class="header" style="padding-bottom:15px">
             <tr>
