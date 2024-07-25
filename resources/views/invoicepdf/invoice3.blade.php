@@ -137,7 +137,7 @@
     </style>
 </head>
 <body>
-   @if($Invoices->inv_status)
+   @if($Invoices->inv_status === "CANCEL")
         <div class="cancel-overlayy">CANCEL
             <p style="font-size: 30px;">{{ $Invoices->inv_remark }}</p>
         </div>
