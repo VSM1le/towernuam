@@ -24,6 +24,10 @@ Route::view('contract' ,'custrent')
     ->middleware(['auth'])
     ->name('contract');
 
+Route::view('bill', 'waterelectric')
+    ->middleware(['auth'])
+    ->name('bill');
+
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
