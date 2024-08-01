@@ -184,7 +184,7 @@
 
                             </td>
                             <td style="vertical-align: top; font-size: 18px; ;">
-                                <p style="margin: 0; font-size: 18px; line-height: 0.7;">พื้นที่เลขที่ {{ $Invoices->inv_unite ?? $Invoices->customerrental->custr_unit }}</p>
+                                <p style="margin: 0; font-size: 18px; line-height: 0.7;">พื้นที่เลขที่ {{ $Invoices->inv_unite ?? $Invoices->customerrental->custr_unit ?? null}}</p>
                             </td>
                         </tr>
                     </table> 

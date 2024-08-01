@@ -206,7 +206,7 @@
                             </td>
                             <td style="vertical-align: top; font-size: 18px; ;">
                                 <p style="margin: 0; font-size: 18px; line-height: 0.7;">เลขที่สัญญา {{ $Receipt->receiptdetail->first()->invoicedetail->invoiceheader
-                                ->customerrental->custr_contract_no_real}}</p>
+                                ->customerrental->custr_contract_no_real ?? null}}</p>
                             </td>
                         </tr>
                     </table>   
