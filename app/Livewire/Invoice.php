@@ -235,7 +235,7 @@ class Invoice extends Component
             'invd_duedate' => $this->dueDate,
             'ps_group_id' => $this->psGroup,
             'inv_status' => 'USE',
-            'inv_unite' => $unite->custr_unit, 
+            'inv_unite' => $unite->custr_unit ?? null, 
             'inv_tower' => $this->tower,
             'created_by' => auth()->id(),
             'updated_by' => auth()->id(),

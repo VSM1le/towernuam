@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Imports\BillImport;
 use App\Models\Bill;
+use Carbon\Carbon;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -15,6 +16,9 @@ class BillWE extends Component
 
     public $csvFile;
     public $type;
+    public $typeQuery = "WA";
+
+    public $monthYear;
     public $showImportModal = false;
     public function bill()
     {
@@ -45,7 +49,15 @@ class BillWE extends Component
     }
     public function render()
     {
-        $bills = Bill::all();
+       $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
+       $bills = Bill::when($monthYear, function ($query) use($monthYear) {
+       $query->where('invoice_date', 'like', '%' . $monthYear  . '%');
+       })
+       ->when($this->typeQuery, function ($query){
+        $query->where('type',$this->typeQuery);
+       })
+       ->get();
+ 
         return view('livewire.bill-w-e',['bills'=> $bills]);
     }
 }
