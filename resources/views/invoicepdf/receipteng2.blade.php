@@ -187,7 +187,7 @@
             </tr>
         </table>
         <div class="invoice-details" style="padding-bottom: 8px">
-            <p style="margin: -5px;font-size:24px;line-height:10px;"><strong>สำเนาใบเสร็จรับเงิน/ใบกำกับภาษี</strong></p>
+            <p style="margin: -5px;font-size:24px;line-height:10px;"><strong>สำเนาใบเสร็จรับเงิน/สำเนาใบกำกับภาษี</strong></p>
             <p style="margin: -5px;font-size:24px;line-height:18px"><strong>COPY RECEIPT / TAX INVOICE</strong></p>
             <p style="margin: -5px;font-size:24px;line-height:18px"><strong>(บัญชี)</strong></p>
         </div>
