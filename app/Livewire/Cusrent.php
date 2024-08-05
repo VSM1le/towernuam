@@ -96,6 +96,7 @@ class Cusrent extends Component
             'custr_contract_year' => $this->year,
             'updated_by' => auth()->id(),
         ]);
+        $this->closeEditContract();
     }
 
     public function closeEditContract(){

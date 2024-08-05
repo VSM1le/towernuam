@@ -85,13 +85,13 @@ class Invoice extends Component
                 $vat = $this->sanitizeNumericValue($this->invoiceDetails[$index]['vat'] ?? 0); // Sanitize vat value
                 $whvat = $this->sanitizeNumericValue($this->invoiceDetails[$index]['whvat'] ?? 0);// Sanitize whvat value
 
-                $vatamt = ($amt * $vat) / 100 ?? 0;
-                $whtaxamt = ($amt * $whvat) / 100 ?? 0;
+                $vatamt = round(($amt * $vat) / 100 ?? 0,2);
+                $whtaxamt = round(($amt * $whvat) / 100 ?? 0,2);
                 $netamt = $vatamt + $amt;
                 
-                $this->invoiceDetails[$index]['vatamt'] = round($vatamt,2);
-                $this->invoiceDetails[$index]['whtaxamt'] = round($whtaxamt,2);
-                $this->invoiceDetails[$index]['netamt'] = round($netamt, 2); 
+                $this->invoiceDetails[$index]['vatamt'] = $vatamt;
+                $this->invoiceDetails[$index]['whtaxamt'] = $whtaxamt;
+                $this->invoiceDetails[$index]['netamt'] = $netamt; 
             }
         }
     }
@@ -151,9 +151,9 @@ class Invoice extends Component
             $wh_tax = 0;
        }
         if(($product_service->ps_code == "1001" || $product_service->ps_code == "1010") && !is_null($customer_rent)){
-            $amt = $customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm;
-            $vatamt = ($amt * $product_service->ps_vat)/100;
-            $whamt = ($amt * $wh_tax)/100;
+            $amt = round($customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm,2);
+            $vatamt = round(($amt * $product_service->ps_vat)/100,2);
+            $whamt = round(($amt * $wh_tax)/100,2);
             $netamt = $amt + $vatamt ;
             $this->invoiceDetails[] = 
             ['pscode'=> $product_service->ps_code
@@ -161,17 +161,17 @@ class Invoice extends Component
             ,'period' => $period ?? 0
             ,'amt'=>$amt
             ,'vat'=>$product_service->ps_vat
-            ,'vatamt'=>round($vatamt,2)
+            ,'vatamt'=>$vatamt
             ,'whvat'=>$wh_tax
-            ,'whtaxamt' => round($whamt,2) 
-            ,'netamt'=>round($netamt, 2) 
+            ,'whtaxamt' => $whamt 
+            ,'netamt'=>$netamt 
             ,'remark'=>''];
             $check = false;
         }
         if($product_service->ps_code == '1020' && !is_null($customer_rent)){
-            $amt = $customer_rent->custr_area_sqm * $customer_rent->custr_service_fee;
-            $vatamt = ($amt * $product_service->ps_vat)/100;
-            $whamt = ($amt * $wh_tax)/100;
+            $amt = round($customer_rent->custr_area_sqm * $customer_rent->custr_service_fee,2);
+            $vatamt = round(($amt * $product_service->ps_vat)/100,2);
+            $whamt = round(($amt * $wh_tax)/100,2);
             $netamt = $amt + $vatamt; 
             $this->invoiceDetails[] = 
             ['pscode'=> $product_service->ps_code
@@ -179,10 +179,10 @@ class Invoice extends Component
             ,'period' => $period
             ,'amt'=>$amt
             ,'vat'=>$product_service->ps_vat
-            ,'vatamt'=>round($vatamt,2)
+            ,'vatamt'=>$vatamt
             ,'whvat'=>$wh_tax
-            ,'whtaxamt' => round($whamt,2) 
-            ,'netamt'=> round($netamt, 2) 
+            ,'whtaxamt' => $whamt 
+            ,'netamt'=> $netamt 
             ,'remark'=>''];
             $check = false;
         }
@@ -194,7 +194,7 @@ class Invoice extends Component
             ,'amt'=> 0
             ,'vat'=> $product_service->ps_vat 
             ,'vatamt'=> 0
-             ,'whvat'=>$wh_tax 
+            ,'whvat'=>$wh_tax 
             ,'whtaxamt' => 0
             ,'netamt'=> 0
             ,'remark'=>''];
@@ -217,16 +217,20 @@ class Invoice extends Component
         $year = Carbon::parse($this->invoiceDate)->format('Y');
         $datePart = substr($year,-2) . Carbon::parse($this->invoiceDate)->format('m');
         $unite = CustomerRental::where('id',$this->rental)->first();
-        $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
-
-        if (is_null($lastInvoice)) {
-            $invNo = $prefix . $datePart . '0001';
-        } else {
-            $lastNumber = (int)substr($lastInvoice->inv_no, -4);
-            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-            $invNo = $prefix . $datePart . $newNumber;
+        $existingInvoices = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')
+        ->where('inv_status', '!=', 'CANCEL')
+            ->orderBy('inv_no', 'asc')
+            ->pluck('inv_no')
+            ->toArray();
+        $invNo= null;
+    foreach (range(1, count($existingInvoices) + 1) as $i) {
+        $expectedId =  $prefix . $datePart . str_pad($i, 4, '0', STR_PAD_LEFT);
+        if (!in_array($expectedId, $existingInvoices)) {
+            $invNo= $expectedId;
+            break;
         }
-
+    }
+        
         $createInvoice = InvoiceHeader::create([
             'inv_no' => $invNo,
             'customer_id' => $this->customerCode,
@@ -268,7 +272,7 @@ class Invoice extends Component
 
     public function closeCreateInvoice(){
         $this->showCreateInvoice = false;
-        $this->reset(['psGroup','customerName','customerCode','customerrents','rental','service','invoiceDate','invoiceDetails']);
+        $this->reset(['psGroup','customerName','customerCode','customerrents','rental','service','invoiceDate','dueDate','invoiceDetails']);
         $this->resetValidation();
        
     }
@@ -297,13 +301,13 @@ class Invoice extends Component
                 $vat = $this->sanitizeNumericValue($this->editInvoiceDetails[$index]['vat'] ?? 0); // Sanitize vat value
                 $whvat = $this->sanitizeNumericValue($this->editInvoiceDetails[$index]['whvat'] ?? 0); // Sanitize whvat value
 
-                $vatamt = ($amt * $vat) / 100 ?? 0;
-                $whtaxamt = ($amt * $whvat) / 100 ?? 0;
+                $vatamt = round(($amt * $vat) / 100 ?? 0,2);
+                $whtaxamt = round(($amt * $whvat) / 100 ?? 0,2);
                 $netamt = $vatamt + $amt;
 
-                $this->editInvoiceDetails[$index]['vatamt'] = round($vatamt,2);
-                $this->editInvoiceDetails[$index]['whtaxamt'] = round($whtaxamt,2);
-                $this->editInvoiceDetails[$index]['netamt'] = round($netamt,2);
+                $this->editInvoiceDetails[$index]['vatamt'] = $vatamt;
+                $this->editInvoiceDetails[$index]['whtaxamt'] = $whtaxamt;
+                $this->editInvoiceDetails[$index]['netamt'] = $netamt;
             }
         }
     }
@@ -379,10 +383,10 @@ class Invoice extends Component
        } 
         
         if(($product_service->ps_code == "1001" || $product_service->ps_code == "1010") && !is_null($customer_rent)){
-            $amt = $customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm;
-            $vatamt = ($amt * $product_service->ps_vat)/100;
-            $whamt = ($amt * $wh_tax)/100;
-            $netamt =$amt + $vatamt ;
+            $amt = round($customer_rent->custr_rental_fee * $customer_rent->custr_area_sqm,2);
+            $vatamt = round(($amt * $product_service->ps_vat)/100,2);
+            $whamt = round(($amt * $wh_tax)/100,2);
+            $netamt =$amt + $vatamt;
             $this->editInvoiceDetails[] = 
             [
             'id' => null,
@@ -394,14 +398,14 @@ class Invoice extends Component
             ,'vatamt'=>$vatamt
             ,'whvat'=>$wh_tax
             ,'whtaxamt' => $whamt 
-            ,'netamt'=> round($netamt, 2)  
+            ,'netamt'=> $netamt  
             ,'remark'=>''];
             $check = false;
         }
         if($product_service->ps_code == '1020' && !is_null($customer_rent)){
-            $amt = $customer_rent->custr_area_sqm * $customer_rent->custr_service_fee;
-            $vatamt = ($amt * $product_service->ps_vat)/100;
-            $whamt = ($amt * $wh_tax)/100;
+            $amt = round($customer_rent->custr_area_sqm * $customer_rent->custr_service_fee,2);
+            $vatamt = round(($amt * $product_service->ps_vat)/100,2);
+            $whamt = round(($amt * $wh_tax)/100,2);
             $netamt =$amt + $vatamt ;
             $this->editInvoiceDetails[] = 
             [
@@ -412,9 +416,9 @@ class Invoice extends Component
             ,'amt'=>$amt
             ,'vat'=>$product_service->ps_vat
             ,'vatamt'=>$vatamt
-            ,'whvat'=>round($wh_tax,2)
-            ,'whtaxamt' => round($whamt,2) 
-            ,'netamt'=>round($netamt, 2)   
+            ,'whvat'=>$wh_tax
+            ,'whtaxamt' => $whamt 
+            ,'netamt'=>$netamt   
             ,'remark'=>''];
             $check = false;
         }
@@ -466,7 +470,8 @@ class Invoice extends Component
         'inv_date' => $this->editInvoiceDate,
         'invd_duedate' => $this->editDueDate,
         'ps_group_id' => $this->editPsGroup,
-        'inv_unite' => CustomerRental::where('id',$this->editRental)->pluck('custr_unit') ?? null,
+        'inv_unite' => CustomerRental::where('id',$this->editRental)
+            ->pluck('custr_unit')->first() ?? null,
         'updated_by' => auth()->id(),
     ]);
 

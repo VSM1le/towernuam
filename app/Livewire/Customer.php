@@ -98,6 +98,7 @@ class Customer extends Component
             'cust_gov_flag' => $this->customerType,
             'updated_by' => auth()->id(),
         ]);
+        $this->closeEditCustomer();
     }
 
     public function closeEditCustomer(){
