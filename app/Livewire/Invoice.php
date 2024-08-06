@@ -217,19 +217,15 @@ class Invoice extends Component
         $year = Carbon::parse($this->invoiceDate)->format('Y');
         $datePart = substr($year,-2) . Carbon::parse($this->invoiceDate)->format('m');
         $unite = CustomerRental::where('id',$this->rental)->first();
-        $existingInvoices = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')
-        ->where('inv_status', '!=', 'CANCEL')
-            ->orderBy('inv_no', 'asc')
-            ->pluck('inv_no')
-            ->toArray();
-        $invNo= null;
-    foreach (range(1, count($existingInvoices) + 1) as $i) {
-        $expectedId =  $prefix . $datePart . str_pad($i, 4, '0', STR_PAD_LEFT);
-        if (!in_array($expectedId, $existingInvoices)) {
-            $invNo= $expectedId;
-            break;
+        $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
+
+        if (is_null($lastInvoice)) {
+            $invNo = $prefix . $datePart . '0001';
+        } else {
+            $lastNumber = (int)substr($lastInvoice->inv_no, -4);
+            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            $invNo = $prefix . $datePart . $newNumber;
         }
-    }
         
         $createInvoice = InvoiceHeader::create([
             'inv_no' => $invNo,
