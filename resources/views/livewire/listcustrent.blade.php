@@ -30,12 +30,6 @@
                                Rental fee 
                             </th>
                             <th scope="col" class="px-6 py-3">
-                               Service fee 
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                               Equipment Fee 
-                            </th>
-                            <th scope="col" class="px-6 py-3">
                                Action
                             </th>
                         </tr>
@@ -47,22 +41,14 @@
                                 {{$loop->iteration}}
                             </th>
                             <td class="px-6 py-4">
-                               {{ $rent->productservice->ps_code}} : {{ $rent->productservice->ps_name_th }} 
-                               @if ($rent->remark)
-                                : {{ $rent->remark }}     
-                               @endif 
+                               {{ $rent->productservice->ps_code}} : {{ $rent->productservice->ps_name_th }} {{ $rent->lcr_remark }} 
                             </td>
+                          
                             <td class="px-6 py-4">
                                 {{ $rent->lcr_area_sqm }}
                             </td>
                             <td class="px-6 py-4">
                                 {{ $rent->lcr_rental_fee }}
-                            </td>
-                            <td class="px-6 py-4">
-                                {{ $rent->lcr_service_fee }}
-                            </td>
-                            <td class="px-6 py-4">
-                                {{ $rent->lcr_equipment_fee }}
                             </td>
                             <td class="px-6 py-4">
                                 <button wire:click="openEditList({{$rent->id}})" class="font-medium text-yellow-500 dark:text-blue-500 hover:underline">Edit</button>
@@ -89,11 +75,11 @@
         </div>
         <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
             <div class="flex justify-start w-full">
-                <div class="m-3 ml-5">
+                <div class="m-3 ml-5 w-64">
                     <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Product</label>
-                        <label class="w-52 text-sm font-medium text-gray-900"></label>
+                        <label class=" text-sm font-medium text-gray-900"></label>
                         <select wire:model="productId" required
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-64 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                             <option value="">select product</option>
                             @foreach ($products as $product)
                                <option value="{{ $product->id }}">{{ $product->ps_code }} : {{ $product->ps_name_th }}</option> 
@@ -103,7 +89,7 @@
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror
                 </div>
-                <div class="m-3 mr-5">
+                <div class="m-3 mr-5 w-48">
                     <label 
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Remark</label>
                     <input  wire:model="remark"
@@ -113,8 +99,8 @@
                     @enderror
                 </div>
             </div>
-            <div class="flex justify-start">
-                <div class="m-3 w-full ml-5">
+            <div class="flex justify-start w-full">
+                <div class="m-3 w-48 ml-5">
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Area sqm</label>
                     <input wire:model="areaSqm" step="0.01" type="number" 
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"/>
@@ -122,27 +108,11 @@
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror
                 </div>
-                <div class="m-3 w-full">
+                <div class="m-3 w-48">
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rental fee</label>
                     <input wire:model="rentalFee" step="0.01"  type="number"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                     @error('rentalFee') 
-                        <span class="text-red-500 text-xs">{{ $message }}</span> 
-                    @enderror
-                </div>
-                <div class="m-3 w-full ">
-                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service fee</label>
-                    <input type="number"  wire:model="serviceFee" step="0.01" 
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                    @error('serviceFee') 
-                        <span class="text-red-500 text-xs">{{ $message }}</span> 
-                    @enderror
-                </div>
-                 <div class="m-3 w-full mr-5">
-                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Equipment fee</label>
-                    <input type="number"  wire:model="equipFee" step="0.01" 
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                    @error('equipFee') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror
                 </div>
@@ -173,11 +143,11 @@
         </div>
         <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
             <div class="flex justify-start w-full">
-                <div class="m-3 ml-5">
+                <div class="m-3 ml-5 w-64">
                     <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Product</label>
                         <label class="w-52 text-sm font-medium text-gray-900"></label>
                         <select wire:model="productId" required
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-64 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                             <option value="">select product</option>
                             @foreach ($products as $product)
                                <option value="{{ $product->id }}">{{ $product->ps_code }} : {{ $product->ps_name_th }}</option> 
@@ -187,18 +157,18 @@
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror
                 </div>
-                <div class="m-3 mr-5">
+                <div class="m-3 mr-5 w-full">
                     <label 
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Remark</label>
                     <input  wire:model="remark"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                     @error('remark') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror
                 </div>
             </div>
-            <div class="flex justify-start">
-                <div class="m-3 w-full ml-5">
+            <div class="flex justify-start w-full">
+                <div class="m-3 w-48 ml-5">
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Area sqm</label>
                     <input wire:model="areaSqm" step="0.01" type="number" 
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"/>
@@ -206,27 +176,11 @@
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror
                 </div>
-                <div class="m-3 w-full">
+                <div class="m-3 w-48">
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rental fee</label>
                     <input wire:model="rentalFee" step="0.01"  type="number"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                     @error('rentalFee') 
-                        <span class="text-red-500 text-xs">{{ $message }}</span> 
-                    @enderror
-                </div>
-                <div class="m-3 w-full ">
-                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service fee</label>
-                    <input type="number"  wire:model="serviceFee" step="0.01" 
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                    @error('serviceFee') 
-                        <span class="text-red-500 text-xs">{{ $message }}</span> 
-                    @enderror
-                </div>
-                 <div class="m-3 w-full mr-5">
-                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Equipment fee</label>
-                    <input type="number"  wire:model="equipFee" step="0.01" 
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                    @error('equipFee') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror
                 </div>

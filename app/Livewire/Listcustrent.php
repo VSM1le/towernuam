@@ -39,8 +39,6 @@ class Listcustrent extends Component
             'productId'=> ['required'],
             'areaSqm' => ['required','numeric','min:1'],
             'rentalFee' => ['required','numeric','min:1'],
-            'serviceFee' => ['required','numeric','min:1'],
-            'equipFee' => ['required','numeric'],
         ]);
 
         ListCustomerRent::create([
@@ -49,8 +47,6 @@ class Listcustrent extends Component
             'lcr_remark' => $this->remark,
             'lcr_area_sqm' => $this->areaSqm,
             'lcr_rental_fee' => $this->rentalFee,
-            'lcr_service_fee' => $this->serviceFee,
-            'lcr_equipment_fee' => $this->equipFee,
             'created_by' => auth()->id(),
             'updated_by' => auth()->id()
         ]);
@@ -64,8 +60,6 @@ class Listcustrent extends Component
         $this->remark = $listrent->lcr_remark;
         $this->areaSqm = $listrent->lcr_area_sqm;
         $this->rentalFee = $listrent->lcr_rental_fee;
-        $this->serviceFee = $listrent->lcr_service_fee;
-        $this->equipFee = $listrent->lcr_equipment_fee;
         $this->showEditList = true;
     }
     public function editList(){
@@ -73,16 +67,12 @@ class Listcustrent extends Component
             'productId'=> ['required'],
             'areaSqm' => ['required','numeric','min:1'],
             'rentalFee' => ['required','numeric','min:1'],
-            'serviceFee' => ['required','numeric','min:1'],
-            'equipFee' => ['required','numeric'],
         ]);
         ListCustomerRent::where('id',$this->listId)->update([
             'product_service_id' =>  $this->productId,
             'lcr_remark' => $this->remark,
             'lcr_area_sqm' => $this->areaSqm,
             'lcr_rental_fee' => $this->rentalFee,
-            'lcr_service_fee' => $this->serviceFee,
-            'lcr_equipment_fee' => $this->equipFee,
             'updated_by' => auth()->id()
         ]);
         $this->closeEditList();

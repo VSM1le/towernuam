@@ -96,7 +96,8 @@ class BillWE extends Component
         $year = Carbon::parse($this->monthYear)->format('Y');
         $datePart = substr($year, -2) . Carbon::parse($this->monthYear)->format('m');
 
-        $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
+        $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')
+            ->orderBy('inv_no', 'desc')->first();
         $generatedInvoices = [];
 
         // Create the set of expected invoice numbers and find the gaps
