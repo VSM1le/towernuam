@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Listcustrent;
 use App\Models\InvoiceHeader;
 use App\Models\ReceiptHeader;
 use App\Services\numberToBath;
@@ -36,6 +37,7 @@ Route::view('invoice', 'invoicepdf.invoice1')
     ->middleware(['auth'])
     ->name('invoice');
 
+Route::view('contract/{id}','custconlist')->middleware(['auth'])->name('custlist');
 // Route::view('invoice3', 'invoicepdf.invoice3')
 //     ->middleware(['auth'])
 //     ->name('invoice');

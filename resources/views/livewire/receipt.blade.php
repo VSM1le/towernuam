@@ -138,7 +138,7 @@
             </div>
                <div class="m-3">
                     {{ $receipt->links() }}
-                </div>  
+            </div>  
     </div>
 
 

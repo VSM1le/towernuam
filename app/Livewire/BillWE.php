@@ -96,22 +96,30 @@ class BillWE extends Component
         $year = Carbon::parse($this->monthYear)->format('Y');
         $datePart = substr($year, -2) . Carbon::parse($this->monthYear)->format('m');
 
-        $existingInvoices = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . "%")
-            ->where('inv_status', '!=', 'CANCEL')
-            ->orderBy('inv_no', 'asc')
-            ->pluck('inv_no')
-            ->toArray();
-
-        $existingInvoicesSet = array_flip($existingInvoices); // For faster lookups
+        $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
         $generatedInvoices = [];
 
         // Create the set of expected invoice numbers and find the gaps
-        for ($i = 1; count($generatedInvoices) < count($sumBill); $i++) {
-            $expectedInvoice = $prefix . $datePart . str_pad($i, 4, '0', STR_PAD_LEFT);
-            if (!isset($existingInvoicesSet[$expectedInvoice])) {
-                $generatedInvoices[] = $expectedInvoice;
+        // for ($i = 1; count($generatedInvoices) < count($sumBill); $i++) {
+        //     $expectedInvoice = $prefix . $datePart . str_pad($i, 4, '0', STR_PAD_LEFT);
+        //     if (!isset($existingInvoicesSet[$expectedInvoice])) {
+        //         $generatedInvoices[] = $expectedInvoice;
+        //     }
+        // } 
+        if (is_null($lastInvoice)) {
+            foreach($sumBill as $index => $bill){
+                 $generatedInvoices[] = $prefix . $datePart . str_pad(1 + $index, 4, '0', STR_PAD_LEFT);
+                }
+            
+        } else {
+            foreach($sumBill as $index => $bill){
+            $lastNumber = (int)substr($lastInvoice->inv_no, -4);
+            $newNumber = str_pad($lastNumber + 1 + $index, 4, '0', STR_PAD_LEFT);
+            $generatedInvoices[]= $prefix . $datePart . $newNumber;
             }
-        } 
+        }
+        dd($generatedInvoices);
+
         if($this->typeQuery == "WA"){
             $product = ProductService::where('ps_code','2002')->first();
             $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
