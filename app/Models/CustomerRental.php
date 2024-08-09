@@ -53,5 +53,9 @@ class CustomerRental extends Model
     public function customer():BelongsTo{
         return $this->belongsTo(Customer::class,'customer_id');
     }
+
+    public function listcust():HasMany{
+        return $this->hasMany(ListCustomerRent::class);
+    } 
    
 }

@@ -13,6 +13,7 @@ class Listcustrent extends Component
     public $conId;
     public $contractInfo;
     public $showCreateList = false;
+    public $line;
     public $remark;
     public $productId;
     public $areaSqm;
@@ -32,18 +33,21 @@ class Listcustrent extends Component
     }
     public function closeCreateList(){
         $this->showCreateList = false;
-        $this->reset('productId','remark','areaSqm','rentalFee','serviceFee','equipFee');
+        $this->reset('line','productId','remark','areaSqm','rentalFee','serviceFee','equipFee');
+        $this->resetValidation();
     }
     public function createList(){
         $this->validate([
             'productId'=> ['required'],
             'areaSqm' => ['required','numeric','min:1'],
             'rentalFee' => ['required','numeric','min:1'],
+            'line' => ['required','numeric','min:1','max:255']
         ]);
 
         ListCustomerRent::create([
             'customer_rental_id' => $this->conId,
             'product_service_id' =>  $this->productId,
+            'lcr_line' => $this->line,
             'lcr_remark' => $this->remark,
             'lcr_area_sqm' => $this->areaSqm,
             'lcr_rental_fee' => $this->rentalFee,
@@ -60,6 +64,7 @@ class Listcustrent extends Component
         $this->remark = $listrent->lcr_remark;
         $this->areaSqm = $listrent->lcr_area_sqm;
         $this->rentalFee = $listrent->lcr_rental_fee;
+        $this->line = $listrent->lcr_line;
         $this->showEditList = true;
     }
     public function editList(){
@@ -67,11 +72,13 @@ class Listcustrent extends Component
             'productId'=> ['required'],
             'areaSqm' => ['required','numeric','min:1'],
             'rentalFee' => ['required','numeric','min:1'],
+            'line' => ['required','numeric','min:1','max:255']
         ]);
         ListCustomerRent::where('id',$this->listId)->update([
             'product_service_id' =>  $this->productId,
             'lcr_remark' => $this->remark,
             'lcr_area_sqm' => $this->areaSqm,
+            'lcr_line' => $this->line,
             'lcr_rental_fee' => $this->rentalFee,
             'updated_by' => auth()->id()
         ]);
@@ -79,7 +86,8 @@ class Listcustrent extends Component
     }
     public function closeEditList(){
         $this->showEditList = false;
-       $this->reset('productId','remark','areaSqm','rentalFee','serviceFee','equipFee','listId'); 
+       $this->reset('productId','line','remark','areaSqm','rentalFee','serviceFee','equipFee','listId'); 
+       $this->resetValidation();
     }
     public function openDeleteList($id)
     {

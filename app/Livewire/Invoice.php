@@ -60,6 +60,12 @@ class Invoice extends Component
         return (float) $sanitizedValue;
     }
 
+    public function mount(){
+        $this->endDate = Carbon::now()->format('Y-m-d');
+        $this->startDate = Carbon::now()->subMonth()->format('Y-m-d');
+        // $this->genMontly();
+    }
+
     public function updatedCustomerCode(){
         $this->rental = null;
         $this->invoiceDetails = [];
@@ -579,6 +585,84 @@ public function closeCancelInvoice(){
             echo $pdf->stream();
         }, $invoice->inv_no . '.pdf'); 
     } 
+
+    public function genMontly(){
+        $date = '2025-01-01';
+        $duedate = '2025-01-30';
+        $carbon_date = Carbon::parse($date);
+        $start = $carbon_date->copy()->addMonth()->startOfMonth()->format('d/m/Y');
+        $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
+        $period = $start . " - " . $end;
+        $availableContracts = CustomerRental::whereDate('custr_end_date2', '>=', '2026-09-30')
+            ->whereHas('listcust') 
+            ->get();
+        $prefix = 'I'.$this->tower.'S';
+        $year = Carbon::parse($date)->format('Y');
+        $datePart = substr($year,-2) . Carbon::parse($this->invoiceDate)->format('m');
+        $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
+
+        if (is_null($lastInvoice)) {
+            foreach($availableContracts as $index => $bill){
+                 $generatedInvoices[] = $prefix . $datePart . str_pad(1 + $index, 4, '0', STR_PAD_LEFT);
+                }
+            
+        } else {
+            foreach($availableContracts as $index => $bill){
+            $lastNumber = (int)substr($lastInvoice->inv_no, -4);
+            $newNumber = str_pad($lastNumber + 1 + $index, 4, '0', STR_PAD_LEFT);
+            $generatedInvoices[]= $prefix . $datePart . $newNumber;
+            }
+        } 
+        foreach($availableContracts as $index => $contract){
+            
+            $createInvoice = InvoiceHeader::create([
+            'inv_no' => $generatedInvoices[$index],
+            'customer_id' => $contract->customer_id,
+            'customer_rental_id' => $contract->id,
+            'inv_date' => $date,
+            'invd_duedate' => $duedate,
+            'ps_group_id' => 1,
+            'inv_status' => 'USE',
+            'inv_unite' => $contract->custr_unit ?? null, 
+            'inv_tower' => $this->tower,
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
+        ]);
+
+        foreach ($contract->listcust as $list) {
+            $wh_tax = $list->productservice->ps_whtax;
+            if($contract->customer->cust_gov_flag == 1){
+                $wh_tax = $list->productservice->gov_whtax;
+            } 
+            if($contract->customer->cust_gov_flag == 3){
+                $wh_tax = 0;
+            }
+            $amt = round($list->lcr_area_sqm * $list->lcr_rental_fee,2);
+            $vatamt = round(($amt * $list->productservice->ps_vat)/100,2);
+            $whamt = round(($amt * $wh_tax)/100,2);
+            $netamt = $amt + $vatamt ;
+            $createInvoice->invoicedetail()->create([
+                'invd_product_code' => $list->product_service_id,
+                'invd_product_name' => $list->productservice->ps_name_th,
+                'invd_period' => $period,
+                'invd_amt' => $detail['amt'],
+                'invd_vat_percent' => $detail['vat'],
+                'invd_vat_amt' => $detail['vatamt'],
+                'invd_wh_tax_percent' => $detail['whvat'],
+                'invd_wh_tax_amt' => $detail['whtaxamt'],
+                'invd_net_amt' => $detail['netamt'],
+                'invd_remake' => $detail['remark'],
+                'invd_receipt_flag' => "No",
+                'created_by' => auth()->id(),
+                'updated_by' => auth()->id(),
+            ]);
+        }
+
+
+        }
+       
+            dd($availableContracts->first()->listcust->first());
+    }
     
 
     

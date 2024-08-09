@@ -18,6 +18,7 @@ class ListCustomerRent extends Model
         "lcr_rental_fee",
         "lcr_service_fee",
         "lcr_equipment_fee",
+        "lcr_line",
         "created_by",
         "updated_by"
     ];
