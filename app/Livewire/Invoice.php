@@ -13,6 +13,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Dompdf\Options;
 use Illuminate\Support\Carbon as SupportCarbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -53,6 +54,11 @@ class Invoice extends Component
     public $startDate;
     public $endDate;
     public $customer;
+
+    public $showGenrateInvoice= false;
+    public $genInvDate;
+    public $genDueDate;
+
     private function sanitizeNumericValue($value)
     {
         $sanitizedValue = preg_replace('/[^-?\d.]/', '', $value);
@@ -61,8 +67,8 @@ class Invoice extends Component
     }
 
     public function mount(){
-        $this->endDate = Carbon::now()->format('Y-m-d');
-        $this->startDate = Carbon::now()->subMonth()->format('Y-m-d');
+        // $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
+        $this->startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
         // $this->genMontly();
     }
 
@@ -586,26 +592,44 @@ public function closeCancelInvoice(){
         }, $invoice->inv_no . '.pdf'); 
     } 
 
-    public function genMontly(){
-        $date = '2025-01-01';
-        $duedate = '2025-01-30';
-        $carbon_date = Carbon::parse($date);
-        $start = $carbon_date->copy()->addMonth()->startOfMonth()->format('d/m/Y');
-        $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
+    public function openGenMonth(){
+        $this->showGenrateInvoice = true;
+    }
+    public function closeGenMonth(){
+        $this->showGenrateInvoice = false;
+        $this->reset('genInvDate','genDueDate');
+        $this->resetValidation();
+    }
+    public function genMonthly(){
+        $this->validate([
+            'genInvDate' => 'required',
+            'genDueDate' => 'required'
+        ]);
+        $carbon_date = Carbon::parse($this->genInvDate)->addMonth();
+        $start = $carbon_date->copy()->startOfMonth()->format('d/m/Y');
+        $end = $carbon_date->copy()->endOfMonth()->format('d/m/Y');
         $period = $start . " - " . $end;
-        $availableContracts = CustomerRental::whereDate('custr_end_date2', '>=', '2026-09-30')
-            ->whereHas('listcust') 
-            ->get();
+
+        $availableContracts = CustomerRental::where(function($query) use ($carbon_date) {
+            $query->whereDate('custr_begin_date2', '<=', $carbon_date->endOfMonth())
+                ->whereDate('custr_end_date2', '>=', $carbon_date->startOfMonth());
+        })
+        ->whereHas("customer",function($query){
+            $query->where('cust_invauto','Y');
+        })
+        ->whereHas('listcust')
+        ->with('listcust')
+        ->get();
+        if($availableContracts){
         $prefix = 'I'.$this->tower.'S';
-        $year = Carbon::parse($date)->format('Y');
-        $datePart = substr($year,-2) . Carbon::parse($this->invoiceDate)->format('m');
+        $year = Carbon::parse($this->genInvDate)->format('Y');
+        $datePart = substr($year,-2) . Carbon::parse($this->genInvDate)->format('m');
         $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
 
         if (is_null($lastInvoice)) {
             foreach($availableContracts as $index => $bill){
                  $generatedInvoices[] = $prefix . $datePart . str_pad(1 + $index, 4, '0', STR_PAD_LEFT);
                 }
-            
         } else {
             foreach($availableContracts as $index => $bill){
             $lastNumber = (int)substr($lastInvoice->inv_no, -4);
@@ -619,8 +643,8 @@ public function closeCancelInvoice(){
             'inv_no' => $generatedInvoices[$index],
             'customer_id' => $contract->customer_id,
             'customer_rental_id' => $contract->id,
-            'inv_date' => $date,
-            'invd_duedate' => $duedate,
+            'inv_date' => $this->genInvDate,
+            'invd_duedate' => $this->genDueDate,
             'ps_group_id' => 1,
             'inv_status' => 'USE',
             'inv_unite' => $contract->custr_unit ?? null, 
@@ -629,7 +653,21 @@ public function closeCancelInvoice(){
             'updated_by' => auth()->id(),
         ]);
 
-        foreach ($contract->listcust as $list) {
+        $groupedMonth = $contract->listcust()
+        ->select(
+            'customer_rental_id',
+            'lcr_line',
+            'product_service_id',
+            DB::raw("GROUP_CONCAT(lcr_remark SEPARATOR ' ') as con_remark"),
+            DB::raw('SUM(lcr_rental_fee * lcr_area_sqm) as amt' ), 
+        )->groupBy(
+            'customer_rental_id',
+            'product_service_id',
+            'lcr_line',
+        )->orderBy('lcr_line')
+        ->get();
+
+        foreach ($groupedMonth as $list) {
             $wh_tax = $list->productservice->ps_whtax;
             if($contract->customer->cust_gov_flag == 1){
                 $wh_tax = $list->productservice->gov_whtax;
@@ -637,31 +675,43 @@ public function closeCancelInvoice(){
             if($contract->customer->cust_gov_flag == 3){
                 $wh_tax = 0;
             }
-            $amt = round($list->lcr_area_sqm * $list->lcr_rental_fee,2);
+            $amt = $list->amt;
+           
+            if(Carbon::parse($contract->custr_begin_date2)->format('m-Y') == $carbon_date->format('m-Y') )
+            {
+                $day = Carbon::parse($contract->custr_begin_date2);
+                $endMonth = $day->copy()->endOfMonth();
+                $daysRemaining = $day->diffInDays($endMonth) + 1;
+                $amt = round(($amt / 30) * $daysRemaining,2);
+            } 
+            if(Carbon::parse($contract->custr_end_date2)->format('m-Y') == $carbon_date->format('m-Y') )
+            {
+                $day = Carbon::parse($contract->custr_end_date2)->day; 
+                $amt = round(($amt / 30) * $day, 2);    
+            }
+
             $vatamt = round(($amt * $list->productservice->ps_vat)/100,2);
             $whamt = round(($amt * $wh_tax)/100,2);
-            $netamt = $amt + $vatamt ;
+            $netamt = $amt + $vatamt;
             $createInvoice->invoicedetail()->create([
-                'invd_product_code' => $list->product_service_id,
+                'invd_product_code' => $list->productservice->ps_code,
                 'invd_product_name' => $list->productservice->ps_name_th,
                 'invd_period' => $period,
-                'invd_amt' => $detail['amt'],
-                'invd_vat_percent' => $detail['vat'],
-                'invd_vat_amt' => $detail['vatamt'],
-                'invd_wh_tax_percent' => $detail['whvat'],
-                'invd_wh_tax_amt' => $detail['whtaxamt'],
-                'invd_net_amt' => $detail['netamt'],
-                'invd_remake' => $detail['remark'],
+                'invd_amt' => $amt,
+                'invd_vat_percent' => $list->productservice->ps_vat,
+                'invd_vat_amt' => $vatamt,
+                'invd_wh_tax_percent' => $wh_tax,
+                'invd_wh_tax_amt' => $whamt,
+                'invd_net_amt' => $netamt,
+                'invd_remake' => $list->con_remark,
                 'invd_receipt_flag' => "No",
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
             ]);
         }
-
-
         }
-       
-            dd($availableContracts->first()->listcust->first());
+        }
+      $this->closeGenMonth(); 
     }
     
 
@@ -669,8 +719,11 @@ public function closeCancelInvoice(){
     public function render()
     {
         $invoices = InvoiceHeader::with(['invoicedetail', 'customer'])
-        ->when($this->startDate && $this->endDate, function ($query) {
-            $query->whereBetween('inv_date', [$this->startDate, $this->endDate]);
+        ->when($this->startDate, function ($query) {
+            $query->whereDate('inv_date','>=', $this->startDate);
+        })
+        ->when($this->endDate, function($query){
+            $query->whereDate('inv_date',"<=" ,$this->endDate);
         })
         ->when($this->customer != "" ,function ($query){
             $query->where('customer_id',$this->customer);

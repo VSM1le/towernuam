@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Exports\GroupedByContractExport;
 use App\Imports\BillImport;
 use App\Models\Bill;
 use App\Models\CustomerRental;
@@ -44,12 +45,19 @@ class BillWE extends Component
             return;
         }
 
-        // Explicitly specify the file type
+        try {
+        // Import the file
         Excel::import(new BillImport($this->type), $this->csvFile);
-
+        
         // Provide feedback to the user
         session()->flash('success', 'File imported successfully!');
         $this->closeImport();
+        } catch (\Exception $e) {
+        // Handle exceptions and provide feedback
+        session()->flash('error', 'Failed to import file: ' . $e->getMessage());
+        $this->closeImport();
+        } 
+        
     }
     public function openImport(){
         $this->showImportModal = true;
@@ -91,7 +99,6 @@ class BillWE extends Component
                 'price_unit'
             )
             ->get(); 
-        // dd($sumBill);
         $prefix = 'IAS';
         $year = Carbon::parse($this->monthYear)->format('Y');
         $datePart = substr($year, -2) . Carbon::parse($this->monthYear)->format('m');
@@ -119,12 +126,11 @@ class BillWE extends Component
             $generatedInvoices[]= $prefix . $datePart . $newNumber;
             }
         }
-        dd($generatedInvoices);
 
         if($this->typeQuery == "WA"){
             $product = ProductService::where('ps_code','2002')->first();
             $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
-            $period = $carbon_date->copy()->day(16)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day(15)->format('d/m/Y');
+            $period = $carbon_date->copy()->day(16)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day(6)->format('d/m/Y');
             $whtax = $product->ps_whtax ?? 0;
         }
         elseif($this->typeQuery == "EC"){
@@ -151,11 +157,11 @@ class BillWE extends Component
             if($this->typeQuery == "OT"){
                 $amt = round($bill->total_sales * ($bill->price_unit / 0.041666667),2);
             }
-            if($contractInfo->customer->cust_gov_flag === 3)
+            if($contractInfo->customer->cust_gov_flag === 1)
             {
                 $whtax = 1;
             }
-            if($contractInfo->customer->cust_gov_flag === 1)
+            if($contractInfo->customer->cust_gov_flag === 3)
             {
                 $whtax = 0;
             }
@@ -192,6 +198,55 @@ class BillWE extends Component
         }
         $this->closeGenInvoice();
     }
+
+    public function exportGroupByContract()
+    {
+       $data = Bill::join('customer_rentals', 'bill.contract_no', '=', 'customer_rentals.custr_contract_no')
+            ->select(
+                'bill.id',
+                'bill.contract_no',
+                'bill.unit', 
+                'bill.meter',
+                'bill.p_time',
+                'bill.t_time',
+                'bill.p_unit',
+                'bill.price_unit',
+                'bill.invoice_date', 
+                'bill.due_date',
+                'bill.bill_tran_date',
+                'bill.bill_open',
+                'bill.bill_close',
+                'bill.bill_use',
+                'customer_rentals.custr_contract_no_real as real_contract'  
+            )
+            ->when($this->monthYear, function ($query) {
+                $query->where('invoice_date', 'like', '%' . $this->monthYear . '%');
+            })
+            ->when($this->typeQuery, function ($query){
+                $query->where('type',$this->typeQuery);
+            })
+            ->where('status','Y')
+            ->get(); 
+        if($this->typeQuery == "WA"){
+            $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
+            $period = $carbon_date->copy()->day(16)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day(6)->format('d/m/Y');
+        }
+        elseif($this->typeQuery == "EC"){
+            $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
+            $start = $carbon_date->copy()->subMonth()->day(4)->format('d/m/Y');
+            $end = $carbon_date->copy()->day(3)->format('d/m/Y');
+            $period = $start . " - " . $end;
+        }
+        else{
+            $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
+
+            $start = $carbon_date->copy()->addMonth()->startOfMonth()->format('d/m/Y');
+            $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
+            $period = $start . " - " . $end;
+        }
+            return Excel::download(new GroupedByContractExport($data,$this->typeQuery,$period), 'bills_grouped_by_contract.xlsx');
+    }
+
     public function render()
     {
        $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');

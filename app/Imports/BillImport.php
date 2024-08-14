@@ -4,10 +4,14 @@ namespace App\Imports;
 
 use App\Models\Bill;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
+use Maatwebsite\Excel\Concerns\WithValidation;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Illuminate\Support\Facades\Validator;
 
 class BillImport implements ToCollection , WithCalculatedFormulas ,WithHeadingRow 
 {
@@ -15,21 +19,39 @@ class BillImport implements ToCollection , WithCalculatedFormulas ,WithHeadingRo
      * @param Collection $collection
      */
     public $type;
+    protected $errors = [];
     public function __construct($type){
         $this->type = $type;
     }
     public function collection(Collection $rows)
     {
         foreach ($rows as $index => $row) {
+            if (count(array_filter($row->toArray())) === 0) {
+                continue;
+            }
+
+            $validator = Validator::make($row->toArray(), $this->rules());
+
+            if ($validator->fails()) {
+                $this->errors[$index] = $validator->errors()->all();
+            }
+        }
+
+        if (!empty($this->errors)) {
+            throw new \Exception('Validation failed: ' . json_encode($this->errors));
+        }
+
+        foreach ($rows as $index => $row) {
+
                 if (count(array_filter($row->toArray())) === 0) {
                 continue;
                }
                Bill::create([
                 'invoice_date' => Date::excelToDateTimeObject($row['invoice_date'])->format('Y-m-d') ?? null,
                 'due_date' => Date::excelToDateTimeObject($row['due_date'])->format('Y-m-d') ?? null,
-                'bill_tran_date' => Date::excelToDateTimeObject($row['transaction_date'])->format('Y-m-d') ?? null,
-                'bill_open' => Date::excelToDateTimeObject($row['open']) ?? null,
-                'bill_close' => Date::excelToDateTimeObject($row['close']) ?? null,
+                'bill_tran_date' => Date::excelToDateTimeObject($row['transaction_date'] ?? null)->format('Y-m-d') ?? null,
+                'bill_open' => Date::excelToDateTimeObject($row['open'] ?? null) ?? null,
+                'bill_close' => Date::excelToDateTimeObject($row['close'] ?? null) ?? null,
                 'contract_no' => $row['contract_no'] ?? null,
                 'unit' => $row['unit'] ?? null,
                 'meter' => $row['meter_no'] ?? null,
@@ -43,6 +65,16 @@ class BillImport implements ToCollection , WithCalculatedFormulas ,WithHeadingRo
                 'updated_by' => auth()->id()
             ]);
         }
+    }
+
+    public function rules(): array{
+        return [
+            'contract_no' => 'exists:customer_rentals,custr_contract_no'
+        ];
+    }
+    public function getErrors()
+    {
+        return $this->errors;
     }
 
     public function headingRow(): int

@@ -82,7 +82,6 @@
         </div>
     </div>
 
-
  @if($showEditContract)
     <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeEditContract"></div>
     <form wire:submit.prevent="editContract" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 

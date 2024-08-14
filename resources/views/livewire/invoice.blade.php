@@ -1,5 +1,9 @@
 <div class="">
-    <div class="flex justify-end">
+    <div class="flex justify-between">
+         <button type="button"
+            wire:click = "openGenMonth"  
+            class="text-white bg-orange-500 hover:bg-orange-400 focus:ring-4 focus:ring-orange-600 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-orange-500 dark:hover:bg-orange-400 focus:outline-none dark:focus:ring-orange-600">
+            Generate Invoice</button>
             <button type="button"
             wire:click = "openCreateInvoice"  
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
@@ -152,12 +156,6 @@
                 </div>
                  
             </div>
-
-
-
-
-
-
 
 
 
@@ -373,8 +371,6 @@
 </form>
 </div>
 @endif 
-
-
 
     {{-- Edit modal --}} 
     @if($showEditInvoice)
@@ -601,4 +597,40 @@
    </div>
  </div>
  @endif
+    @if($showGenrateInvoice)
+        <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeGenMonth"></div>
+        <form wire:submit.prevent="genMonthly" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 
+        :style="{ 'max-height': '400px', 'max-width' : '500px' }">
+            <div class="bg-orange-500 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
+                <div class="text-xl font-bold">Generate Invoice</div>
+                <button wire:click="closeGenMonth" type="button" class="focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
+                <div class="flex justify-start w-full">
+                   <div class="w-full ml-5 m-3">
+                        <label for="genInvDate" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">Invoice Date</label>
+                        <input id="genInvDate" wire:model.live="genInvDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    </div>
+                    <div class="w-full mr-5 m-3">
+                        <label for="genDueDate" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">Due Date</label>
+                        <input id="genDueDate" wire:model.live="genDueDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-100 w-full flex justify-between p-4">
+                <div class="flex">
+                    
+                </div>
+                <div>
+                 <button type="submit" 
+        class="text-white bg-orange-500 hover:bg-orange-400 focus:ring-4 focus:outline-none focus:ring-orange-600 font-medium rounded-lg text-sm px-5 py-2.5">Generate</button>
+                </div>
+            </div>
+        </form>
+        </div>
+    @endif  
 </div>
