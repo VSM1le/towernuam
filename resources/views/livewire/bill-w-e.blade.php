@@ -201,7 +201,7 @@
     {{-- Importmodal --}}
     @if($showImportModal)
         <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeImport"></div>
-        <form wire:submit.prevent="bill" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 
+        <form wire:submit.prevent="bill" enctype="multipart/form-data" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 
         :style="{ 'max-height': '400px', 'max-width' : '500px' }">
             <div class="bg-blue-700 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
                 <div class="text-xl font-bold">Import Bill</div>
