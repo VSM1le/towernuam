@@ -15,10 +15,12 @@ class GroupedByContractExport implements WithMultipleSheets
     protected $data;
     protected $type;
     protected $period;
-    public function __construct($data,$type,$period){
+    protected $vat;
+    public function __construct($data,$type,$period,$vat){
        $this->data = $data; 
        $this->type = $type;
        $this->period = $period;
+       $this->vat = $vat;
     }
 
 
@@ -29,9 +31,9 @@ class GroupedByContractExport implements WithMultipleSheets
 
         foreach ($uniqueContract as $item) {
 
-            $filteredItems = $this->data->where('real_contract', $item);
+            $filteredItems = $this->data->where('real_contract', $item)->sortBy('bill_tran_date');
 
-            $sheets[] = new ContractSheetExport($item, $filteredItems,$this->type,$this->period); 
+            $sheets[] = new ContractSheetExport($item, $filteredItems,$this->type,$this->period,$this->vat); 
         }   
 
         return $sheets;

@@ -69,7 +69,7 @@ class BillImport implements ToCollection , WithCalculatedFormulas ,WithHeadingRo
                 'meter' => $row['meter_no'] ?? null,
                 'p_time' => $row['previous_time'] ?? null,
                 't_time' => $row['this_time'] ?? null ,
-                'p_unit' => $row['diff'] ?? round($row['time_diff']  * 60,9) ?? null,
+                'p_unit' => $row['diff'] ?? round($row['time_diff'],9) ?? null,
                 'price_unit' => $row['rate']  ?? null,
                 'status' => $row['status'] ?? null,
                 'type' => $this->type,

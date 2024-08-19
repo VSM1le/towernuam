@@ -157,7 +157,7 @@ class BillWE extends Component
             $contractInfo = CustomerRental::where('custr_contract_no',$bill->contract_no)->first(); 
             $amt = round($bill->total_sales * $bill->price_unit,2);
             if($this->typeQuery == "OT"){
-                $amt = round($bill->total_sales * ($bill->price_unit / 0.041666667),2);
+                $amt = round( $bill->total_sales * ($bill->price_unit / 0.041666667),2);
             }
             if($contractInfo->customer->cust_gov_flag === 1)
             {
@@ -231,23 +231,25 @@ class BillWE extends Component
             ->where('status','Y')
             ->get(); 
         if($this->typeQuery == "WA"){
+            $vat= ProductService::where('ps_code','2002')->pluck('ps_vat')->first();
             $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
             $period = $carbon_date->copy()->day(16)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day(6)->format('d/m/Y');
         }
         elseif($this->typeQuery == "EC"){
+            $vat= ProductService::where('ps_code','2001')->pluck('ps_vat')->first();
             $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
             $start = $carbon_date->copy()->subMonth()->day(4)->format('d/m/Y');
             $end = $carbon_date->copy()->day(3)->format('d/m/Y');
             $period = $start . " - " . $end;
         }
         else{
+            $vat= ProductService::where('ps_code','3001')->pluck('ps_vat')->first();
             $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
-
             $start = $carbon_date->copy()->addMonth()->startOfMonth()->format('d/m/Y');
             $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
             $period = $start . " - " . $end;
         }
-            return Excel::download(new GroupedByContractExport($data,$this->typeQuery,$period), 'bills_grouped_by_contract.xlsx');
+            return Excel::download(new GroupedByContractExport($data,$this->typeQuery,$period,$vat), 'bills_grouped_by_contract.xlsx');
     }
 
     public function openClear(){

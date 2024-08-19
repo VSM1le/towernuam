@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\CustomerRental;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -22,15 +23,17 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
     protected $items;
     protected $type;
     protected $period;
+    protected $vat;
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function __construct($contractNo, $items,$type,$period)
+    public function __construct($contractNo, $items,$type,$period,$vat)
     {
         $this->contractNo = $contractNo;
         $this->items = $items;
         $this->type = $type;
         $this->period = $period;
+        $this->vat = $vat;
     } 
 
     public function startCell():string{
@@ -78,20 +81,21 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
         $sheet->getRowDimension(2)->setRowHeight(35);
         $sheet->mergeCells("A2:I2");
         $sheet->getRowDimension(4)->setRowHeight(25);
-        $sheet->getColumnDimension('B')->setWidth(15);
+        $sheet->getColumnDimension('B')->setWidth(17);
         $sheet->setCellValue("B4","Due Date :");
         $sheet->getRowDimension(5)->setRowHeight(25);
         $sheet->setCellValue("B5","Building :");
         $sheet->getRowDimension(6)->setRowHeight(25);
         $sheet->setCellValue("B6","Customer Code :");
         $sheet->getRowDimension(7)->setRowHeight(25);
-        $sheet->setCellValue("B7","Meter Type :");
+        // $sheet->setCellValue("B7","Meter Type :");
         $sheet->getRowDimension(8)->setRowHeight(27);
         $sheet->getColumnDimension('C')->setWidth(19);
-        $sheet->setCellValue("C4",$this->items->first()->due_date);
+        $sheet->setCellValue("C4",Carbon::parse($this->items->first()->due_date)
+                                        ->format('d-m-Y'));
         $sheet->setCellValue("C5",'อาคารนวม');
         $sheet->setCellValue("C6",$customerName->customer->cust_name_th ." (เลขที่สัญญา ".$this->items->first()->real_contract.")");
-        $sheet->setCellValue("C7",$this->items->first()->due_date);
+        // $sheet->setCellValue("C7",$this->items->first()->due_date);
         $sheet->getColumnDimension('D')->setWidth(25);
         $sheet->getColumnDimension('E')->setWidth(17);
         $sheet->getColumnDimension('F')->setWidth(15);
@@ -99,11 +103,12 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
         $sheet->getColumnDimension('H')->setWidth(17);
         $sheet->getColumnDimension('I')->setWidth(20);
 
-        for($col = 'A'; $col<= "I";$col++){
+        $sheet->getStyle("B8:I8")->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_THIN);
+        for($col = 'B'; $col<= "I";$col++){
             $sheet->getStyle("{$col}8")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle("{$col}8")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-            $sheet->getStyle("{$col}8")->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_THIN);
         }
+         $total_amt = 0;
         $currentRow = 9;
         if($this->type != "OT"){
         foreach($this->items as $bill)
@@ -115,8 +120,8 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
             $sheet->setCellValue("B{$currentRow}",$bill->unit);
             $sheet->setCellValue("C{$currentRow}",$bill->meter);
             $sheet->setCellValue("D{$currentRow}",$this->period);
-            $sheet->setCellValue("E{$currentRow}",$bill->p_time);
-            $sheet->setCellValue("F{$currentRow}",$bill->t_time);
+            $sheet->setCellValue("E{$currentRow}",Carbon::parse($bill->p_time)->format('d-m-Y'));
+            $sheet->setCellValue("F{$currentRow}",Carbon::parse($bill->t_time)->format('d-m-Y'));
             $sheet->setCellValue("G{$currentRow}",$bill->p_unit);
             $sheet->setCellValue("H{$currentRow}",$bill->price_unit);
             $sheet->setCellValue("I{$currentRow}",round($bill->p_unit * $bill->price_unit,2));
@@ -125,23 +130,44 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
         }
         else{
             foreach($this->items as $bill){
+                $minutes = $bill->p_unit;
+                $amt = round($bill->p_unit * ($bill->price_unit / 0.041666667),2);
                 $sheet->getStyle("B{$currentRow}:H{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle("B{$currentRow}:I{$currentRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
                 $sheet->getStyle("B{$currentRow}:I{$currentRow}")->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_THIN);
-                $sheet->setCellValue("B{$currentRow}",$bill->bill_tran_date);
+                $sheet->setCellValue("B{$currentRow}",Carbon::parse($bill->bill_tran_date)->format('d-m-Y'));
                 $sheet->setCellValue("C{$currentRow}",$bill->unit);
-                $sheet->setCellValue("D{$currentRow}",$this->period);
+                $sheet->setCellValue("D{$currentRow}",$bill->meter);
                 $sheet->setCellValue("E{$currentRow}",$bill->bill_open);
                 $sheet->setCellValue("F{$currentRow}",$bill->bill_close);
-                $minutes = $bill->p_unit /60 ;
                 $sheet->setCellValue("G{$currentRow}",$minutes);
                 $sheet->getStyle("G{$currentRow}")->getNumberFormat()->setFormatCode('H:mm');
                 $sheet->setCellValue("H{$currentRow}",$bill->price_unit);
-                $sheet->setCellValue("I{$currentRow}",round($bill->p_unit * $bill->price_unit,2));
+                $sheet->setCellValue("I{$currentRow}",$amt);
+                $total_amt += $amt;
                 $currentRow += 1;
             }
-
         }
+        $vat_amt = ($total_amt * $this->vat) / 100;  
+        $sheet->mergeCells("B".$currentRow.":H".$currentRow);
+        $sheet->setCellValue("B{$currentRow}","Amount");
+        $sheet->setCellValue("I{$currentRow}",$total_amt);
+        $sheet->mergeCells("B".($currentRow + 1).":H".($currentRow + 1));
+        $sheet->setCellValue("B".($currentRow + 1),"VAT ".$this->vat."%");
+        $sheet->setCellValue("I".($currentRow + 1),$vat_amt);
+        $sheet->setCellValue("B".($currentRow + 2),"Total Amount");
+        $sheet->mergeCells("B".($currentRow + 2).":H".($currentRow + 2));
+        $sheet->setCellValue("I".($currentRow + 2),$total_amt + $vat_amt);
+        $sheet->getRowDimension($currentRow)->setRowHeight(25);
+        $sheet->getRowDimension($currentRow + 1)->setRowHeight(25);
+        $sheet->mergeCells("B".($currentRow + 2).":H".($currentRow + 2));
+        $sheet->setCellValue("I".($currentRow + 2),$total_amt + $vat_amt);
+        $sheet->getRowDimension($currentRow)->setRowHeight(25);
+        $sheet->getRowDimension($currentRow + 1)->setRowHeight(25);
+        $sheet->getRowDimension($currentRow + 2)->setRowHeight(25);
+        $sheet->getStyle("B".($currentRow).":B".($currentRow + 2))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle("B".($currentRow). ":B".($currentRow + 2))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle("B".($currentRow).":I".($currentRow + 2))->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_THIN);
     }
     public function registerEvents(): array
             {
