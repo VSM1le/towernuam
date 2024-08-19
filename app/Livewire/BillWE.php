@@ -27,6 +27,7 @@ class BillWE extends Component
     public $showImportModal = false;
 
     public $showGenerateInvoice = false;
+    public $showDeleteBill = false;
     
     public function __construct(){
         $this->monthYear = Carbon::now()->format('Y-m');
@@ -77,9 +78,10 @@ class BillWE extends Component
     } 
 
     public function genInvoice(){
+        $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
 
-    $sumBill = Bill::when($this->monthYear, function ($query) {
-                $query->where('invoice_date', 'like', '%' . $this->monthYear . '%');
+        $sumBill = Bill::when($monthYear, function ($query) use($monthYear) {
+                $query->where('invoice_date', 'like', '%' . $monthYear . '%');
             })
             ->when($this->typeQuery, function ($query) {
                 $query->where('type', $this->typeQuery);
@@ -201,6 +203,7 @@ class BillWE extends Component
 
     public function exportGroupByContract()
     {
+       $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
        $data = Bill::join('customer_rentals', 'bill.contract_no', '=', 'customer_rentals.custr_contract_no')
             ->select(
                 'bill.id',
@@ -219,8 +222,8 @@ class BillWE extends Component
                 'bill.bill_use',
                 'customer_rentals.custr_contract_no_real as real_contract'  
             )
-            ->when($this->monthYear, function ($query) {
-                $query->where('invoice_date', 'like', '%' . $this->monthYear . '%');
+            ->when($monthYear, function ($query) use($monthYear) {
+                $query->where('invoice_date', 'like', '%' . $monthYear . '%');
             })
             ->when($this->typeQuery, function ($query){
                 $query->where('type',$this->typeQuery);
@@ -247,11 +250,35 @@ class BillWE extends Component
             return Excel::download(new GroupedByContractExport($data,$this->typeQuery,$period), 'bills_grouped_by_contract.xlsx');
     }
 
+    public function openClear(){
+        $this->showDeleteBill = true;
+    }
+    public function clearBill(){
+
+        $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
+        try{
+            Bill::when($monthYear, function($query) use($monthYear){
+                $query->where('invoice_date','like','%'.$monthYear.'%');
+                })
+            ->when($this->typeQuery, function($query){
+                $query->where('type',$this->typeQuery);
+            })->delete();
+            session()->flash('success', ' Clear Bill successful'); 
+        }catch(\Exception $e){
+            session()->flash('error', ' Error can not clear Bill'); 
+        }finally{
+            $this->closeClear();
+        }
+    }
+    public function closeClear(){
+        $this->showDeleteBill = false;
+    }
+
     public function render()
-    {
+    {   
        $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
-       $this->bills = Bill::when($monthYear, function ($query) use($monthYear) {
-       $query->where('invoice_date', 'like', '%' . $monthYear  . '%');
+       $this->bills = Bill::when($monthYear, function ($query) use($monthYear)  {
+       $query->where('invoice_date', 'like', '%' . $monthYear. '%');
        })
        ->when($this->typeQuery, function ($query){
         $query->where('type',$this->typeQuery);

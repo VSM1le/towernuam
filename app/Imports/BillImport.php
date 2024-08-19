@@ -26,19 +26,31 @@ class BillImport implements ToCollection , WithCalculatedFormulas ,WithHeadingRo
     public function collection(Collection $rows)
     {
         foreach ($rows as $index => $row) {
+            // Skip empty rows
             if (count(array_filter($row->toArray())) === 0) {
                 continue;
             }
 
+            // Perform validation
             $validator = Validator::make($row->toArray(), $this->rules());
 
             if ($validator->fails()) {
-                $this->errors[$index] = $validator->errors()->all();
+                // Get all validation errors
+                $validationErrors = $validator->errors();
+
+                // Store errors along with the invalid values
+                foreach ($validationErrors->keys() as $key) {
+                    $this->errors[$index][$key] = [
+                        'value' => $row[$key],  // The invalid value
+                        'errors' => $validationErrors->get($key),  // Error messages
+                    ];
+                }
             }
         }
 
+        // Throw an exception if there are validation errors
         if (!empty($this->errors)) {
-            throw new \Exception('Validation failed: ' . json_encode($this->errors));
+            throw new \Exception('Validation failed: ' . json_encode($this->errors, JSON_PRETTY_PRINT));
         }
 
         foreach ($rows as $index => $row) {
