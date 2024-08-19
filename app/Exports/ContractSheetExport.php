@@ -5,6 +5,7 @@ namespace App\Exports;
 use App\Models\CustomerRental;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -13,11 +14,12 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeadings
+class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeadings,WithColumnFormatting
 {
     protected $contractNo;
     protected $items;
@@ -124,7 +126,7 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
             $sheet->setCellValue("F{$currentRow}",Carbon::parse($bill->t_time)->format('d-m-Y'));
             $sheet->setCellValue("G{$currentRow}",$bill->p_unit);
             $sheet->setCellValue("H{$currentRow}",$bill->price_unit);
-            $sheet->setCellValue("I{$currentRow}",round($bill->p_unit * $bill->price_unit,2));
+            $sheet->setCellValue("I{$currentRow}",$bill->p_unit * $bill->price_unit);
             $currentRow += 1;
         } 
         }
@@ -168,7 +170,14 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
         $sheet->getStyle("B".($currentRow).":B".($currentRow + 2))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
         $sheet->getStyle("B".($currentRow). ":B".($currentRow + 2))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
         $sheet->getStyle("B".($currentRow).":I".($currentRow + 2))->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('I9:I'.($currentRow + 2))->getNumberFormat()->setFormatCode('#,##0.00');
     }
+    public function columnFormats(): array
+    {
+        return [
+            'B' => NumberFormat::FORMAT_CURRENCY_USD_SIMPLE // Applying format to column B
+        ];
+    } 
     public function registerEvents(): array
             {
                 return[ 
