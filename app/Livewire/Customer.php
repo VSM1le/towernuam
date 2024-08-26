@@ -112,7 +112,7 @@ class Customer extends Component
 
     public function render()
     {
-        $customers = ModelsCustomer::paginate(10);
+        $customers = ModelsCustomer::orderBy('cust_code')->paginate(10);
         return view('livewire.customer' , compact('customers'));
     }
 }

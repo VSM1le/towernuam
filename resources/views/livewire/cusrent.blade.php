@@ -15,19 +15,13 @@
                                 Customer Id
                             </th>
                             <th scope="col" class="px-6 py-3">
+                                Customer Name 
+                            </th>
+                            <th scope="col" class="px-6 py-3">
                                 Custumer Contact 
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 Customer Unit 
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Area sqm
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Rental fee 
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Service fee 
                             </th>
                              <th scope="col" class="px-6 py-3">
                                 Begin - End 
@@ -47,19 +41,13 @@
                                 {{$rental->customer->cust_code}}  
                             </th>
                             <td class="px-6 py-4">
+                               {{ $rental->customer->cust_name_th}} 
+                            </td>
+                            <td class="px-6 py-4">
                                {{ $rental->custr_contract_no}} 
                             </td>
                             <td class="px-6 py-4">
                                {{$rental->custr_unit }} 
-                            </td>
-                            <td class="px-6 py-4">
-                                {{ $rental->custr_area_sqm }}
-                            </td>
-                            <td class="px-6 py-4">
-                                {{ $rental->custr_rental_fee }}
-                            </td>
-                            <td class="px-6 py-4">
-                                {{ $rental->custr_service_fee }}
                             </td>
                             <td class="px-6 py-4">
                                 {{ $rental->custr_begin_date2}} - {{$rental->custr_end_date2}}

@@ -103,7 +103,7 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
         $sheet->getColumnDimension('F')->setWidth(15);
         $sheet->getColumnDimension('G')->setWidth(13);
         $sheet->getColumnDimension('H')->setWidth(17);
-        $sheet->getColumnDimension('I')->setWidth(20);
+        $sheet->getColumnDimension('I')->setWidth(14);
 
         $sheet->getStyle("B8:I8")->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_THIN);
         for($col = 'B'; $col<= "I";$col++){
@@ -127,10 +127,12 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
             $sheet->setCellValue("G{$currentRow}",$bill->p_unit);
             $sheet->setCellValue("H{$currentRow}",$bill->price_unit);
             $sheet->setCellValue("I{$currentRow}",$bill->p_unit * $bill->price_unit);
+            $sheet->getRowDimension($currentRow)->setRowHeight(20);
             $currentRow += 1;
         } 
         }
         else{
+        $sheet->getColumnDimension('D')->setWidth(10);
             foreach($this->items as $bill){
                 $minutes = $bill->p_unit;
                 $amt = round($bill->p_unit * ($bill->price_unit / 0.041666667),2);
@@ -146,6 +148,7 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
                 $sheet->getStyle("G{$currentRow}")->getNumberFormat()->setFormatCode('H:mm');
                 $sheet->setCellValue("H{$currentRow}",$bill->price_unit);
                 $sheet->setCellValue("I{$currentRow}",$amt);
+                $sheet->getRowDimension($currentRow)->setRowHeight(20);
                 $total_amt += $amt;
                 $currentRow += 1;
             }
@@ -182,14 +185,24 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
             {
                 return[ 
                     AfterSheet::class => function(AfterSheet $event) {
-                    // Set paper size to A4
-                    $event->sheet->getPageSetup()->setPaperSize(PageSetup::PAPERSIZE_A4);
-                    $event->sheet->getPageSetup()->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
-                    // Set print margins (units are in inches)
-                    $event->sheet->getPageMargins()->setTop(0.5);
-                    $event->sheet->getPageMargins()->setBottom(0.5);
-                    $event->sheet->getPageMargins()->setLeft(0.5);
-                    $event->sheet->getPageMargins()->setRight(0.5);
+                    // $event->sheet->getPageMargins()->setTop(1);
+                    // $event->sheet->getPageMargins()->setBottom(1.9);
+                    // $event->sheet->getPageMargins()->setLeft(0.8);
+                    // $event->sheet->getPageMargins()->setRight(0.8);
+
+                    $sheet = $event->sheet->getDelegate();
+                    // Set print setup to fit to one page
+                    $sheet->getPageSetup()->setFitToWidth(1);
+                    $sheet->getPageSetup()->setFitToHeight(0); // 0 means it will scale based on width
+
+                    // Optionally set the paper size, e.g., A4
+                    $sheet->getPageSetup()->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
+
+                    // Set page margins (optional)
+                    $sheet->getPageMargins()->setTop(1);
+                    $sheet->getPageMargins()->setRight(0.75);
+                    $sheet->getPageMargins()->setLeft(0.8);
+                    $sheet->getPageMargins()->setBottom(1.9);
                  },
                     ];
             }

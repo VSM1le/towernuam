@@ -106,7 +106,9 @@ class Cusrent extends Component
 
     public function render()
     {
-        $rentals = CustomerRental::orderBy('updated_at','desc')->paginate(10);
+        $rentals = CustomerRental::whereHas('customer',function($query){
+            $query->orderBy('cust_code');
+        })->paginate(10);
         return view('livewire.cusrent',compact('rentals'));
     }
 }

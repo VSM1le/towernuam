@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Exports\InvoiceExport;
 use App\Models\Customer;
 use App\Models\CustomerRental;
 use App\Models\InvoiceDetail;
@@ -17,10 +18,13 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
+use PHPUnit\Framework\Constraint\IsEmpty;
 
 class Invoice extends Component
 {
     use WithPagination;
+    public $status = null;
     public $psGroup = null;
     public $customerName = null;
     public $customerCode = null;
@@ -58,6 +62,10 @@ class Invoice extends Component
     public $showGenrateInvoice= false;
     public $genInvDate;
     public $genDueDate;
+
+    public $showExportInvoice = false;
+    public $exFromDate;
+    public $exToDate;
 
     private function sanitizeNumericValue($value)
     {
@@ -111,7 +119,7 @@ class Invoice extends Component
 
     #[Computed()]
     public function customers(){
-        return Customer::all();
+        return Customer::orderBy('cust_code')->get();
     }
 
     #[Computed()]
@@ -216,7 +224,6 @@ class Invoice extends Component
        unset($this->invoiceDetails[$index]);
        $this->invoiceDetails = array_values($this->invoiceDetails);
     }
-    
     public function createInvoice(){
         $this->validate([
             'psGroup' => ['required'],
@@ -252,7 +259,6 @@ class Invoice extends Component
             'created_by' => auth()->id(),
             'updated_by' => auth()->id(),
         ]);
-
         foreach ($this->invoiceDetails as $detail) {
             $createInvoice->invoicedetail()->create([
                 'invd_product_code' => $detail['pscode'],
@@ -273,18 +279,15 @@ class Invoice extends Component
         $this->closeCreateInvoice();
         return redirect()->route('dashboard');
     }
-
     public function openCreateInvoice(){
         $this->showCreateInvoice = true;
     }
-
     public function closeCreateInvoice(){
         $this->showCreateInvoice = false;
         $this->reset(['psGroup','customerName','customerCode','customerrents','rental','service','invoiceDate','dueDate','invoiceDetails']);
         $this->resetValidation();
        
     }
-
     public function updatedEditCustomerCode()
     {
         $this->editRental = null; // Clear dependent data
@@ -713,8 +716,39 @@ public function closeCancelInvoice(){
         }
       $this->closeGenMonth(); 
     }
-    
+    public function openExportInvoice(){
+        $this->showExportInvoice = true;
 
+    }
+    public function closeExportInvoice(){
+        $this->showExportInvoice = false;
+        $this->reset(['exFromDate','exToDate']);
+    }
+    public function exportInvoice(){
+        // dd('dd');
+        $this->validate([
+            'exFromDate' => ['required','date'],
+            'exToDate' => ['required','date','after:exFromDate'],
+        ],
+        [
+            'exToDate.after' => "The TO DATE field must be a date after FROM DATE"
+        ]);
+        $invoice = InvoiceHeader::when($this->exFromDate, function ($query) {
+            $query->whereDate('inv_date','>=', $this->exFromDate);
+        })
+        ->when($this->exToDate, function($query){
+            $query->whereDate('inv_date',"<=" ,$this->exToDate);
+        })
+        ->get();
+
+        if(empty($invoice)){
+            session()->flash('error', 'No invoice between the date you were given.'); 
+            $this->closeExportInvoice();
+            return;
+        }
+        $this->closeExportInvoice();
+        return Excel::download(new InvoiceExport($invoice),'yeah.xlsx'); 
+    }
     
     public function render()
     {
@@ -728,9 +762,13 @@ public function closeCancelInvoice(){
         ->when($this->customer != "" ,function ($query){
             $query->where('customer_id',$this->customer);
         })
+         ->when($this->status != "", function ($query) {
+            $query->whereHas('invoicedetail', function ($detailQuery) {
+            $detailQuery->where('invd_receipt_flag', $this->status);
+        }, '=', DB::raw('(SELECT COUNT(*) FROM invoice_details WHERE invoice_details.invoice_header_id =   invoice_headers.id)'));
+        }) 
         ->orderBy('id', 'desc')
         ->paginate(10);
-
         return view('livewire.invoice',compact('invoices'));
     }
 }

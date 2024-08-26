@@ -79,7 +79,12 @@ class BillWE extends Component
 
     public function genInvoice(){
         $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
-
+        $totalSalesQuery = null;
+        if($this->typeQuery == "OT"){
+            $totalSalesQuery = DB::raw('SUM(p_unit * (price_unit /  0.041666667)) as total_sales');
+        } else {
+            $totalSalesQuery = DB::raw('SUM(p_unit * price_unit) as total_sales');
+        }
         $sumBill = Bill::when($monthYear, function ($query) use($monthYear) {
                 $query->where('invoice_date', 'like', '%' . $monthYear . '%');
             })
@@ -91,14 +96,12 @@ class BillWE extends Component
                 'contract_no',
                 'invoice_date',
                 'due_date',
-                'price_unit',
-                DB::raw('SUM(p_unit) as total_sales')
+                $totalSalesQuery
             )
             ->groupBy(
                 'contract_no',
                 'invoice_date',
                 'due_date',
-                'price_unit'
             )
             ->get(); 
         $prefix = 'IAS';
@@ -109,13 +112,6 @@ class BillWE extends Component
             ->orderBy('inv_no', 'desc')->first();
         $generatedInvoices = [];
 
-        // Create the set of expected invoice numbers and find the gaps
-        // for ($i = 1; count($generatedInvoices) < count($sumBill); $i++) {
-        //     $expectedInvoice = $prefix . $datePart . str_pad($i, 4, '0', STR_PAD_LEFT);
-        //     if (!isset($existingInvoicesSet[$expectedInvoice])) {
-        //         $generatedInvoices[] = $expectedInvoice;
-        //     }
-        // } 
         if (is_null($lastInvoice)) {
             foreach($sumBill as $index => $bill){
                  $generatedInvoices[] = $prefix . $datePart . str_pad(1 + $index, 4, '0', STR_PAD_LEFT);
@@ -147,18 +143,15 @@ class BillWE extends Component
             $product = ProductService::where('ps_code','3001')->first();
             $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
 
-            $start = $carbon_date->copy()->addMonth()->startOfMonth()->format('d/m/Y');
-            $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
+            $start = $carbon_date->copy()->subMonth()->day(16)->format('d/m/Y');
+            $end = $carbon_date->copy()->day(15)->format('d/m/Y');
             $period = $start . " - " . $end;
             $whtax = $product->ps_whtax ?? 0;
         }
 
         foreach($sumBill as $index => $bill){
             $contractInfo = CustomerRental::where('custr_contract_no',$bill->contract_no)->first(); 
-            $amt = round($bill->total_sales * $bill->price_unit,2);
-            if($this->typeQuery == "OT"){
-                $amt = round( $bill->total_sales * ($bill->price_unit / 0.041666667),2);
-            }
+            $amt = round($bill->total_sales,2);
             if($contractInfo->customer->cust_gov_flag === 1)
             {
                 $whtax = 1;

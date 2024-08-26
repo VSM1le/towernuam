@@ -4,13 +4,42 @@
             wire:click = "openGenMonth"  
             class="text-white bg-orange-500 hover:bg-orange-400 focus:ring-4 focus:ring-orange-600 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-orange-500 dark:hover:bg-orange-400 focus:outline-none dark:focus:ring-orange-600">
             Generate Invoice</button>
+            <div class="flex">
+            <button type="button"
+            wire:click = "openExportInvoice"  
+            class="text-white bg-teal-400 hover:bg-teal-500 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-teal-400 dark:hover:bg-teal-500 focus:outline-none dark:focus:ring-teal-300">
+            Export Invoice</button>
             <button type="button"
             wire:click = "openCreateInvoice"  
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
             Create Invoice</button>
-    </div>
+            </div>
+        </div>
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="flex mt-4">
+                 @if (session()->has('success'))
+            <div class="flex items-center p-4  text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800 mb-1" role="alert">
+                <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                </svg>
+                <span class="sr-only">Info</span>
+                <div>
+                  <span class="font-medium">Success alert! </span> {{ session('success') }}
+                </div>
+              </div>
+        @endif
+        @if (session()->has('error'))
+              <div class="flex items-center p-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300 dark:border-yellow-800 mb-1" role="alert">
+                <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                </svg>
+                <span class="sr-only">Info</span>
+                <div>
+                  <span class="font-medium">Warning alert! </span>{{ session('error') }}
+                </div>
+              </div>
+        @endif
+                <div class="flex mt-4 justify-between">
+                    <div class="flex">
                     <div class="w-48 ml-5">
                         <label for="datefrom" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">From date</label>
                         <input id="datefrom" wire:model.live="startDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
@@ -29,7 +58,21 @@
                             <option value="{{$customer->id}}">{{$customer->cust_code}} : {{$customer->cust_name_th}}</option>
                         @endforeach
                         </select>
-                </div>
+                    </div>
+                    </div>
+                    <div>
+                        <div class="mr-5">
+                    <label for="customercode" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">Status</label>
+                        <label class=" text-sm font-medium text-gray-900"></label>
+                        <select id= "customercode" wire:model.live="status"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-24  p-2.5 ">
+                            <option value="">All</option>
+                            <option value="Yes">Paid</option>
+                            <option value="No">UnPaid</option>
+
+                        </select>
+                    </div> 
+                    </div>
                 </div>
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     @foreach ($invoices as $index => $pland)
@@ -628,6 +671,48 @@
                 <div>
                  <button type="submit" 
         class="text-white bg-orange-500 hover:bg-orange-400 focus:ring-4 focus:outline-none focus:ring-orange-600 font-medium rounded-lg text-sm px-5 py-2.5">Generate</button>
+                </div>
+            </div>
+        </form>
+        </div>
+    @endif  
+       @if($showExportInvoice)
+        <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeExportInvoice"></div>
+        <form wire:submit.prevent="exportInvoice" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 
+        :style="{ 'max-height': '300px', 'max-width' : '500px' }">
+            <div class="bg-teal-400 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
+                <div class="text-xl font-bold">Export Invoice</div>
+                <button wire:click="closeExportInvoice" type="button" class="focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
+                <div class="flex justify-start w-full">
+                   <div class="w-full ml-5 m-3">
+                        <label for="exFromDate" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">From Date</label>
+                        <input id="exFronDate" wire:model="exFromDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                        @error('exFromDate')
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="w-full mr-5 m-3">
+                        <label for="exToDate" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">To Date</label>
+                        <input id="exToDate" wire:model="exToDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                        @error('exToDate')
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-100 w-full flex justify-between p-4">
+                <div class="flex">
+                    
+                </div>
+                <div>
+                 <button type="submit" 
+        class="text-white bg-teal-400 hover:bg-teal-400 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5">Export</button>
                 </div>
             </div>
         </form>

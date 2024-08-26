@@ -277,9 +277,9 @@
   @endif
   @if($showDeleteBill)
 <div class="fixed inset-0 p-4 flex flex-wrap justify-center items-center w-full h-full z-[1000] before:fixed before:inset-0 before:w-full before:h-full before:bg-[rgba(0,0,0,0.5)] overflow-auto font-[sans-serif]">
- <div class="fixed inset-0 bg-gray-300 opacity-40" wire:click="closeCancelInvoice"></div>
+ <div class="fixed inset-0 bg-gray-300 opacity-40" wire:click="closeClear"></div>
    <div class="w-full max-w-md bg-white shadow-lg rounded-md p-6 relative">
-     <svg wire:click="closeCancelInvoice" xmlns="http://www.w3.org/2000/svg"
+     <svg wire:click="closeClear" xmlns="http://www.w3.org/2000/svg"
        class="w-3.5 cursor-pointer shrink-0 fill-black hover:fill-red-500 float-right" viewBox="0 0 320.591 320.591">
        <path
          d="M30.391 318.583a30.37 30.37 0 0 1-21.56-7.288c-11.774-11.844-11.774-30.973 0-42.817L266.643 10.665c12.246-11.459 31.462-10.822 42.921 1.424 10.362 11.074 10.966 28.095 1.414 39.875L51.647 311.295a30.366 30.366 0 0 1-21.256 7.288z"
