@@ -50,6 +50,11 @@ new class extends Component
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('psgroup')" :active="request()->routeIs('psgroup')" wire:navigate>
+                        {{ __('PsGroup') }}
+                    </x-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('bill')" :active="request()->routeIs('bill')" wire:navigate>
                         {{ __('Import') }}
                     </x-nav-link>
