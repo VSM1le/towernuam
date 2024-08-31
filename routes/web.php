@@ -24,6 +24,10 @@ Route::view('customer', 'customer')
 Route::view('contract' ,'custrent')
     ->middleware(['auth'])
     ->name('contract');
+Route::view('psgroup' ,'psgroup')
+    ->middleware(['auth'])
+    ->name('psgroup');
+
 
 Route::view('bill', 'waterelectric')
     ->middleware(['auth'])
@@ -42,6 +46,7 @@ Route::view('contract/{id}','custconlist')->middleware(['auth'])->name('custlist
 //     ->middleware(['auth'])
 //     ->name('invoice');
 
+Route::view('report','invoicepdf.reportinvoice')->name('report');
 
 Route::get('invoice3/{id}', function ($id) {
     $number = new numberToBath;

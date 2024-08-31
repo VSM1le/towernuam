@@ -9,6 +9,7 @@ use App\Models\CustomerRental;
 use App\Models\InvoiceHeader;
 use App\Models\ProductService;
 use App\Models\PsGroup;
+use App\Services\periodPs;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -21,7 +22,7 @@ class BillWE extends Component
 
     public $csvFile;
     public $type;
-    public $typeQuery = "WA";
+    public $typeQuery = 5;
     public $bills;
     public $monthYear;
     public $showImportModal = false;
@@ -80,7 +81,7 @@ class BillWE extends Component
     public function genInvoice(){
         $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
         $totalSalesQuery = null;
-        if($this->typeQuery == "OT"){
+        if($this->typeQuery == "7"){
             $totalSalesQuery = DB::raw('SUM(p_unit * (price_unit /  0.041666667)) as total_sales');
         } else {
             $totalSalesQuery = DB::raw('SUM(p_unit * price_unit) as total_sales');
@@ -125,27 +126,26 @@ class BillWE extends Component
             }
         }
 
-        if($this->typeQuery == "WA"){
+        if($this->typeQuery == "5"){
             $product = ProductService::where('ps_code','2002')->first();
-            $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
-            $period = $carbon_date->copy()->day(16)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day(6)->format('d/m/Y');
+            $ps_group = PsGroup::where('id',$this->typeQuery)->first();
+            $periodPs = new periodPs;
+            $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
             $whtax = $product->ps_whtax ?? 0;
+
         }
-        elseif($this->typeQuery == "EC"){
+        elseif($this->typeQuery == "3"){
             $product = ProductService::where('ps_code','2001')->first();
-            $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
-            $start = $carbon_date->copy()->subMonth()->day(4)->format('d/m/Y');
-            $end = $carbon_date->copy()->day(3)->format('d/m/Y');
-            $period = $start . " - " . $end;
+            $ps_group = PsGroup::where('id',$this->typeQuery)->first();
+            $periodPs = new periodPs;
+            $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
             $whtax = $product->ps_whtax ?? 0;
         }
         else{
             $product = ProductService::where('ps_code','3001')->first();
-            $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
-
-            $start = $carbon_date->copy()->subMonth()->day(16)->format('d/m/Y');
-            $end = $carbon_date->copy()->day(15)->format('d/m/Y');
-            $period = $start . " - " . $end;
+            $ps_group = PsGroup::where('id',$this->typeQuery)->first();
+            $periodPs = new periodPs;
+            $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
             $whtax = $product->ps_whtax ?? 0;
         }
 
@@ -223,24 +223,26 @@ class BillWE extends Component
             })
             ->where('status','Y')
             ->get(); 
-        if($this->typeQuery == "WA"){
+        if($this->typeQuery == "5"){
             $vat= ProductService::where('ps_code','2002')->pluck('ps_vat')->first();
-            $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
-            $period = $carbon_date->copy()->day(16)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day(6)->format('d/m/Y');
+            $ps_group = PsGroup::where('id',$this->typeQuery)->first();
+            $periodPs = new periodPs;
+            $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
         }
-        elseif($this->typeQuery == "EC"){
+        elseif($this->typeQuery == "3"){
             $vat= ProductService::where('ps_code','2001')->pluck('ps_vat')->first();
-            $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
-            $start = $carbon_date->copy()->subMonth()->day(4)->format('d/m/Y');
-            $end = $carbon_date->copy()->day(3)->format('d/m/Y');
-            $period = $start . " - " . $end;
+            $ps_group = PsGroup::where('id',$this->typeQuery)->first();
+            $periodPs = new periodPs;
+            $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
         }
         else{
             $vat= ProductService::where('ps_code','3001')->pluck('ps_vat')->first();
-            $carbon_date = Carbon::parse($this->monthYear ?? Carbon::now()->format('Y-m'));
-            $start = $carbon_date->copy()->addMonth()->startOfMonth()->format('d/m/Y');
-            $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
-            $period = $start . " - " . $end;
+            $ps_group = PsGroup::where('id',$this->typeQuery)->first();
+            $period = "null";
+            if($ps_group){
+            $periodPs = new periodPs;
+            $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
+            }
         }
             return Excel::download(new GroupedByContractExport($data,$this->typeQuery,$period,$vat), 'bills_grouped_by_contract.xlsx');
     }

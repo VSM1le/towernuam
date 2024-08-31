@@ -40,9 +40,9 @@
                 <label class="w-40 text-sm font-medium text-gray-900"></label>
                     <select id= "customercode" wire:model.live="typeQuery"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                    <option value="WA">Water Bill</option>
-                    <option value="EC">Electric Bill</option>
-                    <option value="OT">OT Air Bill</option>
+                    <option value="5">Water Bill</option>
+                    <option value="3">Electric Bill</option>
+                    <option value="7">OT Air Bill</option>
                 </select>
            </div>
            </div>
@@ -70,7 +70,7 @@
         <div class="p-6 text-gray-900 dark:text-gray-100">
              @if (!$bills->isEmpty())
              <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-                @if ($typeQuery == "WA" || $typeQuery == "EC")
+                @if ($typeQuery == "5" || $typeQuery == "3")
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>

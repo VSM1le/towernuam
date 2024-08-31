@@ -10,6 +10,7 @@ use App\Models\InvoiceHeader;
 use App\Models\ProductService;
 use App\Models\PsGroup;
 use App\Services\numberToBath;
+use App\Services\periodPs;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Dompdf\Options;
@@ -67,6 +68,8 @@ class Invoice extends Component
     public $exFromDate;
     public $exToDate;
 
+    public $reportType = 1;
+   
     private function sanitizeNumericValue($value)
     {
         $sanitizedValue = preg_replace('/[^-?\d.]/', '', $value);
@@ -145,24 +148,8 @@ class Invoice extends Component
         $product_service = ProductService::where('id',$this->service)->first();
         $ps_group = PsGroup::where('id',$this->psGroup)->first();
         $wh_tax = $product_service->ps_whtax;
-        if($ps_group->begin_date == '1' && $ps_group->end_date == '31'){
-
-            $carbon_date = Carbon::parse($this->invoiceDate);
-
-            $start = $carbon_date->copy()->addMonth()->startOfMonth()->format('d/m/Y');
-            $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
-            $period = $start . " - " . $end;
-        }
-        elseif($ps_group->begin_date == '8' && $ps_group->end_date == '7'){
-            $carbon_date = Carbon::parse($this->invoiceDate);
-            $start = $carbon_date->copy()->subMonth()->day(4)->format('d/m/Y');
-            $end = $carbon_date->copy()->day(3)->format('d/m/Y');
-            $period = $start . " - " . $end;
-        }
-        else{
-            $carbon_date = Carbon::parse($this->invoiceDate);
-            $period = $carbon_date->copy()->day($ps_group->begin_date)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day($ps_group->end_date)->format('d/m/Y');
-        }
+        $periodPs = new periodPs;
+        $period = $periodPs->invoicePeriod($this->invoiceDate, $ps_group); 
         
        if(Customer::where('id',$this->customerCode)->pluck('cust_gov_flag')->first() == 1){
             $wh_tax = $product_service->gov_whtax;
@@ -375,19 +362,9 @@ class Invoice extends Component
         $customer_rent= CustomerRental::where('customer_id',$this->editCustomerCode)->where('id',$this->editRental)->with('customer')->first();
         $product_service = ProductService::where('id',$this->service)->first();
         $ps_group = PsGroup::where('id',$this->editPsGroup)->first();
+        $periodPs = new periodPs;
+        $period = $periodPs->invoicePeriod($this->editInvoiceDate, $ps_group); 
         $wh_tax = $product_service->ps_whtax;
-        if($ps_group->begin_date == '1' && $ps_group->end_date == '31'){
-
-            $carbon_date = Carbon::parse($this->editInvoiceDate);
-
-            $start = $carbon_date->copy()->addMonth()->startOfMonth()->format('d/m/Y');
-            $end = $carbon_date->copy()->addMonth()->endOfMonth()->format('d/m/Y');
-            $period = $start . " - " . $end;
-        }
-        else{
-            $carbon_date = Carbon::parse($this->editInvoiceDate);
-            $period = $carbon_date->copy()->day($ps_group->begin_date)->format('d/m/Y') . " - " . $carbon_date->copy()->addMonth()->day($ps_group->end_date)->format('d/m/Y');
-        }
         
        if(Customer::where('id',$this->editCustomerCode)->pluck('cust_gov_flag')->first() == 1){
             $wh_tax = $product_service->gov_whtax;
@@ -594,6 +571,57 @@ public function closeCancelInvoice(){
             echo $pdf->stream();
         }, $invoice->inv_no . '.pdf'); 
     } 
+    protected function exportReportPDF($invoices){
+        $uniqueProducts = $invoices->flatMap(function ($invoice) {
+            return $invoice->invoicedetail->pluck('invd_product_code');
+        })->unique();
+        $combinedHtml = null;
+        foreach($uniqueProducts as $unique){
+            $sumInvoice = collect(); 
+            $invoiceFiltereds = $invoices->flatMap(function ($filter) use($unique){
+                return $filter->invoicedetail->where('invd_product_code',$unique);
+            }); 
+            $sumInvoice->amount =  $invoiceFiltereds->sum('invd_amt');
+            $sumInvoice->vatAmt =  $invoiceFiltereds->sum('invd_vat_amt');
+            $sumInvoice->whAmt =  $invoiceFiltereds->sum('invd_wh_tax_amt');
+            $sumInvoice->netAmt =  $invoiceFiltereds->sum('invd_net_amt');
+            $chunks = $invoiceFiltereds->chunk(33);
+            foreach ($chunks as $index => $chunk) {
+                $chunk = $chunk->map(function ($detail) {
+                $lastReceipt = $detail->receiptdetail->sortByDesc('id')->first();
+
+                $invoiceDate = $detail->invoiceheader->inv_date ? Carbon::parse($detail->invoiceheader->inv_date) : null;
+                $receiptDate = $lastReceipt && $lastReceipt->receiptheader ? Carbon::parse($lastReceipt->receiptheader->rec_date) : null;
+                $detail->overdue = ($invoiceDate && $receiptDate)
+                ? $invoiceDate->diffInDays($receiptDate)
+                : null;
+
+                return $detail;
+            });
+                // dd($chunk);
+                if ($index < $chunks->count() - 1) {
+                    $report = view('invoicepdf.reportinvoice', [
+                    'filteredDetails' => $chunk, // Pass the chunked data
+                    'uniqueProductCode' =>  $unique, 
+                    ])->render();
+                }
+                else{
+                     $report = view('invoicepdf.reportinvoice', [
+                    'filteredDetails' => $chunk, // Pass the chunked data
+                    'uniqueProductCode' =>  $unique, 
+                    'sumInvoice' => $sumInvoice
+                    ])->render();
+                }
+                
+                $combinedHtml .= $report;
+            }
+            $pdf = PDF::loadHTML($combinedHtml);
+        }
+
+       return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        },'test.pdf'); 
+    }
 
     public function openGenMonth(){
         $this->showGenrateInvoice = true;
@@ -725,7 +753,6 @@ public function closeCancelInvoice(){
         $this->reset(['exFromDate','exToDate']);
     }
     public function exportInvoice(){
-        // dd('dd');
         $this->validate([
             'exFromDate' => ['required','date'],
             'exToDate' => ['required','date','after:exFromDate'],
@@ -733,21 +760,26 @@ public function closeCancelInvoice(){
         [
             'exToDate.after' => "The TO DATE field must be a date after FROM DATE"
         ]);
-        $invoice = InvoiceHeader::when($this->exFromDate, function ($query) {
-            $query->whereDate('inv_date','>=', $this->exFromDate);
-        })
-        ->when($this->exToDate, function($query){
-            $query->whereDate('inv_date',"<=" ,$this->exToDate);
-        })
-        ->get();
-
-        if(empty($invoice)){
-            session()->flash('error', 'No invoice between the date you were given.'); 
-            $this->closeExportInvoice();
-            return;
+         $invoice = InvoiceHeader::with('invoicedetail')
+         ->when($this->exFromDate, function ($query) {
+                $query->whereDate('inv_date','>=', $this->exFromDate);
+            })
+            ->when($this->exToDate, function($query){
+                $query->whereDate('inv_date',"<=" ,$this->exToDate);
+            })
+            ->get();
+        // if(empty($invoice)){
+        //     session()->flash('error', 'No invoice between the date you were given.'); 
+        //     $this->closeExportInvoice();
+        //     return;
+        // }
+        $this->closeExportInvoice(); 
+        if($this->reportType === '1'){
+            return $this->exportReportPDF($invoice);
         }
-        $this->closeExportInvoice();
-        return Excel::download(new InvoiceExport($invoice),'yeah.xlsx'); 
+        else{
+            return Excel::download(new InvoiceExport($invoice),'yeah.xlsx'); 
+        }
     }
     
     public function render()
