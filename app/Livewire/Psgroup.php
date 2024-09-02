@@ -14,7 +14,7 @@ class Psgroup extends Component
     public $description;
     public $begin;
     public $end;
-    public $type;
+    public $type = "last";
     public $psGroupId;
     public function openCreatePs(){
         $this->showCreatePsGroup = true;
@@ -38,7 +38,8 @@ class Psgroup extends Component
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
             ]);
-        }catch (\Exception $e) {
+
+       }catch (\Exception $e) {
             \Log::error('Failed to create PS Group: ' . $e->getMessage());
             session()->flash('error', 'Failed to create PS Group. Please try again.');
 
