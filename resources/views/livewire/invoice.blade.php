@@ -1,8 +1,7 @@
 <div class="">
     <div class="flex justify-between">
          <button type="button"
-            {{-- wire:click = "openGenMonth"   --}}
-            wire:click = "exportReportPDF"
+            wire:click = "openGenMonth"  
             class="text-white bg-orange-500 hover:bg-orange-400 focus:ring-4 focus:ring-orange-600 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-orange-500 dark:hover:bg-orange-400 focus:outline-none dark:focus:ring-orange-600">
             Generate Invoice</button>
             <div class="flex">
