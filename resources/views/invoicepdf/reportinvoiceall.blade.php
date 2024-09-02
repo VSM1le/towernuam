@@ -89,16 +89,13 @@
 </head>
 <body>
     <div class="report-container">
-        {{-- <h1>บริษัท นวม จำกัด</h1> --}}
-        {{-- <h2>รายงานใบเเจ้งหนี้บัญชี</h2> --}}
         <table>
              <thead>
                 <tr >
                     <th style="background-color:white;"></th>
                     <th style="text-align: center; background-color:white;">
                         <p>บริษัท นวม จำกัด</p>
-                        <p style="line-height: 10px">รายงานใบเเจ้งหนี้บัญชี {{ $filteredDetails->first()->invd_product_name }} {{ $uniqueProductCode }}</p>
-                        <p style="line-height: 10px">{{ $filteredDetails->first()->invd_period }}</p>
+                        <p style="line-height: 10px">รายงานใบเเจ้งหนี้บัญชี</p>
                     </th>
                     <th style="background-color:white;"></th>
                 </tr>
@@ -129,7 +126,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($filteredDetails as $detail )
+              @foreach ($filteredDetails as $detail )
                 <tr style="vertical-align: top;">
                     <td class="td-inv" style="height: 15px; vertical-align: top;">
                        <p class="test">{{ $loop->iteration }}</p>
@@ -179,7 +176,7 @@
                        <p class="test">{{ $detail->invoiceheader->inv_status ?? null }}</p>
                     </td>
                 </tr>
-                @endforeach
+                @endforeach 
                 @for($i = count($filteredDetails);$i < 32; $i++)
                 <tr>
                     <td class="td-inv" style="height: 15px"></td>
@@ -201,6 +198,7 @@
                 @endfor
             </tbody>
         </table>
+        @if ($sumInvoice)
          <table style="margin-top: 5px; width:0%">
              <tbody>
                 <tr >
@@ -219,6 +217,7 @@
                 </tr>
              </tbody>
         </table>
+        @endif
     </div>
 </body>
 </html>

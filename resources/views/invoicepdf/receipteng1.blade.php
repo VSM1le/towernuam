@@ -164,9 +164,30 @@
             border-width: 0 3px 3px 0;
             transform: rotate(45deg);
         }
+          .cancel-overlayy {
+            position: fixed; /* Fixed position to cover the entire viewport */
+            top: 250;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: rgba(255, 0, 0); /* Red color for the text */
+            opacity:0.5;
+            font-size: 10em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 9999; /* Ensure it appears above all other content */
+            pointer-events: none; /* Allow interaction with underlying content */
+        } 
     </style>
 </head>
 <body>
+    @if($Receipt->rec_status=== "Cancel")
+        <div class="cancel-overlayy">CANCEL
+            <p style="font-size: 30px;"></p>
+        </div>
+    @endif 
     <div class="invoice-container">
         <table class="header" style="padding-bottom:15px">
             <tr>

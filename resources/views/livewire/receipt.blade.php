@@ -32,7 +32,8 @@
                    @foreach ($receipt as $index => $pland)
                     <div wire:key="items-{{ $index }}" class="wrapper relative ">
                         <div x-data="{ isOpen: false }" @click="isOpen = !isOpen" class="tab px-5 py-2 border-2   
-                            bg-slate-100 shadow-lg relative mb-4 rounded-md cursor-pointer">
+                            bg-slate-100 shadow-lg relative mb-4 rounded-md cursor-pointer
+                            @if ($pland->rec_status== 'Cancel') border-red-500 @endif">
                             <div 
                                 class="flex justify-between items-center font-semibold text-lg after:absolute after:right-5 after:text-2xl after:text-gray-400 hover:after:text-gray-950 peer-checked:after:transform peer-checked:after:rotate-45">
                                 <div class="flex">
@@ -48,6 +49,11 @@
                                     <button wire:click.stop="exportPdf({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
                                        PDF TH
                                     </button>
+                                    @if ($pland->rec_status != "Cancel")
+                                     <button wire:click.stop="openCancelReceipt({{ $pland->id }})"  class="text-white bg-red-500 hover:bg-red-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                       CANCEL 
+                                    </button> 
+                                    @endif
                                     {{-- <button wire:click.stop="openEditInvoice({{ $pland->id }})"  class="text-white bg-green-500 hover:bg-green-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
                                        EDIT 
                                     </button> --}}
@@ -355,4 +361,32 @@
 </form>
 </div>
 @endif 
+@if($showCancelReceipt)
+<div class="fixed inset-0 p-4 flex flex-wrap justify-center items-center w-full h-full z-[1000] before:fixed before:inset-0 before:w-full before:h-full before:bg-[rgba(0,0,0,0.5)] overflow-auto font-[sans-serif]">
+ <div class="fixed inset-0 bg-gray-300 opacity-40" wire:click="closeCancelReceipt"></div>
+   <form wire:submit.prevent="cancelReceipt" class="w-full max-w-md bg-white shadow-lg rounded-md p-6 relative">
+     <svg wire:click="closeCancelReceipt" xmlns="http://www.w3.org/2000/svg"
+       class="w-3.5 cursor-pointer shrink-0 fill-black hover:fill-red-500 float-right" viewBox="0 0 320.591 320.591">
+       <path
+         d="M30.391 318.583a30.37 30.37 0 0 1-21.56-7.288c-11.774-11.844-11.774-30.973 0-42.817L266.643 10.665c12.246-11.459 31.462-10.822 42.921 1.424 10.362 11.074 10.966 28.095 1.414 39.875L51.647 311.295a30.366 30.366 0 0 1-21.256 7.288z"
+         data-original="#000000"></path>
+       <path
+         d="M287.9 318.583a30.37 30.37 0 0 1-21.257-8.806L8.83 51.963C-2.078 39.225-.595 20.055 12.143 9.146c11.369-9.736 28.136-9.736 39.504 0l259.331 257.813c12.243 11.462 12.876 30.679 1.414 42.922-.456.487-.927.958-1.414 1.414a30.368 30.368 0 0 1-23.078 7.288z"
+         data-original="#000000"></path>
+     </svg>
+     <div class="my-8 text-center flex align-middle justify-center">
+    <svg width="149px" height="149px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M512 128C300.8 128 128 300.8 128 512s172.8 384 384 384 384-172.8 384-384S723.2 128 512 128z m0 85.333333c66.133333 0 128 23.466667 179.2 59.733334L273.066667 691.2C236.8 640 213.333333 578.133333 213.333333 512c0-164.266667 134.4-298.666667 298.666667-298.666667z m0 597.333334c-66.133333 0-128-23.466667-179.2-59.733334l418.133333-418.133333C787.2 384 810.666667 445.866667 810.666667 512c0 164.266667-134.4 298.666667-298.666667 298.666667z" fill="#ef4444"></path></g></svg> 
+     </div> 
+    <h4 class="text-xl font-semibold text-center">Do you want to cancel this Receipt</h4>
+    <input wire:model="" 
+    class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="REMARK go here" />
+     <div class="flex flex-col space-y-2">
+       <button  type="submit"
+         class="px-6 py-2.5 rounded-md text-white text-sm font-semibold border-none outline-none bg-red-500 hover:bg-red-600 active:bg-red-500">Cancel Receipt</button>
+       <button wire:click="closeCancelInvoice" type="button"
+         class="px-6 py-2.5 rounded-md text-black text-sm font-semibold border-none outline-none bg-gray-200 hover:bg-gray-300 active:bg-gray-200">Cancel</button>
+     </div>
+    </form>
+ </div>
+ @endif
 </div>

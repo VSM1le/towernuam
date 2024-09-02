@@ -32,6 +32,10 @@ class Receipt extends Component
 
     public $showCreateReceipt = false;
 
+    public $showCancelReceipt = false;
+    public $cancelId;
+
+
      #[Computed()]
     public function customers(){
         return Customer::all();
@@ -277,6 +281,34 @@ class Receipt extends Component
             echo $pdf->stream();
         }, $receipt->rec_no . '.pdf'); 
     } 
+
+    public function openCancelReceipt($id){
+        $this->cancelId = $id;
+        $this->showCancelReceipt = true;
+    }
+
+    public function cancelReceipt(){
+        $receipt = ReceiptHeader::find($this->cancelId);
+        if($receipt->rec_status != "Cancel"){
+        foreach($receipt->receiptdetail as $detail){
+            $unpaid = max($detail->invoicedetail->invd_receipt_amt - $detail->rec_pay,0);
+            $receiptFlag = ($unpaid == 0) ? "No" : "Partial";
+            InvoiceDetail::where('id',$detail->invoice_detail_id)->update([
+                "invd_receipt_flag" => $receiptFlag,
+                "invd_receipt_amt" =>$unpaid,
+            ]);
+        }
+            $receipt->update([
+               'rec_status' => "Cancel" 
+            ]);
+        } 
+        $this->closeCancelReceipt();
+    }
+
+    public function closeCancelReceipt(){
+        $this->showCancelReceipt = false;
+        $this->reset('cancelId');
+    }
 
     public function render()
     {

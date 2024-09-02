@@ -572,6 +572,7 @@ public function closeCancelInvoice(){
         }, $invoice->inv_no . '.pdf'); 
     } 
     protected function exportReportPDF($invoices){
+        // dump($invoices->first()->invoicedetail);
         $uniqueProducts = $invoices->flatMap(function ($invoice) {
             return $invoice->invoicedetail->pluck('invd_product_code');
         })->unique();
@@ -615,12 +616,39 @@ public function closeCancelInvoice(){
                 
                 $combinedHtml .= $report;
             }
-            $pdf = PDF::loadHTML($combinedHtml);
-        }
 
-       return response()->streamDownload(function () use ($pdf) {
+        }
+        $sumAllInvoice = collect();
+        $allDetails = $invoices->flatMap(function($invoice) {
+            return $invoice->invoicedetail;
+        });
+        $sumAllInvoice->amount =  $allDetails->sum('invd_amt');
+        $sumAllInvoice->vatAmt =  $allDetails->sum('invd_vat_amt');
+        $sumAllInvoice->whAmt =  $allDetails->sum('invd_wh_tax_amt');
+        $sumAllInvoice->netAmt =  $allDetails->sum('invd_net_amt');
+
+        $chunks = $allDetails->chunk(33);
+        foreach($chunks as $index => $chunk){
+             if ($index < $chunks->count() - 1) {
+                    $report = view('invoicepdf.reportinvoiceall', [
+                    'filteredDetails' => $chunk, // Pass the chunked data
+                   // 'uniqueProductCode' =>  $unique, 
+                    'sumInvoice' => null 
+                    ])->render();
+                }
+                else{
+                     $report = view('invoicepdf.reportinvoiceall', [
+                    'filteredDetails' => $chunk, // Pass the chunked data
+                    // 'uniqueProductCode' =>  $unique, 
+                    'sumInvoice' => $sumAllInvoice
+                    ])->render();
+                }
+                $combinedHtml .= $report;
+        }
+        $pdf = PDF::loadHTML($combinedHtml);
+        return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
-        },'test.pdf'); 
+        },'invoice_report.pdf'); 
     }
 
     public function openGenMonth(){
@@ -768,13 +796,9 @@ public function closeCancelInvoice(){
                 $query->whereDate('inv_date',"<=" ,$this->exToDate);
             })
             ->get();
-        // if(empty($invoice)){
-        //     session()->flash('error', 'No invoice between the date you were given.'); 
-        //     $this->closeExportInvoice();
-        //     return;
-        // }
+    
         $this->closeExportInvoice(); 
-        if($this->reportType === '1'){
+        if($this->reportType == '1'){
             return $this->exportReportPDF($invoice);
         }
         else{
