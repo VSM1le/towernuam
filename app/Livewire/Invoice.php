@@ -586,7 +586,7 @@ public function closeCancelInvoice(){
             $sumInvoice->vatAmt =  $invoiceFiltereds->sum('invd_vat_amt');
             $sumInvoice->whAmt =  $invoiceFiltereds->sum('invd_wh_tax_amt');
             $sumInvoice->netAmt =  $invoiceFiltereds->sum('invd_net_amt');
-            $chunks = $invoiceFiltereds->chunk(33);
+            $chunks = $invoiceFiltereds->chunk(30);
             foreach ($chunks as $index => $chunk) {
                 $chunk = $chunk->map(function ($detail) {
                 $lastReceipt = $detail->receiptdetail->sortByDesc('id')->first();
@@ -627,7 +627,7 @@ public function closeCancelInvoice(){
         $sumAllInvoice->whAmt =  $allDetails->sum('invd_wh_tax_amt');
         $sumAllInvoice->netAmt =  $allDetails->sum('invd_net_amt');
 
-        $chunks = $allDetails->chunk(33);
+        $chunks = $allDetails->chunk(30);
         foreach($chunks as $index => $chunk){
              if ($index < $chunks->count() - 1) {
                     $report = view('invoicepdf.reportinvoiceall', [

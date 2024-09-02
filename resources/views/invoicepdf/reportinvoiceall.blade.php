@@ -177,7 +177,7 @@
                     </td>
                 </tr>
                 @endforeach 
-                @for($i = count($filteredDetails);$i < 32; $i++)
+                @for($i = count($filteredDetails);$i < 29; $i++)
                 <tr>
                     <td class="td-inv" style="height: 15px"></td>
                     <td class="td-inv"></td>
@@ -203,16 +203,16 @@
              <tbody>
                 <tr >
                     <th style="background-color:white; width:150px">
-                        Amount : {{ number_format($sumInvoice->amount,2,'.',',') ?? null }} 
+                        Amount : {{ number_format($sumInvoice->amount ?? 0,2,'.',',') ?? null }} 
                     </th>
                     <th style="text-align: center; background-color:white; width:150px">
-                        Vat Amount : {{ number_format($sumInvoice->vatAmt,2,'.',',') ?? null }}
+                        Vat Amount : {{ number_format($sumInvoice->vatAmt ?? 0,2,'.',',') ?? null }}
                     </th>
                     <th style="background-color:white;width:150px">
-                        Wh Amount : {{ number_format($sumInvoice->whAmt,2,'.',',') ?? null }}
+                        Wh Amount : {{ number_format($sumInvoice->whAmt ?? 0,2,'.',',') ?? null }}
                     </th>
                     <th style="background-color:white;width:150px">
-                        Net Amount : {{ number_format($sumInvoice->netAmt,2,'.',',') ?? null }}
+                        Net Amount : {{ number_format($sumInvoice->netAmt ?? 0,2,'.',',') ?? null }}
                     </th>
                 </tr>
              </tbody>
