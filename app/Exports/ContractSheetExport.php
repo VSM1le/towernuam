@@ -69,9 +69,9 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
         $sheet->getStyle("A1")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle("A1")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
         $sheet->getStyle("A1")->getFont()->setSize(18);
-        if($this->type == "WA"){
+        if($this->type == "5"){
             $sheet->setCellValue('A2',"รายงานการใช้น้ำประปา");
-        }elseif($this->type == "EC"){
+        }elseif($this->type == "3"){
             $sheet->setCellValue('A2',"รายงานการใช้ไฟฟ้า");
         }else{
             $sheet->setCellValue('A2',"รายงานการใช้ไอเย็นล่วงเวลา");
