@@ -115,6 +115,7 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
         if($this->type != "OT"){
         foreach($this->items as $bill)
         {
+            $amt = $bill->p_unit * $bill->price_unit; 
             $sheet->getRowDimension($currentRow)->setRowHeight(25);
             $sheet->getStyle("B{$currentRow}:D{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle("B{$currentRow}:I{$currentRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
@@ -122,12 +123,13 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
             $sheet->setCellValue("B{$currentRow}",$bill->unit);
             $sheet->setCellValue("C{$currentRow}",$bill->meter);
             $sheet->setCellValue("D{$currentRow}",$this->period);
-            $sheet->setCellValue("E{$currentRow}",Carbon::parse($bill->p_time)->format('d-m-Y'));
-            $sheet->setCellValue("F{$currentRow}",Carbon::parse($bill->t_time)->format('d-m-Y'));
+            $sheet->setCellValue("E{$currentRow}",$bill->p_time);
+            $sheet->setCellValue("F{$currentRow}",$bill->t_time);
             $sheet->setCellValue("G{$currentRow}",$bill->p_unit);
             $sheet->setCellValue("H{$currentRow}",$bill->price_unit);
-            $sheet->setCellValue("I{$currentRow}",$bill->p_unit * $bill->price_unit);
+            $sheet->setCellValue("I{$currentRow}",$amt);
             $sheet->getRowDimension($currentRow)->setRowHeight(20);
+            $total_amt += $amt;
             $currentRow += 1;
         } 
         }

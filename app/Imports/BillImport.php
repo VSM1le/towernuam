@@ -30,7 +30,6 @@ class BillImport implements ToCollection , WithCalculatedFormulas ,WithHeadingRo
             if (count(array_filter($row->toArray())) === 0) {
                 continue;
             }
-
             // Perform validation
             $validator = Validator::make($row->toArray(), $this->rules());
 

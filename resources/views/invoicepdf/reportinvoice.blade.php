@@ -138,7 +138,7 @@
                        <p class="test">{{ $detail->invoiceheader->inv_no ?? null }}</p>
                     </td>
                     <td class="td-inv"tyle="text-align: center">
-                        <p class="test">{{ $detail->invoiceheader->inv_date ?? null }}</p>
+                        <p class="test">{{  Carbon\Carbon::parse($detail->invoiceheader->inv_date)->format('d-m-Y') ?? null }}</p>
                     </td>
                     <td class="td-inv">
                         <p class="test">{{ Str::limit($detail->invoiceheader->customer->cust_name_th ?? null,35) }}</p> 
@@ -159,7 +159,7 @@
                         <p class="test" style="text-align: right">{{ number_format($detail->invd_net_amt ?? 0,2,'.',',')}}</p>
                     </td>
                     <td class="td-inv" style="text-align: center">
-                        <p class="test">{{ $detail->invoiceheader->invd_duedate ?? null }}</p>
+                        <p class="test">{{  Carbon\Carbon::parse($detail->invoiceheader->invd_duedate)->format('d-m-Y') ?? null }}</p>
                     </td>
                     <td class="td-inv" style="text-align: center">
                         <p class="test">{{ $detail->invd_receipt_flag ?? null}}</p>

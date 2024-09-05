@@ -40,7 +40,7 @@ class InvoiceExport implements WithHeadings, WithStyles
                     $sheet->getStyle('A'.($column).':Q'.($column))->getFont()->getColor()->setRGB('FF0000');
                 }
                $sheet->setCellValue("A$column",$invoiceDetails->inv_no); 
-               $sheet->setCellValue("B$column",$invoiceDetails->inv_date); 
+               $sheet->setCellValue("B$column",Carbon::parse($invoiceDetails->inv_date)->format('d-m-Y')); 
                $sheet->setCellValue("C$column",$invoiceDetails->customer->cust_name_th); 
                $sheet->setCellValue("D$column",$invoiceDetails->customerrental->custr_contract_no ?? null); 
                $sheet->setCellValue("E$column",$detail->invd_product_code ?? null); 
@@ -49,7 +49,7 @@ class InvoiceExport implements WithHeadings, WithStyles
                $sheet->setCellValue("H$column",$detail->invd_vat_amt ?? 0); 
                $sheet->setCellValue("I$column",$detail->invd_wh_tax_amt ?? 0); 
                $sheet->setCellValue("J$column",$detail->invd_net_amt ?? 0); 
-               $sheet->setCellValue("K$column",$invoiceDetails->invd_duedate); 
+               $sheet->setCellValue("K$column",Carbon::parse($invoiceDetails->invd_duedate)->format('d-m-Y')); 
                $sheet->setCellValue("L$column",$detail->invd_receipt_flag); 
                $sheet->setCellValue("M$column",$detail->invd_receipt_amt ?? 0); 
                $sheet->setCellValue("N$column",$overdue); 

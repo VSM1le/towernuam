@@ -68,7 +68,7 @@ class Invoice extends Component
     public $exFromDate;
     public $exToDate;
 
-    public $reportType = 1;
+    public $reportType = '1';
    
     private function sanitizeNumericValue($value)
     {
@@ -798,11 +798,11 @@ public function closeCancelInvoice(){
             ->get();
     
         $this->closeExportInvoice(); 
-        if($this->reportType == '1'){
+        if($this->reportType === '1'){
             return $this->exportReportPDF($invoice);
         }
         else{
-            return Excel::download(new InvoiceExport($invoice),'yeah.xlsx'); 
+            return Excel::download(new InvoiceExport($invoice),'report.xlsx'); 
         }
     }
     
