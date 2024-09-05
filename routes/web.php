@@ -41,12 +41,16 @@ Route::view('invoice', 'invoicepdf.invoice1')
     ->middleware(['auth'])
     ->name('invoice');
 
+Route::view('service', 'productservice')
+    ->middleware(['auth'])
+    ->name('service');
+
+
 Route::view('contract/{id}','custconlist')->middleware(['auth'])->name('custlist');
 // Route::view('invoice3', 'invoicepdf.invoice3')
 //     ->middleware(['auth'])
 //     ->name('invoice');
 
-Route::view('report','invoicepdf.reportinvoice')->name('report');
 
 Route::get('invoice3/{id}', function ($id) {
     $number = new numberToBath;

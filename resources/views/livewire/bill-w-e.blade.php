@@ -222,10 +222,14 @@
                         <label class="w-52 text-sm font-medium text-gray-900"></label>
                         <select wire:model="type"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                            <option value="EC">Electric Fee</option>
-                            <option value="WA">Water Fee</option>
-                            <option value="OT">OT Air Fee</option>
+                            <option value="3">Electric Fee</option>
+                            <option value="5">Water Fee</option>
+                            <option value="7">OT Air Fee</option>
                         </select>
+                    @error('type') 
+                      <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+
                 </div> 
               <div class=" mt-6  ">
               <input class="ml-2 block text-sm w-60 text-slate-500

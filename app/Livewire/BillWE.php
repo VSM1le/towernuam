@@ -21,7 +21,7 @@ class BillWE extends Component
     use WithFileUploads;
 
     public $csvFile;
-    public $type;
+    public $type = 3 ;
     public $typeQuery = 5;
     public $bills;
     public $monthYear;
@@ -40,7 +40,6 @@ class BillWE extends Component
             'csvFile' => 'required|file|mimes:csv,txt,xls,xlsx',
             'type' => 'required',
         ]);
-
         // Check if the file is set
         if (!$this->csvFile) {
             session()->flash('error', 'No file uploaded');
@@ -53,12 +52,13 @@ class BillWE extends Component
         
         // Provide feedback to the user
         session()->flash('success', 'File imported successfully!');
-        $this->closeImport();
         } catch (\Exception $e) {
         // Handle exceptions and provide feedback
         session()->flash('error', 'Failed to import file: ' . $e->getMessage());
+        }finally{
         $this->closeImport();
-        } 
+        }
+         
         
     }
     public function openImport(){
