@@ -169,7 +169,7 @@ class BillWE extends Component
             'customer_rental_id' => $contractInfo->id,
             'inv_date' => $bill->invoice_date,
             'invd_duedate' => $bill->due_date,
-            'ps_group_id' => PsGroup::where('ps_group',$this->typeQuery)->pluck('id')->first(),
+            'ps_group_id' => $this->typeQuery, 
             'inv_status' => 'USE',
             'inv_unite' => $contractInfo->custr_unit ?? null, 
             'inv_tower' => 'A',
