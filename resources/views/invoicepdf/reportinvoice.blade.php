@@ -98,7 +98,7 @@
                     <th style="text-align: center; background-color:white;">
                         <p>บริษัท นวม จำกัด</p>
                         <p style="line-height: 10px">รายงานใบเเจ้งหนี้บัญชี {{ $filteredDetails->first()->invd_product_name }} {{ $uniqueProductCode }}</p>
-                        <p style="line-height: 10px">{{ $filteredDetails->first()->invd_period }}</p>
+                        <p style="line-height: 10px">{{ $startDate }} - {{ $endDate }}</p>
                     </th>
                     <th style="background-color:white;"></th>
                 </tr>

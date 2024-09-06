@@ -571,8 +571,8 @@ public function closeCancelInvoice(){
             echo $pdf->stream();
         }, $invoice->inv_no . '.pdf'); 
     } 
-    protected function exportReportPDF($invoices){
-        // dump($invoices->first()->invoicedetail);
+    protected function exportReportPDF($invoices,$edFromDate,$exToDate){
+        $exToDate = Carbon::parse($exToDate);
         $uniqueProducts = $invoices->flatMap(function ($invoice) {
             return $invoice->invoicedetail->pluck('invd_product_code');
         })->unique();
@@ -588,29 +588,40 @@ public function closeCancelInvoice(){
             $sumInvoice->netAmt =  $invoiceFiltereds->sum('invd_net_amt');
             $chunks = $invoiceFiltereds->chunk(30);
             foreach ($chunks as $index => $chunk) {
-                $chunk = $chunk->map(function ($detail) {
+                $chunk = $chunk->map(function ($detail) use($exToDate){
                 $lastReceipt = $detail->receiptdetail->sortByDesc('id')->first();
-
-                $invoiceDate = $detail->invoiceheader->inv_date ? Carbon::parse($detail->invoiceheader->inv_date) : null;
+                if($detail->invd_receipt_flag == 'No'){
+                $invoiceDate = $detail->invoiceheader->invd_duedate ? Carbon::parse($detail->invoiceheader->invd_duedate) : null;
                 $receiptDate = $lastReceipt && $lastReceipt->receiptheader ? Carbon::parse($lastReceipt->receiptheader->rec_date) : null;
-                $detail->overdue = ($invoiceDate && $receiptDate)
-                ? $invoiceDate->diffInDays($receiptDate)
-                : null;
-
+                $checkDate = $invoiceDate->diffInDays($exToDate);
+                    if($checkDate > 0){
+                        $detail->overdue = (int)$checkDate; 
+                    }
+                    else{
+                        $detail->overdue = null;
+                    }
+                }
+                else{
+                    $detail->overdue = null;
+                }
                 return $detail;
             });
                 // dd($chunk);
                 if ($index < $chunks->count() - 1) {
                     $report = view('invoicepdf.reportinvoice', [
+                    'startDate' => Carbon::parse($edFromDate)->format('d-m-Y'),
                     'filteredDetails' => $chunk, // Pass the chunked data
                     'uniqueProductCode' =>  $unique, 
+                    'endDate' => $exToDate->format('d-m-Y'),
                     ])->render();
                 }
                 else{
                      $report = view('invoicepdf.reportinvoice', [
+                    'startDate' => Carbon::parse($edFromDate)->format('d-m-Y'),
                     'filteredDetails' => $chunk, // Pass the chunked data
                     'uniqueProductCode' =>  $unique, 
-                    'sumInvoice' => $sumInvoice
+                    'sumInvoice' => $sumInvoice,
+                    'endDate' => $exToDate->format('d-m-Y'),
                     ])->render();
                 }
                 
@@ -778,7 +789,6 @@ public function closeCancelInvoice(){
     }
     public function closeExportInvoice(){
         $this->showExportInvoice = false;
-        $this->reset(['exFromDate','exToDate']);
     }
     public function exportInvoice(){
         $this->validate([
@@ -796,13 +806,12 @@ public function closeCancelInvoice(){
                 $query->whereDate('inv_date',"<=" ,$this->exToDate);
             })
             ->get();
-    
         $this->closeExportInvoice(); 
         if($this->reportType === '1'){
-            return $this->exportReportPDF($invoice);
+            return $this->exportReportPDF($invoice,$this->exFromDate,$this->exToDate);
         }
         else{
-            return Excel::download(new InvoiceExport($invoice),'report.xlsx'); 
+            return Excel::download(new InvoiceExport($invoice,$this->exToDate),'report.xlsx');
         }
     }
     

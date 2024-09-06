@@ -28,6 +28,42 @@
                 </div>
               </div>
         @endif
+         <div class="flex mt-4 justify-start">
+                    <div class="flex">
+                    <div class="w-48 ml-5">
+                        <label for="datefrom" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">From date</label>
+                        <input id="datefrom" wire:model.live="startDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    </div>
+                    <div class="w-48 ml-5">
+                        <label for="datefrom" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">To date</label>
+                        <input id="datefrom" wire:model.live="endDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    </div>
+                     <div class="w-80 ml-5">
+                    <label for="customercode" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">Customer code</label>
+                        <label class="w-40 text-sm font-medium text-gray-900"></label>
+                        <select id= "customercode" wire:model.live="customer"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                            <option value="">Select Customer</option>
+                        @foreach ($this->customers as $customer)
+                            <option value="{{$customer->id}}">{{$customer->cust_code}} : {{$customer->cust_name_th}}</option>
+                        @endforeach
+                        </select>
+                    </div>
+                    </div>
+                    {{-- <div>
+                        <div class="mr-5">
+                    <label for="customercode" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">Status</label>
+                        <label class=" text-sm font-medium text-gray-900"></label>
+                        <select id= "customercode" wire:model.live="status"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-24  p-2.5 ">
+                            <option value="">All</option>
+                            <option value="Yes">Paid</option>
+                            <option value="No">UnPaid</option>
+
+                        </select>
+                    </div> 
+                    </div> --}}
+                </div>
             <div class="p-6 text-gray-900 dark:text-gray-100">
                    @foreach ($receipt as $index => $pland)
                     <div wire:key="items-{{ $index }}" class="wrapper relative ">

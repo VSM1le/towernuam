@@ -34,11 +34,19 @@ class Receipt extends Component
 
     public $showCancelReceipt = false;
     public $cancelId;
+    public $startDate;
+    public $endDate;
+    public $customer;
 
 
      #[Computed()]
     public function customers(){
         return Customer::all();
+    }
+    public function mount(){
+        // $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
+        $this->startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
+        // $this->genMontly();
     }
 
   public function updateCheque($field)
@@ -312,7 +320,19 @@ class Receipt extends Component
 
     public function render()
     {
-        $receipt = ReceiptHeader::with(['customer','receiptdetail'])->orderBy('rec_no','desc')->paginate(10);
+
+        $receipt = ReceiptHeader::with(['customer','receiptdetail'])
+        ->when($this->startDate, function ($query) {
+            $query->whereDate('rec_date','>=', $this->startDate);
+        })
+        ->when($this->endDate, function($query){
+            $query->whereDate('rec_date',"<=" ,$this->endDate);
+        })
+        ->when($this->customer ,function ($query){
+            $query->where('customer_id',$this->customer);
+        })
+        ->orderBy('rec_no','desc')
+        ->paginate(10);
         return view('livewire.receipt', compact('receipt'));
     }
 }

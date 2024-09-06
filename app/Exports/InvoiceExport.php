@@ -14,8 +14,10 @@ class InvoiceExport implements WithHeadings, WithStyles
     * @return \Illuminate\Support\Collection
     */
     protected $invoice;
-    public function __construct($invoice){
+    protected $endDate;
+    public function __construct($invoice,$endDate){
         $this->invoice = $invoice;
+        $this->endDate = $endDate;
     }
     public function headings(): array
     {
@@ -27,15 +29,20 @@ class InvoiceExport implements WithHeadings, WithStyles
             foreach($invoiceDetails->invoicedetail as $detail){
                 $overdue = null;
                 $lastReceipt = $detail->receiptdetail->sortByDesc('id')->first();
-                $invoiceDate = $invoiceDetails->inv_date ? Carbon::parse($invoiceDetails->inv_date) : null;
+                if($detail->invd_receipt_flag == 'No'){
+                $invoiceDate = $detail->invoiceheader->invd_duedate ? Carbon::parse($detail->invoiceheader->invd_duedate) : null;
                 $receiptDate = $lastReceipt && $lastReceipt->receiptheader ? Carbon::parse($lastReceipt->receiptheader->rec_date) : null;
-                $overdue = ($invoiceDate && $receiptDate)
-                ? $invoiceDate->diffInDays($receiptDate)
-                : null;
-
-                $detail->overdue = ($invoiceDate && $receiptDate)
-                ? $invoiceDate->diffInDays($receiptDate)
-                : null;
+                $checkDate = $invoiceDate->diffInDays($this->endDate);
+                    if($checkDate > 0){
+                        $overdue = (int)$checkDate; 
+                    }
+                    else{
+                        $overdue = null;
+                    }
+                }
+                else{
+                    $overdue = null;
+                }
                 if($invoiceDetails->inv_status === "CANCEL"){
                     $sheet->getStyle('A'.($column).':Q'.($column))->getFont()->getColor()->setRGB('FF0000');
                 }
