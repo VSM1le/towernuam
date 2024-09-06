@@ -572,6 +572,7 @@ public function closeCancelInvoice(){
         }, $invoice->inv_no . '.pdf'); 
     } 
     protected function exportReportPDF($invoices,$edFromDate,$exToDate){
+        $countInvoice = $invoices->count();
         $exToDate = Carbon::parse($exToDate);
         $uniqueProducts = $invoices->flatMap(function ($invoice) {
             return $invoice->invoicedetail->pluck('invd_product_code');
@@ -651,7 +652,8 @@ public function closeCancelInvoice(){
                      $report = view('invoicepdf.reportinvoiceall', [
                     'filteredDetails' => $chunk, // Pass the chunked data
                     // 'uniqueProductCode' =>  $unique, 
-                    'sumInvoice' => $sumAllInvoice
+                    'sumInvoice' => $sumAllInvoice,
+                    'countInvoice' => $countInvoice,
                     ])->render();
                 }
                 $combinedHtml .= $report;

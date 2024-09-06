@@ -214,6 +214,9 @@
                     <th style="background-color:white;width:150px">
                         Net Amount : {{ number_format($sumInvoice->netAmt ?? 0,2,'.',',') ?? null }}
                     </th>
+                     <th style="background-color:white;width:150px">
+                        มี invoice ทั้งหมด {{ $countInvoice ?? 0 }} ฉบับ 
+                    </th>
                 </tr>
              </tbody>
         </table>
