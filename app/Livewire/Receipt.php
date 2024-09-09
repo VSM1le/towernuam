@@ -244,11 +244,30 @@ class Receipt extends Component
         });
         $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2);
         $bath = $number->baht_text($receipt->rec_payment_amt);
-        $html1 = view('invoicepdf.invoice1', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath,'real' => $realAmount]);
-        $html2 = view('invoicepdf.invoice2', ['Receipt' => $receipt,'receiptdetails' => $receiptDetails,'bath' => $bath,'real' => $realAmount]);
-        // $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
-        
-        $combinedHtml = $html1 . $html2; 
+          $chunkReceipts = $receiptDetails->chunk(8);
+        // dd($chunkReceipts);
+        $countPage = count($chunkReceipts);
+        $combinedHtml = null;
+        foreach($chunkReceipts as $index => $chunkReceipt ){
+            $html1 = view('invoicepdf.invoice1', 
+                ['Receipt' => $receipt,
+                'receiptdetails' => $chunkReceipt,
+                'currentPage' => $index + 1,
+                'sumPage' => $countPage,
+                'bath' => $bath,
+                'real' => $realAmount])->render();
+                $combinedHtml .=  $html1;
+        }
+        foreach($chunkReceipts as $index => $chunkReceipt ){
+            $html2 = view('invoicepdf.invoice2',
+                ['Receipt' => $receipt,
+                'receiptdetails' => $chunkReceipt,
+                'currentPage' => $index + 1,
+                'sumPage' => $countPage,
+                'bath' => $bath,
+                'real' => $realAmount])->render();
+                $combinedHtml .=  $html2;
+            }
         $pdf = PDF::loadHTML($combinedHtml);
        return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
@@ -270,20 +289,30 @@ class Receipt extends Component
         });
         $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2);
         $bath = $number->numberToWords($receipt->rec_payment_amt);
-        $html1 = view('invoicepdf.receipteng1', 
-        ['Receipt' => $receipt,
-        'receiptdetails' => $receiptDetails,
-        'bath' => $bath,
-        'real' => $realAmount]);
-
-        $html2 = view('invoicepdf.receipteng2',
-         ['Receipt' => $receipt,
-         'receiptdetails' => $receiptDetails,
-         'bath' => $bath,
-         'real' => $realAmount]);
-        // $html2 = view('invoicepdf.invoice3', ['Invoices' => $invoice, 'bath' => $bath])->render();
-        
-        $combinedHtml = $html1 . $html2; 
+        $chunkReceipts = $receiptDetails->chunk(8);
+        // dd($chunkReceipts);
+        $countPage = count($chunkReceipts);
+        $combinedHtml = null;
+        foreach($chunkReceipts as $index => $chunkReceipt ){
+            $html1 = view('invoicepdf.receipteng1', 
+                ['Receipt' => $receipt,
+                'receiptdetails' => $chunkReceipt,
+                'currentPage' => $index + 1,
+                'sumPage' => $countPage,
+                'bath' => $bath,
+                'real' => $realAmount])->render();
+                $combinedHtml .=  $html1;
+        }
+        foreach($chunkReceipts as $index => $chunkReceipt ){
+            $html2 = view('invoicepdf.receipteng2',
+                ['Receipt' => $receipt,
+                'receiptdetails' => $chunkReceipt,
+                'currentPage' => $index + 1,
+                'sumPage' => $countPage,
+                'bath' => $bath,
+                'real' => $realAmount])->render();
+                $combinedHtml .=  $html2;
+            }
         $pdf = PDF::loadHTML($combinedHtml);
        return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
