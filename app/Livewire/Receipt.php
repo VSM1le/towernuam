@@ -102,7 +102,7 @@ class Receipt extends Component
                         $amt = round($detail->invd_net_amt - $detail->invd_receipt_amt,2) ?? 0;
                         $whamount = round($detail->invd_wh_tax_amt - ReciptDetail::where('invoice_detail_id',$detail->id)
                         ->whereHas('receiptheader',function ($query){
-                            $query->where('rec_status','!=' ,'No');
+                            $query->where('rec_status','!=' ,'Cancel');
                         })->sum('whpay') ?? 0,2);
                     $this->invoiceDetails[] = 
                     [
