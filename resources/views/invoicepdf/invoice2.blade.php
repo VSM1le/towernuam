@@ -305,7 +305,7 @@
                             มูลค่าที่ได้รับยกเว้นภาษีมูลค่าเพิ่ม
                             <span style="float: right;clear:both;padding-right:15px">
                                  @if ($currentPage == $sumPage)
-                                {{ number_format($receiptdetails
+                                {{ number_format($Receipt->receiptdetail
                                     ->filter(function ($detail) {
                                         return $detail->invoicedetail->invd_vat_percent == 0;
                                     })
@@ -329,7 +329,7 @@
                            &nbsp;&nbsp;&nbsp;&nbsp;-มูลค่าที่เสียภาษีมูลค่าเพิ่ม
                             <span style="float: right;clear:both;padding-right:15px">
                                 @if ($currentPage == $sumPage)
-                                {{ number_format($receiptdetails
+                                {{ number_format($Receipt->receiptdetail
                                     ->filter(function ($detail) {
                                         return $detail->invoicedetail->invd_vat_percent != 0;
                                     })
@@ -341,7 +341,7 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;-ภาษีมูลค่าเพิ่ม
                             <span style="float: right;clear:both;padding-right:15px">
                                 @if ($currentPage == $sumPage)
-                                {{ number_format($receiptdetails
+                                {{ number_format($Receipt->receiptdetail
                                     ->pluck('calculated_vat')
                                     ->sum(), 2, '.', ',') }}
                                 @endif
@@ -369,14 +369,14 @@
                     <td style="border:1px solid #000; text-align:right">
                         <p style="font-size: 18px">
                             @if ($currentPage == $sumPage)
-                                {{  number_format($receiptdetails->pluck('gross')->sum(),2,'.',',') }}
+                                {{  number_format($Receipt->receiptdetail->pluck('gross')->sum(),2,'.',',') }}
                             @endif
                         </p>
                     </td>
                     <td style="border:1px solid #000; text-align:right">
                         <p style="font-size: 18px">
                             @if ($currentPage == $sumPage)
-                                {{  number_format($receiptdetails->pluck('calculated_vat')->sum(),2,'.',',') }}
+                                {{  number_format($Receipt->receiptdetail->pluck('calculated_vat')->sum(),2,'.',',') }}
                             @endif
                         </p>
                     </td>
