@@ -496,7 +496,7 @@
                 </span> 
                  <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
                 @if ( $currentPage == $sumPage )
-                  {{ number_format($receiptdetails
+                  {{ number_format($Receipt->receiptdetail
                             ->sum('whpay'),2,'.',',') }} 
                 @endif
                 </span>
