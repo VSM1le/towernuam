@@ -86,6 +86,9 @@
                                        PDF TH
                                     </button>
                                     @if ($pland->rec_status != "Cancel")
+                                      <button wire:click.stop="openEditReceipt({{ $pland->id }})"  class="text-white bg-yellow-500 hover:bg-yellow-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                                       EDIT 
+                                    </button> 
                                      <button wire:click.stop="openCancelReceipt({{ $pland->id }})"  class="text-white bg-red-500 hover:bg-red-700  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
                                        CANCEL 
                                     </button> 
@@ -396,6 +399,38 @@
     </div>
 </form>
 </div>
+@endif 
+@if($showEditReceipt)
+        <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeEditReceipt"></div>
+        <form wire:submit.prevent="editReceipt" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 
+        :style="{ 'max-height': '400px', 'max-width' : '500px' }">
+            <div class="bg-orange-500 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
+                <div class="text-xl font-bold">Edit Receipt  : {{ $receiptNumber }} </div>
+                <button wire:click="closeEditReceipt" type="button" class="focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
+                <div class="flex justify-start w-full">
+                   <div class="w-48 ml-5 m-3">
+                        <label for="editDate" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">Invoice Date</label>
+                        <input id="editDate" wire:model="receiptDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-100 w-full flex justify-between p-4">
+                <div class="flex">
+                    
+                </div>
+                <div>
+                 <button type="submit" 
+        class="text-white bg-orange-500 hover:bg-orange-400 focus:ring-4 focus:outline-none focus:ring-orange-600 font-medium rounded-lg text-sm px-5 py-2.5">Generate</button>
+                </div>
+            </div>
+        </form>
+        </div>
 @endif 
 @if($showCancelReceipt)
 <div class="fixed inset-0 p-4 flex flex-wrap justify-center items-center w-full h-full z-[1000] before:fixed before:inset-0 before:w-full before:h-full before:bg-[rgba(0,0,0,0.5)] overflow-auto font-[sans-serif]">

@@ -37,6 +37,9 @@ class Receipt extends Component
     public $startDate;
     public $endDate;
     public $customer;
+    public $receiptNumber;
+    public $showEditReceipt = false;
+    public $editId;
 
 
      #[Computed()]
@@ -228,6 +231,34 @@ class Receipt extends Component
         $this->sumCheque = 0;
         $this->resetValidation();
        
+    }
+    public function openEditReceipt($id){
+        $this->editId = $id;
+        $receiptHeader = ReceiptHeader::find($id);
+        $this->receiptNumber = $receiptHeader->rec_no;
+        $this->receiptDate = $receiptHeader->rec_date;
+        $this->showEditReceipt = true;
+    }
+    public function editReceipt(){
+        $this->validate([
+            'receiptDate' => ['required'],
+        ]);
+        try{
+            ReceiptHeader::where('id',$this->editId)->update([
+                'rec_date' => $this->receiptDate,
+            ]);
+             session()->flash('success', 'Updated successful.'); 
+        }catch(\Exception $e){
+             session()->flash('error', 'Failed to update receipt.'); 
+        }
+        finally{
+            $this->closeEditReceipt();
+        }
+    }
+    public function closeEditReceipt(){
+        $this->showEditReceipt = false;
+        $this->receiptDate = null;
+        $this->reset('receiptNumber','editId');
     }
     public function exportPdf($id){
         $number = new numberToBath;
