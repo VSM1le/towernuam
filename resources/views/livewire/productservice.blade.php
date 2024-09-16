@@ -214,12 +214,12 @@
     </div>
     @endif 
     @if($showEditService)
-    <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeCreateService"></div>
+    <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeEditService"></div>
     <form wire:submit.prevent="editService" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 
      :style="{ 'max-height': '700px', 'max-width' : '600px' }">
         <div class="bg-yellow-500 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
             <div class="text-xl font-bold">Edit Service</div>
-            <button wire:click="closeCreateService" type="button" class="focus:outline-none">
+            <button wire:click="closeEditService" type="button" class="focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>

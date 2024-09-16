@@ -266,15 +266,277 @@
                     <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">จำนวนเงินสุทธิ<br>Net Amount</th>
                 </tr>
             </thead>
+            @if ($Receipt->rec_have_inv_flag == 0)
+             <tbody>
+                <tr style="height: 200px;">
+                    <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
+                        @foreach ( $receiptdetails as $index => $receipt)
+                           <p style="font-size:18px; position: relative;">
+                           {{$index + 1 }}. {{App\Models\ProductService::where('ps_code', $receipt->recd_product_code)->pluck('ps_name_en')->first() }}
+                            @if ($receipt->recd_remake)
+                                 - {{ $receipt->recd_remake  }} 
+                            @endif
+                            </p> 
+                        @endforeach
+                    </td>
+                   <td style="vertical-align: top; width: 100px; text-align: right; border-right: 1px solid #000;">
+                        @foreach ( $receiptdetails as $receiptdetail)
+                            <p style="font-size: 18px; margin: 0;">{{ number_format($receiptdetail->recd_amt,2,'.',',') }}</p>
+                        @endforeach
+                    </td> 
+                    <td style="text-align: right; border-right:1px solid #000;vertical-align:top;width:100px">
+                         @foreach ( $receiptdetails as $receiptdetail)
+                            <p style="font-size: 18px" >{{ number_format($receiptdetail->recd_vat_amt,2,'.',',')}}</p>
+                        @endforeach
+                    </td>
+                    <td style="text-align: right; border-right:1px solid #000;vertical-align:top;width:100px">
+                         @foreach ( $receiptdetails as $receipt)
+                            <p style="font-size: 18px" >{{ number_format($receipt->rec_pay,2,'.',',')}}</p>
+                        @endforeach
+                    </td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr style="">
+                   <td style="height:100px;border:1px solid #000; vertical-align:top;font-size:18px">
+                        <p style="font-size: 18px;line-height:0.8">
+                            มูลค่าที่ได้รับยกเว้นภาษีมูลค่าเพิ่ม
+                            <span style="float: right;clear:both;padding-right:15px">
+                                @if ($currentPage == $sumPage)
+                                {{ number_format($Receipt->receiptdetail
+                                    ->filter(function ($detail) {
+                                        return $detail->recd_vat_percent == 0;
+                                    })
+                                    ->pluck('recd_amt')
+                                    ->sum(), 2, '.', ',') }}
+                                @endif
+                            </span> 
+                        </p>
+                        <p style="font-size:18px;line-height:0.8">มูลค่าที่รวมภาษีมูลค่าเพิ่ม
+                            <span style="float: right;clear:both;padding-right:15px">
+                                @if ($currentPage == $sumPage)
+                                {{ number_format($Receipt->receiptdetail
+                                    ->filter(function ($detail) {
+                                        return $detail->recd_vat_percent != 0;
+                                    })
+                                    ->sum('rec_pay'), 2, '.', ',') }}
+                                @endif
+                            </span>
+                        </p>
+                        <p style="font-size:18px;line-height:0.8">
+                            &nbsp;&nbsp;&nbsp;&nbsp;-มูลค่าที่เสียภาษีมูลค่าเพิ่ม
+                            <span style="float: right;clear:both;padding-right:15px">
+                                @if ($currentPage == $sumPage)
+                                {{ number_format($Receipt->receiptdetail
+                                    ->filter(function ($detail) {
+                                        return $detail->recd_vat_percent != 0;
+                                    })
+                                    ->sum('recd_amt'), 2, '.', ',') }}
+                                @endif
+                            </span>
+                        </p>
+                        <p style="font-size:18px;line-height:0.8">
+                            &nbsp;&nbsp;&nbsp;&nbsp;-ภาษีมูลค่าเพิ่ม
+                            <span style="float: right;clear:both;padding-right:15px">
+                                @if ($currentPage == $sumPage)
+                                {{ number_format($Receipt->receiptdetail
+                                    ->pluck('recd_vat_amt')
+                                    ->sum(), 2, '.', ',') }}
+                                @endif
+                            </span>
+                        </p>
+                        <p style="font-size:18px;line-height:0.8">
+                            มูลค่าที่ไม่อยู่ในข้อบังคับภาษีมูลค่าเพิ่ม
+                        </p>
+                    </td> 
+                    <td style="border-right:solid 1px #000">
+
+                    </td>
+                    <td style="border-right:solid 1px #000">
+                    </td>
+                    <td style="">
+
+                    </td>
+                </tr>
+                <tr style="">
+                     <td style="border:1px solid #000; {{ $currentPage != $sumPage ? 'height: 20px;' : '' }}">
+                        @if ($currentPage == $sumPage)
+                            <p style="font-size: 18px;line-height:0.5">{{ $bath }} </p>
+                        @endif
+                    </td>
+                    <td style="border:1px solid #000; text-align:right">
+                        <p style="font-size: 18px">
+                            @if ($currentPage == $sumPage)
+                                {{  number_format($Receipt->receiptdetail->pluck('recd_amt')->sum(),2,'.',',') }}
+                            @endif
+                        </p>
+                    </td>
+                    <td style="border:1px solid #000; text-align:right">
+                    <p style="font-size: 18px">
+                            @if ($currentPage == $sumPage)
+                                {{  number_format($Receipt->receiptdetail->pluck('recd_vat_amt')->sum(),2,'.',',') }}
+                            @endif
+                    </p>
+                    </td>
+                    </td>
+                    <td style="border:1px solid #000; text-align:right">
+                         <p style="font-size: 18px">
+                            @if ($currentPage == $sumPage)
+                                {{  number_format($Receipt->receiptdetail->pluck('rec_pay')->sum(),2,'.',',') }}
+                            @endif
+                        </p> 
+                    </td> 
+                </tr>
+            </tbody>    
+        </table>
+         <table class="details-table">
+            <tr>
+                <td style="vertical-align: top;line-height:0.5; width:100px">
+                    <p style="font-size: 18px">ชำระโดย</p>
+                    <p style="font-size: 18px">Payment of</p>
+                </td>
+                <td style="vertical-align:top;width:150px">
+                    <span style="display: inline-block;">
+                        <input  type="checkbox" {{ $Receipt->rec_payment_type == 'cash'&& $currentPage == $sumPage ? 'checked' : ''}}>
+                    </span>
+                    <span style="display: inline-block; margin-left: 5px;line-height:0.5;position: relative;">
+                        <p style="display: absolute; margin: 0; font-size:18px">เงินสด<br>cash</p>
+                    </span> 
+                    <span style="margin-left: 10px; vertical-align: top; font-size: 18px;line-height:1;position:relative;top:-10px">
+                        @if ($Receipt->rec_payment_type == "cash" && $currentPage == $sumPage)
+                            {{  number_format($real,2,'.',',')  }} 
+                        @endif 
+                    </span>
+                </td>
+                <td style="vertical-align:top;">
+                    <span style="display: inline-block;">
+                        <input  type="checkbox" {{ $Receipt->rec_payment_type == 'tran'  && $currentPage == $sumPage  ? 'checked' : ''}}>
+                    </span>
+                    <span style="display: inline-block; margin-left: 5px;line-height:0.5;position:relative">
+                        <p style="display: absolute; margin: 0; font-size:18px">เงินโอน<br>T/T</p>
+                    </span> 
+                    <span style=" margin-left: 10px; vertical-align: top; font-size: 18px;line-height:1; line-height:0;position:relative;top:-10px">
+                        @if ($Receipt->rec_payment_type == "tran" && $currentPage == $sumPage )
+                            {{  number_format($real,2,'.',',')  }} 
+                            @endif 
+                    </span>
+                </td> 
+                  <td style="vertical-align:top;min-width:150px">
+                  <span style="display: inline-block;">
+                    <input value="value" type="checkbox" {{ $Receipt->rec_payment_type == 'cheq' && $currentPage == $sumPage ? 'checked':'' }}>
+                </span>
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5;position: relative;">
+                    <p style="margin: 0; font-size:18px;">เช็คธนาคาร<br>Cheque No.</p>
+                </span>
+                <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position:relative;top:-10px">
+                        @if ($Receipt->rec_payment_type == "cheq" && $currentPage == $sumPage )
+                            {{ $Receipt->rec_bank }}
+                        @endif 
+                </span>
+                </td> 
+            </tr>
+         
+        </table>
+        <table>
+             <tr>
+                 <td style="vertical-align:top;min-width:150px">
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5;position: relative;">
+                    <p style="margin: 0; font-size:18px">สาขา<br>Branch</p>
+                </span>
+                <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative;top:-10px">
+                    @if ( $currentPage == $sumPage )
+                        {{ $Receipt->rec_branch}}
+                    @endif 
+                </span>
+                </td>
+                 <td style="vertical-align:top;min-width:150px">
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5;position:relative;">
+                    <p style="margin: 0; font-size:18px">เลขที่<br>NO.</p>
+                </span>
+                <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
+                    @if ( $currentPage == $sumPage )
+                        {{ $Receipt->rec_cheque_no}}
+                    @endif 
+                </span>
+                </td>
+                 <td style="vertical-align:top;min-width:150px">
+                <span style="display: inline-block; margin-left: 5px;line-height:0.5;position:relative;">
+                    <p style="margin: 0; font-size:18px">วันที่<br>Date</p>
+                </span> 
+                <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
+                    @if ( $currentPage == $sumPage )
+                        {{ $Receipt->rec_cheque_date  }}
+                    @endif 
+                </span>
+                </td>
+               <td style="vertical-align:top;min-width:150px">
+                <span style="display: inline-block; margin-left: 5px; line-height: 0.5;position:relative">
+                    <p style="margin: 0; font-size: 18px;">จำนวน<br>Amount</p>
+                </span>
+                <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
+                    @if ($Receipt->rec_payment_type == "cheq" && $currentPage == $sumPage)
+                           {{ number_format($real,2,'.',',')  }} 
+                    @endif
+                </span>
+                </td> 
+            </tr>
+        </table>
+        <table>
+            <tr>
+                 <td style="vertical-align:top;">
+                  <span style="display: inline-block;">
+                    <input value="value" type="checkbox" {{
+                        $Receipt->receiptdetail->pluck('invoicedetail.invd_wh_tax_amt')
+                            ->sum() > 0  && $currentPage == $sumPage ? 'checked' : ''     }}>
+                </span>
+                <span style="display: inline-block; margin-left: 5px; line-height: 0.5;position:relative">
+                    <p style="margin: 0; font-size:18px">ภาษีหัก ณ ที่จ่าย<br>Withholding Tax</p>
+                </span> 
+                 <span style="margin-left: 10px; vertical-align: top; font-size: 18px;position: relative; top:-10px">
+                @if ( $currentPage == $sumPage )
+                  {{ number_format($Receipt->receiptdetail
+                            ->sum('whpay'),2,'.',',') }} 
+                @endif
+                </span>
+                </td> 
+            </tr>
+        </table> 
+        <table class="outer-table">
+            <tr>
+                <td>
+                    <table style="border-collapse:collapse">
+                        <tr >
+                            <td class="bordered" style="height: 40px; width: 100px;border:solid 1px #000; text-align:center;line-height:0.8">
+                                <p>ผู้รับเงิน</p>
+                                <p>Collector</p>
+                            </td>
+                            <td class="bordered" style="height: 40px; width: 100px;border:solid 1px #000;text-align:center;line-height:0.8">
+                                <p>การเงิน</p>
+                                <p>Cashier</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="height: 40px; border:solid 1px #000"></td>
+                            <td style="border:solid 1px #000"></td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="text-container" style="padding-left: 10px;">
+                    <p style="font-size: 15px">หมายเหตุ: ในกรณีชำระเป็นเช็ค ใบเสร็จรับเงินและใบกำกับภาษีฉบับนี้จะสมบูรณ์ต่อเมื่อบริษัทฯ ได้รับเงินตามเช็คแล้ว</p>
+                    <p style="font-size: 15px">REMARK: If payment is made by cheque. This receipt will be valid cheque has been cleared by the bank.</p>
+                </td>
+            </tr>
+        </table>
+            @else 
             <tbody>
                 <tr style="height: 200px;">
                     <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ( $receiptdetails as $index => $receipt)
                            <p style="font-size:18px; position: relative;">
-                            {{$index + 1 }}. {{App\Models\ProductService::where('ps_code', $receipt->invoicedetail->invd_product_code)->pluck('ps_name_en')->first() }} 
-                             @if ($receipt->invoicedetail->invd_remake)
+                           {{$index + 1 }}. {{App\Models\ProductService::where('ps_code', $receipt->invoicedetail->invd_product_code)->pluck('ps_name_en')->first() }}
+                            @if ($receipt->invoicedetail->invd_remake)
                                  - {{ $receipt->invoicedetail->invd_remake  }} 
-                                @endif
+                            @endif
                             <span style="position: absolute; right: 15px;">
                                 {{ $receipt->invoicedetail->invoiceheader->inv_no }}
                             </span>
@@ -361,9 +623,9 @@
                     </td>
                 </tr>
                 <tr style="">
-                    <td style="border:1px solid #000; {{ $currentPage != $sumPage ? 'height: 20px;' : '' }}">
+                     <td style="border:1px solid #000; {{ $currentPage != $sumPage ? 'height: 20px;' : '' }}">
                         @if ($currentPage == $sumPage)
-                            <p style="font-size: 18px; line-height:0.5">{{ $bath }} </p>
+                            <p style="font-size: 18px;line-height:0.5">{{ $bath }} </p>
                         @endif
                     </td>
                     <td style="border:1px solid #000; text-align:right">
@@ -502,7 +764,7 @@
                 </span>
                 </td> 
             </tr>
-        </table>
+        </table> 
         <table class="outer-table">
             <tr>
                 <td>
@@ -528,7 +790,8 @@
                     <p style="font-size: 15px">REMARK: If payment is made by cheque. This receipt will be valid cheque has been cleared by the bank.</p>
                 </td>
             </tr>
-        </table> 
+        </table>
+        @endif
     </div>
 </body>
 </html>

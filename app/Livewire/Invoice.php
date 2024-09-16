@@ -15,6 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Dompdf\Options;
 use Illuminate\Support\Carbon as SupportCarbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -33,7 +34,7 @@ class Invoice extends Component
     public $rental = null;
     public $service = null;
     public $invoiceDate = null;
-    public $invoiceDetails;
+    public $invoiceDetails; 
     public $dueDate = null;
     public $tower = "A";
     public $showCreateInvoice = false;
@@ -271,7 +272,8 @@ class Invoice extends Component
     }
     public function closeCreateInvoice(){
         $this->showCreateInvoice = false;
-        $this->reset(['psGroup','customerName','customerCode','customerrents','rental','service','invoiceDate','dueDate','invoiceDetails']);
+        $this->invoiceDetails = null; 
+        $this->reset(['psGroup','customerName','customerCode','customerrents','rental','service','invoiceDate','dueDate']);
         $this->resetValidation();
        
     }
@@ -831,7 +833,6 @@ public function closeCancelInvoice(){
         })
          ->when($this->status != "", function ($query) {
             $query->whereHas('invoicedetail', function ($detailQuery) {
-            $detailQuery->where('invd_receipt_flag', $this->status);
         }, '=', DB::raw('(SELECT COUNT(*) FROM invoice_details WHERE invoice_details.invoice_header_id =   invoice_headers.id)'));
         }) 
         ->orderBy('id', 'desc')

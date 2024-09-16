@@ -5,12 +5,14 @@ namespace App\Livewire;
 use App\Models\Customer;
 use App\Models\InvoiceDetail;
 use App\Models\InvoiceHeader;
+use App\Models\ProductService;
 use App\Models\ReceiptHeader;
 use App\Models\ReciptDetail;
 use App\Services\numberToBath;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Dompdf\Options;
+use FontLib\TrueType\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -20,11 +22,13 @@ class Receipt extends Component
     use WithPagination;
     public $receiptDate ;
     public $customerCode = null;
+    public $customerCodeNoInvoice = null;
 
     public $paymentType = "cash";
 
     public $cheque = ['bank' => "",'branch' => "",'chequeDate' => null,'no' => ""];
-    public $invoiceDetails ;
+    public $receiptDetails;
+    public $invoiceDetails;
     public $sumCheque = 0; 
     public $disable = true;
     public $tower = "A";
@@ -40,12 +44,67 @@ class Receipt extends Component
     public $receiptNumber;
     public $showEditReceipt = false;
     public $editId;
+    public $showCreateNoInvoice = false;
+    public $service;
 
+    #[Computed()]
+    public function productservices(){
+        return ProductService::all();
+    } 
 
-     #[Computed()]
+    #[Computed()]
     public function customers(){
-        return Customer::all();
+        return Customer::orderBy('cust_code')->get();
     }
+     private function sanitizeNumericValue($value)
+    {
+        $sanitizedValue = preg_replace('/[^-?\d.]/', '', $value);
+
+        return (float) $sanitizedValue;
+    }
+    public function updateReceiptDetail($index, $field, $value)
+    {
+        if($this->receiptDetails[$index][$field] == null){
+            $this->receiptDetails[$index][$field] = 0;
+        }
+        if (isset($this->receiptDetails[$index]) && $this->receiptDetails[$index]['payamt'] != null) {
+            $this->receiptDetails[$index][$field] = $value;
+
+            // Recalculate vatamt if amt or vat field is updated
+            if ($field == 'payamt' || $field == 'vat') {
+                $this->sumCheque = 0;
+                $amt = $this->receiptDetails[$index]['payamt'] ?? 0;
+                $vat = $this->sanitizeNumericValue($this->receiptDetails[$index]['vat'] ?? 0); // Sanitize vat value
+                $whvat = $this->sanitizeNumericValue($this->receiptDetails[$index]['whvat'] ?? 0);// Sanitize whvat value
+
+                $rawamt = round(($amt /  (1 + $vat / 100)) ?? 0,2);
+                $vatamt = round($amt - $rawamt,2); 
+                $whtaxamt = round(($amt * $whvat) / 100 ?? 0,2);
+                
+                $this->receiptDetails[$index]['vatamt'] = $vatamt;
+                $this->receiptDetails[$index]['rawamt'] = $rawamt;
+                $this->receiptDetails[$index]['whtaxamt'] = $whtaxamt;
+                foreach($this->receiptDetails as $detail){
+                    $this->sumCheque += $detail['payamt'];
+                }
+            }
+        }
+    }
+    public function addline(){
+
+        $productService =  ProductService::find($this->service);
+
+        $this->receiptDetails[] = 
+            ['pscode'=> $productService->ps_code
+            ,'psname' =>$productService->ps_name_th 
+            ,'payamt'=> 0
+            ,'rawamt'=> 0
+            ,'vat'=> $productService->ps_vat ?? 0 
+            ,'vatamt'=> 0
+            ,'whtaxamt' => 0
+            ,'remark'=>''];
+    }
+
     public function mount(){
         // $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
         $this->startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
@@ -246,6 +305,7 @@ class Receipt extends Component
         try{
             ReceiptHeader::where('id',$this->editId)->update([
                 'rec_date' => $this->receiptDate,
+                'rec_no' => $this->receiptNumber,
             ]);
              session()->flash('success', 'Updated successful.'); 
         }catch(\Exception $e){
@@ -263,10 +323,36 @@ class Receipt extends Component
     public function exportPdf($id){
         $number = new numberToBath;
         $sum = 0; 
-        // $options = new Options();
-        // $options->set('isHtml5ParserEnabled', true);
-        // $options->set('isRemoteEnabled', true);
         $receipt= ReceiptHeader::where('id',$id)->with(['receiptdetail','customer'])->first();
+        if($receipt->rec_have_inv_flag == 0){
+            $receiptDetails = $receipt->receiptdetail;
+            $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay'),2); 
+            $bath = $number->baht_text($receipt->rec_payment_amt);
+            $chunkReceipts = $receiptDetails->chunk(8);
+            $countPage = count($chunkReceipts);
+            $combinedHtml = null;
+            foreach($chunkReceipts as $index => $chunkReceipt ){
+            $html1 = view('invoicepdf.invoice1', 
+                ['Receipt' => $receipt,
+                'receiptdetails' => $chunkReceipt,
+                'currentPage' => $index + 1,
+                'sumPage' => $countPage,
+                'bath' => $bath,
+                'real' => $realAmount])->render();
+                $combinedHtml .=  $html1;
+        }
+        foreach($chunkReceipts as $index => $chunkReceipt ){
+            $html2 = view('invoicepdf.invoice2',
+                ['Receipt' => $receipt,
+                'receiptdetails' => $chunkReceipt,
+                'currentPage' => $index + 1,
+                'sumPage' => $countPage,
+                'bath' => $bath,
+                'real' => $realAmount])->render();
+                $combinedHtml .=  $html2;
+            }
+        }
+        else{
         $receiptDetails = $receipt->receiptdetail->map(function ($detail){
         $detail->gross = round($detail->rec_pay * (100 / (100 + $detail->invoicedetail->invd_vat_percent)),2);
         $detail->calculated_vat = round($detail->rec_pay - $detail->gross,2);
@@ -299,6 +385,7 @@ class Receipt extends Component
                 'real' => $realAmount])->render();
                 $combinedHtml .=  $html2;
             }
+            }
         $pdf = PDF::loadHTML($combinedHtml);
        return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
@@ -312,18 +399,46 @@ class Receipt extends Component
         // $options->set('isHtml5ParserEnabled', true);
         // $options->set('isRemoteEnabled', true);
         $receipt= ReceiptHeader::where('id',$id)->with(['receiptdetail','customer'])->first();
-        $receiptDetails = $receipt->receiptdetail->map(function ($detail){
-        $detail->gross = round($detail->rec_pay * (100 / (100 + $detail->invoicedetail->invd_vat_percent)),2);
-        $detail->calculated_vat = round($detail->rec_pay - $detail->gross,2);
-        $detail->whtax = round(($detail->rec_pay * $detail->invoicedetail->invd_wh_tax_percent) / 100 , 2);
-        return $detail;
-        });
-        $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2);
-        $bath = $number->numberToWords($receipt->rec_payment_amt);
-        $chunkReceipts = $receiptDetails->chunk(8);
-        // dd($chunkReceipts);
-        $countPage = count($chunkReceipts);
-        $combinedHtml = null;
+        if($receipt->rec_have_inv_flag == 0){
+            $receiptDetails = $receipt->receiptdetail;
+            $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay'),2); 
+            $bath = $number->numberToWords($receipt->rec_payment_amt);
+            $chunkReceipts = $receiptDetails->chunk(8);
+            $countPage = count($chunkReceipts);
+            $combinedHtml = null;
+            foreach($chunkReceipts as $index => $chunkReceipt ){
+            $html1 = view('invoicepdf.receipteng1', 
+                ['Receipt' => $receipt,
+                'receiptdetails' => $chunkReceipt,
+                'currentPage' => $index + 1,
+                'sumPage' => $countPage,
+                'bath' => $bath,
+                'real' => $realAmount])->render();
+                $combinedHtml .=  $html1;
+        }
+        foreach($chunkReceipts as $index => $chunkReceipt ){
+            $html2 = view('invoicepdf.receipteng2',
+                ['Receipt' => $receipt,
+                'receiptdetails' => $chunkReceipt,
+                'currentPage' => $index + 1,
+                'sumPage' => $countPage,
+                'bath' => $bath,
+                'real' => $realAmount])->render();
+                $combinedHtml .=  $html2;
+            }
+        }
+        else{
+            $receiptDetails = $receipt->receiptdetail->map(function ($detail){
+            $detail->gross = round($detail->rec_pay * (100 / (100 + $detail->invoicedetail->invd_vat_percent)),2);
+            $detail->calculated_vat = round($detail->rec_pay - $detail->gross,2);
+            $detail->whtax = round(($detail->rec_pay * $detail->invoicedetail->invd_wh_tax_percent) / 100 , 2);
+            return $detail;
+            });
+            $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2);
+            $bath = $number->numberToWords($receipt->rec_payment_amt);
+            $chunkReceipts = $receiptDetails->chunk(8);
+            $countPage = count($chunkReceipts);
+            $combinedHtml = null;
         foreach($chunkReceipts as $index => $chunkReceipt ){
             $html1 = view('invoicepdf.receipteng1', 
                 ['Receipt' => $receipt,
@@ -344,7 +459,8 @@ class Receipt extends Component
                 'real' => $realAmount])->render();
                 $combinedHtml .=  $html2;
             }
-        $pdf = PDF::loadHTML($combinedHtml);
+        }
+       $pdf = PDF::loadHTML($combinedHtml);
        return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
         }, $receipt->rec_no . '.pdf'); 
@@ -358,6 +474,7 @@ class Receipt extends Component
     public function cancelReceipt(){
         $receipt = ReceiptHeader::find($this->cancelId);
         if($receipt->rec_status != "Cancel"){
+        if($receipt->rec_have_inv_flag != 0){
         foreach($receipt->receiptdetail as $detail){
             $unpaid = max($detail->invoicedetail->invd_receipt_amt - $detail->rec_pay,0);
             $receiptFlag = ($unpaid == 0) ? "No" : "Partial";
@@ -365,6 +482,7 @@ class Receipt extends Component
                 "invd_receipt_flag" => $receiptFlag,
                 "invd_receipt_amt" =>$unpaid,
             ]);
+            }
         }
             $receipt->update([
                'rec_status' => "Cancel" 
@@ -376,6 +494,91 @@ class Receipt extends Component
     public function closeCancelReceipt(){
         $this->showCancelReceipt = false;
         $this->reset('cancelId');
+    }
+
+    public function openCreateNoInvoice(){
+        $this->showCreateNoInvoice = true;
+    }
+    public function createReceiptNoInvoice(){
+        $this->validate([
+            'receiptDate' => ['required'],
+            'customerCodeNoInvoice' => ['required'],
+            'paymentType' => ['required'],
+            'receiptDetails' => ['required', 'array'],
+            'cheque.bank' => ['required_if:paymentType,cheq'],
+            'cheque.branch' => ['required_if:paymentType,cheq'],
+            'cheque.no' => ['required_if:paymentType,cheq'],
+            'cheque.chequeDate' => ['required_if:paymentType,cheq', 'nullable', 'date'],
+        ],
+        [
+            'customerCodeNoInvoice.required' => "The customer code field is required.",
+            'cheque.bank.required_if' => 'Bank is required.',
+            'cheque.no.required_if' => 'Bank No. is required.',
+            'cheque.chequeDate.required_if' => 'Cheque Date is required.',
+            'cheque.branch.required_if' => 'branch is required.'
+        ]);
+
+        $prefix = 'R'.$this->tower.'S';
+        $year = Carbon::parse($this->receiptDate)->format("Y");
+        $datePart = substr($year,-2) . Carbon::parse($this->receiptDate)->format('m');
+
+        $lastReceipt= ReceiptHeader::where('rec_no', 'like', $prefix . $datePart . '%')->orderBy('rec_no', 'desc')->first();
+
+        if (is_null($lastReceipt)) {
+            $recNo = $prefix . $datePart . '0001';
+        } else {
+            $lastNumber = (int)substr($lastReceipt->rec_no, -4);
+            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            $recNo = $prefix . $datePart . $newNumber;
+        }
+        try{
+         $create_receipt = ReceiptHeader::create([
+            'rec_no' => $recNo,
+            'customer_id' => $this->customerCodeNoInvoice,
+            'rec_date' => $this->receiptDate,
+            'rec_status' => "Yes",
+            'rec_payment_amt' => $this->sumCheque,
+            'rec_payment_type' => $this->paymentType,
+            'rec_bank' => $this->cheque['bank'] ?? null,
+            'rec_branch' => $this->cheque['branch'] ?? null,
+            'rec_cheque_no' => $this->cheque['no'] ?? null,
+            'rec_cheque_date' => $this->cheque['chequeDate'] ?? null,
+            'rec_have_inv_flag' => false,
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
+        ]);
+
+        foreach($this->receiptDetails as $detail){
+        $create_receipt->receiptdetail()->create([
+                'recd_product_code' => $detail['pscode'],
+                'recd_product_name' => $detail['psname'],
+                'recd_amt' => $detail['rawamt'],
+                'recd_vat_percent' => $detail['vat'],
+                'recd_vat_amt' => $detail['vatamt'], 
+                'whpay' => $detail['whtaxamt'],
+                'rec_pay' => $detail['payamt'],
+                'recd_remark' => $detail['remark'], 
+                'created_by' => auth()->id(),
+                'updated_by' => auth()->id(),
+            ]);
+            session()->flash('success', ' Create receipt successful.'); 
+        }
+        }catch(\Exception $e){
+            session()->flash('error', " Something went wrong can't create receipt."); 
+
+        }finally{
+            $this->closeCreateNoInvoice();
+        }
+    }
+    public function closeCreateNoInvoice(){
+        $this->showCreateNoInvoice= false;
+        $this->receiptDate = null;
+        $this->customerCodeNoInvoice = null;
+        $this->paymentType = "cash";
+        $this->cheque = ['bank' => "", 'branch' => "", 'chequeDate' => null, 'no' => ""];
+        $this->receiptDetails = [];
+        $this->sumCheque = 0;
+        $this->resetValidation(); 
     }
 
     public function render()

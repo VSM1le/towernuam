@@ -1,6 +1,10 @@
 <div>
      <div class="flex justify-end">
             <button type="button"
+            wire:click = "openCreateNoInvoice"  
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+            Receipt</button>
+            <button type="button"
             wire:click = "openCreateReceipt"  
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
             Create Receipt</button>
@@ -101,6 +105,68 @@
                             {{-- Accordion content --}}
                             <div x-show="isOpen" class="answer justify-center mt-5 h-full mr-9"> 
                                 <div  @click.stop class="overflow-x-auto"> 
+                            @if ($pland->rec_have_inv_flag == '0')
+                                    <table  class="m-6 w-full overflow-x-auto  text-sm text-left rtl:text-right text-gray-500 ">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3">
+                                                No.
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                               Product Name
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                               Product Code 
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Amount
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                vat percent
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                vat amount
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                whtax amount
+                                            </th>
+                                            <th scope="col" class="px-6 py-3">
+                                                Paid amount 
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                     @foreach ($pland->receiptdetail as $listitem)
+                                        <tr class="bg-white border-b hover:bg-gray-50">
+                                            <th scope="row"    
+                                            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                                                {{ $loop->iteration }}
+                                            </th>
+                                            
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->recd_product_name}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->recd_product_code }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->recd_amt}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->recd_vat_percent}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{$listitem->recd_vat_amt}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->whpay}}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $listitem->rec_pay}}
+                                            </td>
+                                        </tr>   
+                                    @endforeach 
+                                    </table>
+                                @else
                                 <table  class="m-6 w-full overflow-x-auto  text-sm text-left rtl:text-right text-gray-500 ">
                                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                         <tr>
@@ -173,21 +239,18 @@
                                         </tr>   
                                     @endforeach 
                                 </table>
-                                 </div>
+                                @endif
+                                </div>
                             </div>
                             {{-- End Accordion content --}}
                         </div>    
                     </div>
                 @endforeach
-               
-            </div>
-               <div class="m-3">
+                </div>
+                <div class="m-3">
                     {{ $receipt->links() }}
-            </div>  
+                </div>  
     </div>
-
-
-
 
      @if($showCreateReceipt)
     <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeCreateReceipt"></div>
@@ -418,6 +481,10 @@
                         <label for="editDate" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">Invoice Date</label>
                         <input id="editDate" wire:model="receiptDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
                     </div>
+                     <div class="w-48 ml-5 m-3">
+                        <label for="editReceiptNum" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">Receipt Number</label>
+                        <input id="editReceiptNum" wire:model="receiptNumber"  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    </div>
                 </div>
             </div>
             <div class="bg-gray-100 w-full flex justify-between p-4">
@@ -460,4 +527,211 @@
     </form>
  </div>
  @endif
+
+ {{-- Create modal --}}
+    @if($showCreateNoInvoice)
+    <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeCreateNoInvoice"></div>
+    <form wire:submit.prevent="createReceiptNoInvoice" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" :style="{ 'max-height': '800px', 'max-width' : '1500px' }">
+        <div class="bg-blue-700 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
+            <div class="text-xl font-bold">Create Receipt No Invoice</div>
+            <button wire:click="closeCreateNoInvoice" type="button" class="focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="bg-gray-100 w-full flex justify-between p-4">
+            <div class="flex">
+                <div class="w-48">
+                    <label for="vdate" class="text-xs">Receipt date</label>
+                    <input id="vdate" wire:model="receiptDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    @error('receiptDate') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
+                <div class="w-80 ml-5">
+                    <label for="customercode" class="text-xs">Customer code</label>
+                        <label class="w-40 text-sm font-medium text-gray-900"></label>
+                        <select id= "customercode" wire:model="customerCodeNoInvoice"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                            <option>Select Customer</option>
+                        @foreach ($this->customers as $customer)
+                            <option value="{{$customer->id}}">{{$customer->cust_code}} : {{$customer->cust_name_th}}</option>
+                        @endforeach
+                        </select>
+                          @error('customerCodeNoInvoice') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                         @enderror
+                </div>
+                 <div class="flex content-center ml-5 border border-slate-500 bg-white rounded">
+                    <div class="flex items-center pl-5">
+                        <input id="default-radio-1" type="radio" value="cash" wire:model.live="paymentType"  name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="default-radio-1" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Cash</label>
+                    </div>
+                    <div class="flex items-center ml-5">
+                        <input id="default-radio-2" type="radio" value="tran" wire:model.live="paymentType" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="default-radio-2" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Transfer money</label>
+                    </div>
+                     <div class="flex items-center ml-5 pr-5">
+                        <input id="default-radio-3" type="radio" value="cheq" wire:model.live="paymentType" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="default-radio-3" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Cheque</label>
+                    </div>
+                </div>
+            </div>
+        </div> 
+        <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
+            <div>
+                {{-- @if($duplicateInput)
+                <h3 class="text-red-500 text-xs">There is a duplicate input value in issue field.</h3>
+                @endif --}}
+                @if (!is_null($receiptDetails))
+                <table class="mt-4 max-w-8xl text-sm text-left rtl:text-right text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Service Code</th>
+                            <th scope="col" class="px-2 py-3">Product/Services</th>
+                            <th scope="col" class="px-2 py-3">Pay Amt</th>
+                            <th scope="col" class="px-2 py-3">Amt</th>
+                            <th scope="col" class="px-2 py-3">VAT</th>
+                            <th scope="col" class="px-2 py-3">VAT AMT</th>
+                            <th scope="col" class="px-2 py-3">WH TAX AMT</th>
+                            <th scope="col" class="px-2 py-3">REMARK</th>
+                            <th scope="col" class="px-2 py-3">Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($receiptDetails as $index => $row)
+                            <tr class="bg-white border-b hover:bg-gray-50">
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="receiptDetails.{{ $index }}.pscode" type="text" class="w-24 p-2 border border-gray-300 rounded text-xs"  disabled/>
+                                    </td>
+                                   
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="receiptDetails.{{ $index }}.psname" type="text" class="w-44 p-2 border border-gray-300 text-xs rounded" disabled  />
+                                    </td>
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="receiptDetails.{{ $index }}.payamt" 
+                                        wire:change="updateReceiptDetail({{ $index }}, 'payamt', $event.target.value)" 
+                                        type="number" 
+                                        step="0.01" 
+                                        class="w-full p-2 border border-gray-300 text-xs rounded" 
+                                        />
+                                    </td>
+                                     <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="receiptDetails.{{ $index }}.rawamt" 
+                                        type="number" class="w-full p-2 border border-gray-300 text-xs rounded" 
+                                        step="0.01"/>
+                                    </td> 
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="receiptDetails.{{ $index }}.vat" 
+                                        wire:change="updateReceiptDetail({{ $index }}, 'vat', $event.target.value)" 
+                                        type="number" 
+                                         
+                                        class="w-12 p-2 border border-gray-300 text-xs rounded" 
+                                        
+                                        />     
+                                         @if ($errors->has('receiptDetails.' . $index . '.vat'))
+                                            <div class="text-red-500 text-xs mt-1">{{ $errors->first('receiptDetails.' . $index . '.vat') }}</div>
+                                        @endif 
+                                    </td>
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="receiptDetails.{{ $index }}.vatamt" 
+                                        type="number" class="w-full p-2 border border-gray-300 text-xs rounded" 
+                                        step="0.01" disabled />
+                                    </td>
+                                  <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="receiptDetails.{{ $index }}.whtaxamt" 
+                                        type="number" class="w-full p-2 border border-gray-300 text-xs rounded" 
+                                        step="0.01"/>
+                                    </td> 
+                                    <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
+                                        <input wire:model="receiptDetails.{{ $index }}.remark" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" />     
+                                    </td>
+                                
+                                <td class="px-6 py-4">
+                                    <button type="button" wire:click="removeItem({{ $index }})" class="text-red-500 focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                @endif
+            </div> 
+            <div class="w-80 mt-4">
+                <label class="w-40 text-sm font-medium text-gray-900"></label>
+                <select id= "customercode" wire:model.live="service"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                    <option value="">Select Product</option>
+                    @foreach ($this->productservices as $productservice)
+                        <option value="{{$productservice->id}}">{{$productservice->ps_code}} : {{$productservice->ps_name_th}}</option>
+                    @endforeach
+                </select>
+            </div>  
+            <div class="mt-4">
+                <button type="button" 
+                wire:click='addline' 
+                class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+               Add
+                </button>
+            </div>     
+        </div>
+   
+    <div class="bg-gray-100 w-full flex justify-between p-4">
+        <div class="flex">
+             <div class="flex">
+            <div class="flex">
+                <div class="w-48">
+                    <label  class="text-xs">Cheque Bank</label>
+                    <input  
+                    wire:model="cheque.bank"  class="w-full p-2 border border-gray-300 text-sm rounded" 
+                    wire:change="updateCheque('bank')"
+                    /> 
+
+                    @error('cheque.bank') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
+                <div class="w-48 ml-5">
+                    <label for="vdate" class="text-xs">Branch</label>
+                    <input id="vdate" wire:model="cheque.branch"  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    @error('cheque.branch') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
+                <div class="w-48 ml-5">
+                    <label for="vdate" class="text-xs">NO.</label>
+                    <input id="vdate" wire:model="cheque.no"  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    @error('cheque.no') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
+                <div class="w-48 ml-5">
+                    <label for="vdate" class="text-xs">Date</label>
+                    <input id="vdate" wire:model="cheque.chequeDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    @error('cheque.chequeDate') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror 
+                </div>
+            </div>
+        </div>
+        </div>
+            <div class="w-48 ml-5">
+                <label for="vdate" class="text-xs">Total Amount</label>
+                <input id="vdate" wire:model.live="sumCheque"  class="w-full p-2 border border-gray-300 text-sm rounded text-right" 
+                type="number"
+                step="0.01"
+                disabled /> 
+            </div>
+            <div class="content-end">
+                <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Save</button>
+            </div>
+    </div>
+</form>
+</div>
+@endif 
 </div>
