@@ -324,7 +324,7 @@ class Receipt extends Component
         $number = new numberToBath;
         $sum = 0; 
         $receipt= ReceiptHeader::where('id',$id)->with(['receiptdetail','customer'])->first();
-        if($receipt->rec_have_inv_flag == 0){
+        if($receipt->rec_have_inv_flag == '0'){
             $receiptDetails = $receipt->receiptdetail;
             $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay'),2); 
             $bath = $number->baht_text($receipt->rec_payment_amt);
@@ -399,7 +399,7 @@ class Receipt extends Component
         // $options->set('isHtml5ParserEnabled', true);
         // $options->set('isRemoteEnabled', true);
         $receipt= ReceiptHeader::where('id',$id)->with(['receiptdetail','customer'])->first();
-        if($receipt->rec_have_inv_flag == 0){
+        if($receipt->rec_have_inv_flag == '0'){
             $receiptDetails = $receipt->receiptdetail;
             $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay'),2); 
             $bath = $number->numberToWords($receipt->rec_payment_amt);
