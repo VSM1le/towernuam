@@ -266,8 +266,8 @@
                     <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">จำนวนเงินสุทธิ<br>Net Amount</th>
                 </tr>
             </thead>
-                         @if ($Receipt->rec_have_inv_flag == 0)
-             <tbody>
+            @if ($Receipt->rec_have_inv_flag == '0')
+            <tbody>
                 <tr style="height: 200px;">
                     <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ( $receiptdetails as $index => $receipt)
@@ -751,7 +751,7 @@
                   <span style="display: inline-block;">
                     <input value="value" type="checkbox" {{
                         $Receipt->receiptdetail->pluck('invoicedetail.invd_wh_tax_amt')
-                            ->sum() > 0  && $currentPage == $sumPage ? 'checked' : ''     }}>
+                            ->sum() > 0  && $currentPage == $sumPage ? 'checked' : '' }}>
                 </span>
                 <span style="display: inline-block; margin-left: 5px; line-height: 0.5;position:relative">
                     <p style="margin: 0; font-size:18px">ภาษีหัก ณ ที่จ่าย<br>Withholding Tax</p>

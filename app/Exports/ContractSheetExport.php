@@ -112,7 +112,7 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
         }
          $total_amt = 0;
         $currentRow = 9;
-        if($this->type != "OT"){
+        if($this->type != "7"){
         foreach($this->items as $bill)
         {
             $amt = $bill->p_unit * $bill->price_unit; 
