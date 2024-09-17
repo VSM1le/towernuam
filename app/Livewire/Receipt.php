@@ -474,7 +474,7 @@ class Receipt extends Component
     public function cancelReceipt(){
         $receipt = ReceiptHeader::find($this->cancelId);
         if($receipt->rec_status != "Cancel"){
-        if($receipt->rec_have_inv_flag != 0){
+        if($receipt->rec_have_inv_flag != '0'){
         foreach($receipt->receiptdetail as $detail){
             $unpaid = max($detail->invoicedetail->invd_receipt_amt - $detail->rec_pay,0);
             $receiptFlag = ($unpaid == 0) ? "No" : "Partial";
