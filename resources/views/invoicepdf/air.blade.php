@@ -160,7 +160,7 @@
                     <td class="td-border" style="text-align: center">{{ $bill->meter }}</td>
                     <td class="td-border" style="text-align: center">{{ $bill->bill_open}}</td>
                     <td class="td-border" style="text-align: center">{{ $bill->bill_close }}</td>
-                    <td class="td-border" style="text-align: center">{{ sprintf('%02d:%02d', floor($bill->p_unit * 24) + (round(($bill->p_unit * 24 - floor($bill->p_unit * 24)) * 60) === 60 ? 1 : 0), round(($bill->p_unit * 24 - floor($bill->p_unit * 24)) * 60) % 60) }}</td>
+                    <td class="td-border" style="text-align: center">{{ $bill->hourM }}</td>
                     <td class="td-border" style="text-align: right">{{ number_format($bill->price_unit,2,'.',',') }}</td>
                     <td class="td-border" style="text-align: right">{{ number_format($bill->amt,2,'.',',') }}</td>
                 </tr>

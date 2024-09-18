@@ -347,7 +347,14 @@ class BillWE extends Component
             
              if($this->typeQuery == "7"){
                 $filteredItems = $filteredItems->map(function ($item){
-                $item->amt = round($item->p_unit * ($item->price_unit / 0.041666667),2);
+                    $hours = floor($item->p_unit * 24);
+                    $minutes = round(($item->p_unit * 24 - $hours) * 60);
+                    if ($minutes == '60') {
+                        $hours += 1;
+                        $minutes = 0;
+                    }
+                    $item->amt = round($item->p_unit * ($item->price_unit / 0.041666667),2);
+                    $item->hourM =  $item->hourM = $hours . ":" . sprintf('%02d', $minutes); 
                     return $item;
                  });
                 $total_amt = $filteredItems->sum('amt');
