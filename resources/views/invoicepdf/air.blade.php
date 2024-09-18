@@ -153,14 +153,14 @@
                 </tr>
             </thead>
             <tbody style="border: 1px solid #000;">
-                @foreach ($bills->reverse() as $bill )
+                @foreach ($bills as $bill )
                 <tr style="">
                     <td class="td-border" style="text-align: center">{{ \Carbon\Carbon::parse($bill->bill_tran_date)->format('d-m-Y') }}</td>
                     <td class="td-border" style="text-align: center">{{ $bill->unit }}</td>
                     <td class="td-border" style="text-align: center">{{ $bill->meter }}</td>
                     <td class="td-border" style="text-align: center">{{ $bill->bill_open}}</td>
                     <td class="td-border" style="text-align: center">{{ $bill->bill_close }}</td>
-                    <td class="td-border" style="text-align: center">{{ sprintf('%02d:%02d', floor($bill->p_unit* 24), round(($bill->p_unit* 24 - floor($bill->p_unit* 24)) * 60)) }}</td>
+                    <td class="td-border" style="text-align: center">{{ sprintf('%02d:%02d', floor($bill->p_unit * 24) + (round(($bill->p_unit * 24 - floor($bill->p_unit * 24)) * 60) === 60 ? 1 : 0), round(($bill->p_unit * 24 - floor($bill->p_unit * 24)) * 60) % 60) }}</td>
                     <td class="td-border" style="text-align: right">{{ number_format($bill->price_unit,2,'.',',') }}</td>
                     <td class="td-border" style="text-align: right">{{ number_format($bill->amt,2,'.',',') }}</td>
                 </tr>
@@ -179,7 +179,7 @@
                 </tr>
             </thead>
             <tbody style="border: 1px solid #000;">
-                @foreach ($bills->reverse() as $bill )
+                @foreach ($bills as $bill )
                 <tr style="">
                     <td class="td-border" style="text-align: center">{{ $bill->unit }}</td>
                     <td class="td-border" style="text-align: center">{{ $bill->meter }}</td>

@@ -384,7 +384,7 @@ class BillWE extends Component
         $pdf = PDF::loadHTML($combinedHtml);
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
-        },  'testbill.pdf'); 
+        },  'pdfbill.pdf'); 
     }
 
     public function render()
