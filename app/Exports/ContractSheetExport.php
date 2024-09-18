@@ -43,7 +43,7 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
     }
     public function headings(): array
     {
-        if($this->type == "OT"){
+        if($this->type == "7"){
             return ['Transantion Date', 'Unit', 'Unit Air','Open','Close','Hours of use','Price/Hr','Amount'];
         }
         else{

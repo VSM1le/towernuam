@@ -37,9 +37,8 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
-Route::view('invoice', 'invoicepdf.invoice1')
-    ->middleware(['auth'])
-    ->name('invoice');
+Route::view('air', 'invoicepdf.air')
+    ->name('air');
 
 Route::view('service', 'productservice')
     ->middleware(['auth'])

@@ -55,7 +55,7 @@
             margin-left: 50px;
         }
         .desc {
-            font-size: 16px
+            font-size: 16px;
         }
         .company-details {
             padding: 10px 5px;
@@ -79,26 +79,6 @@
         .content-table th {
             text-align: left;
         }
-        .details-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .details-table th, .details-table td {
-            padding: 8px;
-            text-align: left;
-        }
-        .signature-grid {
-            width: 150px;
-            height: 80px;
-            margin-top: 10px;
-            border-collapse: collapse;
-        }
-        .signature-cell {
-            border: 1px solid #000;
-            text-align: center;
-            vertical-align: middle;
-            font-size: 12px;
-        }
         p {
             font-size: 14px;
             margin: 0;
@@ -110,38 +90,12 @@
         .td-border{
             border-collapse: collapse;
             border: 1px solid #000;
-            padding: 1px 
+            line-height: 10px;
         }
-         .adjacent-table {
-            width: 100%;
-            border: 1px solid #000;
-            border-top: none;
+        .border-bottom{
             border-collapse: collapse;
-            margin-top: -20px; /* Adjusts overlap of the borders */
+            border-bottom: 1px solid #000;
         }
-         .adjacent-table2 {
-            width: 100%;
-            border: 1px solid #000;
-            border-top: none;
-            border-collapse: collapse;
-            margin-top: 0px; /* Adjusts overlap of the borders */
-        }
-         .cancel-overlay {
-            position: fixed; /* Fixed position to cover the entire viewport */
-            top: 250;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            color: rgba(255, 0, 0); /* Red color for the text */
-            opacity:0.8;
-            font-size: 10em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            z-index: 9999; /* Ensure it appears above all other content */
-            pointer-events: none; /* Allow interaction with underlying content */
-        } 
     </style>
 </head>
 <body>
@@ -154,31 +108,38 @@
                 <td class="company-details" style="vertical-align: top;padding-right:100px">
                     <p style="padding-right:10px;text-align:center; margin: 0px; font-weight: bold; font-size:28px;line-height:19px;">บริษัท นวม จำกัด</p>
                     <p style="text-align:center; margin: 0px; font-weight: bold; font-size:28px;line-height:19px;">
+                        @if ($typeQuery == "7")
                         รายงานการใช้ไอเย็นล่วงเวลา 
+                        @elseif ($typeQuery == "5")
+                        รายงานการใช้น้ำประปา
+                        @else
+                        รายงานการใช้ไอเย็นล่วงเวลา
+                        @endif
                     </p>
                 </td>
                 <td class="blank-column" style="vertical-align : top">
-                    <p><span class="page-number">page 1/1</span></p>
+                    <p><span class="page-number">page {{ $currentPage }}/{{ $sumPage }}</span></p>
                 </td>
             </tr>
         </table> 
         <table style="margin-bottom: 10px">
             <tr>
                 <td>
-                    <p class="desc">Due Date : </p>
+                    <p class="desc">Due Date : {{ \Carbon\Carbon::parse($bills->first()->due_date)->format('d-m-Y') }} </p>
                 </td>
             </tr> 
             <tr>
                 <td>
-                    <p class="desc">Building :</p>
+                    <p class="desc">Building : อาคารนวม</p>
                 </td>
 
             </tr>
             <tr>
-                <p class="desc">Customer Code :</p>
+                <p class="desc">Customer Code : {{ $customerName->customer->cust_name_th }} (เลขที่สัญญา {{ $customerName->custr_contract_no_real }})</p>
             </tr>
         </table>
         <table class="content-table">
+            @if ($typeQuery == "7")
                 <thead>
                 <tr style="text-align: center;">
                     <th style="text-align: center;padding:10px; line-height:8px; border: 1px solid #000;border-top: none;">Transaction Date</th>
@@ -192,28 +153,77 @@
                 </tr>
             </thead>
             <tbody style="border: 1px solid #000;">
+                @foreach ($bills as $bill )
                 <tr style="">
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
+                    <td class="td-border" style="text-align: center">{{ \Carbon\Carbon::parse($bill->bill_tran_date)->format('d-m-Y') }}</td>
+                    <td class="td-border" style="text-align: center">{{ $bill->unit }}</td>
+                    <td class="td-border" style="text-align: center">{{ $bill->meter }}</td>
+                    <td class="td-border" style="text-align: center">{{ $bill->bill_open}}</td>
+                    <td class="td-border" style="text-align: center">{{ $bill->bill_close }}</td>
+                    <td class="td-border" style="text-align: center">{{ sprintf('%02d:%02d', floor($bill->p_unit* 24), round(($bill->p_unit* 24 - floor($bill->p_unit* 24)) * 60)) }}</td>
+                    <td class="td-border" style="text-align: right">{{ number_format($bill->price_unit,2,'.',',') }}</td>
+                    <td class="td-border" style="text-align: right">{{ number_format($bill->amt,2,'.',',') }}</td>
+                </tr>
+                @endforeach
+                @else
+                     <thead>
+                <tr style="text-align: center;">
+                    <th style="text-align: center;padding:10px; line-height:8px; border: 1px solid #000;border-top: none;">Unit</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">Meter No.</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">Period</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">Previous</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">This Time</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">Unit</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">Price/unit</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">Amount</th>
+                </tr>
+            </thead>
+            <tbody style="border: 1px solid #000;">
+                @foreach ($bills as $bill )
+                <tr style="">
+                    <td class="td-border" style="text-align: center">{{ $bill->unit }}</td>
+                    <td class="td-border" style="text-align: center">{{ $bill->meter }}</td>
+                    <td class="td-border" style="text-align: center">{{ $period}}</td>
+                    <td class="td-border" style="text-align: center">{{ $bill->p_time}}</td>
+                    <td class="td-border" style="text-align: center">{{ $bill->t_time}}</td>
+                    <td class="td-border" style="text-align: center">{{ $bill->p_unit }}</td>
+                    <td class="td-border" style="text-align: right">{{ number_format($bill->price_unit,2,'.',',') }}</td>
+                    <td class="td-border" style="text-align: right">{{ number_format($bill->amt,2,'.',',') }}</td>
+                </tr>
+                @endforeach
+                @endif
+                @if ($currentPage === $sumPage)
+                <tr>
+                    <td class="border-bottom"></td>
+                    <td class="border-bottom"></td>
+                    <td class="border-bottom"></td>
+                    <td class="border-bottom"></td>
+                    <td class="border-bottom"></td>
+                    <td class="border-bottom"></td>
+                    <td style="text-align: right;line-height:15px;border-bottom:1px solid #000">Amount</td>
+                    <td style=" border: 1px solid #000;line-height:10px; text-align:right">{{ number_format($total_amt,2,'.',',') }}</td>
                 </tr>
                 <tr>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
-                    <td class="td-border">test</td>
+                    <td class="border-bottom"></td>
+                    <td class="border-bottom"></td>
+                    <td class="border-bottom"></td>
+                    <td class="border-bottom"></td>
+                    <td class="border-bottom"></td>
+                    <td class="border-bottom"></td>
+                    <td style="text-align: right;line-height:15px; border-bottom:1px solid #000">VAT {{ $vat }}%</td>
+                    <td style="border:1px solid #000;line-height:15px; text-align:right">{{ number_format($vat_amt,2,'.',',') }}</td>
                 </tr>
-
-
+                 <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align: right;line-height:15px">Total Amount</td>
+                    <td style="border:1px solid #000;line-height:15px; text-align:right">{{ number_format($total_amt + $vat_amt,2,'.',',') }}</td>
+                </tr>
+                @endif
             </tbody>
         </table>
     </div> 

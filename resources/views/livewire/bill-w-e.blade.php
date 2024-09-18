@@ -54,7 +54,7 @@
                         Clear Bill 
                 </button>
                 <button type="button"
-                        wire:click="exportGroupByContract"
+                        wire:click="openShouldExport"
                         class="text-white bg-green-500 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-3 me-2 mb-2 ml-3 dark:bg-green-500 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-300">
                         Excel 
                 </button>
@@ -305,4 +305,41 @@
    </div>
  </div>
  @endif
+   @if($showExportBill)
+        <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeShouldExport"></div>
+        <form wire:submit.prevent="shouldExportType" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 
+        :style="{ 'max-height': '300px', 'max-width' : '500px' }">
+            <div class="bg-teal-400 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
+                <div class="text-xl font-bold">Export Bill Type</div>
+                <button wire:click="closeShouldExport" type="button" class="focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
+                <div class="w-full mt-5 pr-5 pl-5">
+                        <label class="w-40 text-sm font-medium text-gray-900"></label>
+                        <select id= "reportType" wire:model="reportType"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                            <option value="1">PDF Report</option>  
+                            <option value="2">Excel Report</option>  
+                        </select>
+                          @error('editCustomerCode') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                         @enderror
+                </div>
+            </div>
+            <div class="bg-gray-100 w-full flex justify-between p-4">
+                <div class="flex">
+                    
+                </div>
+                <div>
+                 <button type="submit" 
+        class="text-white bg-teal-400 hover:bg-teal-400 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5">Export</button>
+                </div>
+            </div>
+        </form>
+        </div>
+    @endif 
 </div>

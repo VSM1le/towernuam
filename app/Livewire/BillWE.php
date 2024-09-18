@@ -10,6 +10,7 @@ use App\Models\InvoiceHeader;
 use App\Models\ProductService;
 use App\Models\PsGroup;
 use App\Services\periodPs;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -25,10 +26,12 @@ class BillWE extends Component
     public $typeQuery = 5;
     public $bills;
     public $monthYear;
+    public $reportType = 1;
     public $showImportModal = false;
 
     public $showGenerateInvoice = false;
     public $showDeleteBill = false;
+    public $showExportBill = false;
     
     public function __construct(){
         $this->monthYear = Carbon::now()->format('Y-m');
@@ -131,7 +134,7 @@ class BillWE extends Component
             $ps_group = PsGroup::where('id',$this->typeQuery)->first();
             $periodPs = new periodPs;
             $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
-            $whtax = $product->ps_whtax ?? 0;
+            $p_wh = $product->ps_whtax ?? 0;
 
         }
         elseif($this->typeQuery == "3"){
@@ -139,19 +142,20 @@ class BillWE extends Component
             $ps_group = PsGroup::where('id',$this->typeQuery)->first();
             $periodPs = new periodPs;
             $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
-            $whtax = $product->ps_whtax ?? 0;
+            $p_wh = $product->ps_whtax ?? 0;
         }
         else{
             $product = ProductService::where('ps_code','3001')->first();
             $ps_group = PsGroup::where('id',$this->typeQuery)->first();
             $periodPs = new periodPs;
             $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
-            $whtax = $product->ps_whtax ?? 0;
+            $p_wh = $product->ps_whtax ?? 0;
         }
 
         foreach($sumBill as $index => $bill){
             $contractInfo = CustomerRental::where('custr_contract_no',$bill->contract_no)->first(); 
             $amt = round($bill->total_sales,2);
+            $whtax = $p_wh;
             if($contractInfo->customer->cust_gov_flag === 1)
             {
                 $whtax = 1;
@@ -269,6 +273,118 @@ class BillWE extends Component
     }
     public function closeClear(){
         $this->showDeleteBill = false;
+    }
+    public function openShouldExport(){
+        $this->showExportBill = true;
+    }
+    public function closeShouldExport(){
+        $this->showExportBill = false;
+    }
+    public function shouldExportType(){
+        if($this->reportType == "1"){
+            return $this->reportPdfBill();
+        }
+        else{
+            return $this->exportGroupByContract();
+        }
+    }
+    
+    protected function reportPdfBill(){
+       $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
+       $data = Bill::join('customer_rentals', 'bill.contract_no', '=', 'customer_rentals.custr_contract_no')
+            ->select(
+                'bill.id',
+                'bill.contract_no',
+                'bill.unit', 
+                'bill.meter',
+                'bill.p_time',
+                'bill.t_time',
+                'bill.p_unit',
+                'bill.price_unit',
+                'bill.invoice_date', 
+                'bill.due_date',
+                'bill.bill_tran_date',
+                'bill.bill_open',
+                'bill.bill_close',
+                'bill.bill_use',
+                'customer_rentals.custr_contract_no_real as real_contract'  
+            )
+            ->when($monthYear, function ($query) use($monthYear) {
+                $query->where('invoice_date', 'like', '%' . $monthYear . '%');
+            })
+            ->when($this->typeQuery, function ($query){
+                $query->where('type',$this->typeQuery);
+            })
+            ->where('status','Y')
+            ->get(); 
+        if($this->typeQuery == "5"){
+            $vat= ProductService::where('ps_code','2002')->pluck('ps_vat')->first();
+            $ps_group = PsGroup::where('id',$this->typeQuery)->first();
+            $periodPs = new periodPs;
+            $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
+        }
+        elseif($this->typeQuery == "3"){
+            $vat= ProductService::where('ps_code','2001')->pluck('ps_vat')->first();
+            $ps_group = PsGroup::where('id',$this->typeQuery)->first();
+            $periodPs = new periodPs;
+            $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
+        }
+        else{
+            $vat= ProductService::where('ps_code','3001')->pluck('ps_vat')->first();
+            $ps_group = PsGroup::where('id',$this->typeQuery)->first();
+            $period = "null";
+            if($ps_group){
+            $periodPs = new periodPs;
+            $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
+            }
+        }
+        // dd($data);
+        $combinedHtml = null;
+        $uniqueContract = $data->unique('real_contract')->pluck('real_contract');
+        foreach ($uniqueContract as $item) {
+            $filteredItems = $data->where('real_contract', $item)->sortBy('bill_tran_date');
+            
+            
+             if($this->typeQuery == "7"){
+                $filteredItems = $filteredItems->map(function ($item){
+                $item->amt = round($item->p_unit * ($item->price_unit / 0.041666667),2);
+                    return $item;
+                 });
+                $total_amt = $filteredItems->sum('amt');
+                $vat_amt = round(($filteredItems->sum('amt') * $vat) / 100,2);
+            }else{
+                $filteredItems = $filteredItems->map(function($item){
+                    $item->amt = round($item->p_unit * $item->price_unit);
+                    return $item;
+                });
+                $total_amt = $filteredItems->sum('amt');
+                $vat_amt = round(($filteredItems->sum('amt') * $vat) / 100,2);
+            }
+            $chunkContracts = $filteredItems->chunk(25);
+             $customerName = CustomerRental::where('custr_contract_no_real',$filteredItems->first()->real_contract)->first();
+            $sumPage = count($chunkContracts);
+           
+            foreach($chunkContracts as $index => $bills){
+                $Html = view('invoicepdf.air',[
+                        'bills' => $bills,
+                        'period' => $period,
+                        'customerName' => $customerName,
+                        'vat' => $vat,
+                        'vat_amt' => $vat_amt,
+                        'total_amt' => $total_amt,
+                        'currentPage' => $index + 1,
+                        'sumPage' => $sumPage,
+                        'typeQuery' => $this->typeQuery,
+                    ]
+                )->render();
+                $combinedHtml .= $Html;
+            }
+
+        }
+        $pdf = PDF::loadHTML($combinedHtml);
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        },  'testbill.pdf'); 
     }
 
     public function render()
