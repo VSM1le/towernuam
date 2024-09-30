@@ -297,7 +297,7 @@
 
                                 @if ($receipt->recd_remark)
                                     <span style="position: absolute; left: 0; margin-top: 15px; width: 100%;">
-                                        {{ $receipt->recd_remark}} 
+                                    &nbsp;&nbsp;&nbsp; - {{ $receipt->recd_remark}} 
                                     </span>
                                 @endif
                             </div>
@@ -569,7 +569,7 @@
                                 <!-- If remake is too long, position it on the next line using relative positioning -->
                                 @if ($receipt->invoicedetail->invd_remake)
                                     <span style="position: absolute; left: 0; margin-top: 15px; width: 100%;">
-                                        {{ $receipt->invoicedetail->invd_remake }}
+                                    &nbsp;&nbsp;&nbsp; - {{ $receipt->invoicedetail->invd_remake }}
                                     </span>
                                 @endif
                             </div>
