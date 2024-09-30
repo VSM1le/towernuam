@@ -69,6 +69,7 @@
                             <option value="">All</option>
                             <option value="Yes">Paid</option>
                             <option value="No">UnPaid</option>
+                            <option value="Cancel">Cancel</option>
 
                         </select>
                     </div> 

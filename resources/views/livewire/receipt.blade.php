@@ -1,9 +1,13 @@
 <div>
      <div class="flex justify-end">
+          <button type="button"
+            wire:click = "openReport"  
+            class="text-white bg-teal-400 hover:bg-teal-500 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-teal-400 dark:hover:bg-teal-500 focus:outline-none dark:focus:ring-teal-300">
+            Export Receipt</button>
             <button type="button"
             wire:click = "openCreateNoInvoice"  
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-            Receipt</button>
+            No Invoice</button>
             <button type="button"
             wire:click = "openCreateReceipt"  
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
@@ -499,6 +503,53 @@
         </form>
         </div>
 @endif 
+@if($showEditReceiptNoInvoice)
+        <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeEditReceipt"></div>
+        <form wire:submit.prevent="editReceiptNoInvioce" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 
+        :style="{ 'max-height': '400px', 'max-width' : '500px' }">
+            <div class="bg-orange-500 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
+                <div class="text-xl font-bold">Edit Receipt  : {{ $receiptNumber }} </div>
+                <button wire:click="closeEditReceipt" type="button" class="focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
+                <div class="flex justify-start w-full">
+                   <div class="w-48 ml-5 m-3">
+                        <label for="editDate" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">Invoice Date</label>
+                        <input id="editDate" wire:model="receiptDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    </div>
+                     <div class="w-48 ml-5 m-3">
+                        <label for="editReceiptNum" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">Receipt Number</label>
+                        <input id="editReceiptNum" wire:model="receiptNumber"  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                    </div>
+                </div>
+                   <div class="">
+                    <label for="customercode" class="text-xs">Customer code</label>
+                        <label class="w-40 text-sm font-medium text-gray-900"></label>
+                        <select id= "customercode" wire:model="editCustomer"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                            <option>Select Customer</option>
+                        @foreach ($this->customers as $customer)
+                            <option value="{{$customer->id}}">{{$customer->cust_code}} : {{$customer->cust_name_th}}</option>
+                        @endforeach
+                        </select>
+                          @error('editCustomer') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                         @enderror
+                </div> 
+            </div>
+            <div class="bg-gray-100 w-full flex justify-end p-4">
+                <div>
+                    <button type="submit" 
+                    class="text-white bg-orange-500 hover:bg-orange-400 focus:ring-4 focus:outline-none focus:ring-orange-600 font-medium rounded-lg text-sm px-5 py-2.5">save</button>
+                </div>
+            </div>
+        </form>
+        </div>
+@endif 
 @if($showCancelReceipt)
 <div class="fixed inset-0 p-4 flex flex-wrap justify-center items-center w-full h-full z-[1000] before:fixed before:inset-0 before:w-full before:h-full before:bg-[rgba(0,0,0,0.5)] overflow-auto font-[sans-serif]">
  <div class="fixed inset-0 bg-gray-300 opacity-40" wire:click="closeCancelReceipt"></div>
@@ -650,7 +701,7 @@
                                     </td>
                                 
                                 <td class="px-6 py-4">
-                                    <button type="button" wire:click="removeItem({{ $index }})" class="text-red-500 focus:outline-none">
+                                    <button type="button" wire:click="removeLine({{ $index }})" class="text-red-500 focus:outline-none">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
@@ -664,7 +715,7 @@
             </div> 
             <div class="w-80 mt-4">
                 <label class="w-40 text-sm font-medium text-gray-900"></label>
-                <select id= "customercode" wire:model.live="service"
+                <select id= "customercode" wire:model="service"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                     <option value="">Select Product</option>
                     @foreach ($this->productservices as $productservice)
@@ -691,7 +742,6 @@
                     wire:model="cheque.bank"  class="w-full p-2 border border-gray-300 text-sm rounded" 
                     wire:change="updateCheque('bank')"
                     /> 
-
                     @error('cheque.bank') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
@@ -734,4 +784,46 @@
 </form>
 </div>
 @endif 
+  @if($showExportReceipt)
+        <div class="fixed inset-0 bg-gray-300 opacity-40"  wire:click="closeReport"></div>
+        <form wire:submit.prevent="reportReceipt" class="flex flex-col justify-between bg-white rounded m-auto fixed inset-0" 
+        :style="{ 'max-height': '300px', 'max-width' : '500px' }">
+            <div class="bg-teal-400 text-white w-full px-4 py-3 flex items-center justify-between border-b border-gray-300">
+                <div class="text-xl font-bold">Export Invoice</div>
+                <button wire:click="closeReport" type="button" class="focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-grow bg-white w-full flex flex-col items-center justify-start overflow-y-auto">
+                <div class="flex justify-start w-full">
+                   <div class="w-full ml-5 m-3">
+                        <label for="exFromDate" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">From Date</label>
+                        <input id="exFronDate" wire:model="exFromDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                        @error('exFromDate')
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="w-full mr-5 m-3">
+                        <label for="exToDate" class="text-xs block uppercase tracking-wide text-gray-700 font-bold">To Date</label>
+                        <input id="exToDate" wire:model="exToDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                        @error('exToDate')
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-100 w-full flex justify-between p-4">
+                <div class="flex">
+                    
+                </div>
+                <div>
+                 <button type="submit" 
+        class="text-white bg-teal-400 hover:bg-teal-400 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5">Export</button>
+                </div>
+            </div>
+        </form>
+        </div>
+    @endif  
 </div>

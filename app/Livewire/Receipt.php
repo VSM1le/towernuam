@@ -43,9 +43,14 @@ class Receipt extends Component
     public $customer;
     public $receiptNumber;
     public $showEditReceipt = false;
+    public $showEditReceiptNoInvoice = false;
     public $editId;
     public $showCreateNoInvoice = false;
     public $service;
+    public $editCustomer;
+    public $exFromDate;
+    public $exToDate;
+    public $showExportReceipt = false;
 
     #[Computed()]
     public function productservices(){
@@ -91,6 +96,9 @@ class Receipt extends Component
         }
     }
     public function addline(){
+        $this->validate([
+            'service' => 'required'
+        ]);
 
         $productService =  ProductService::find($this->service);
 
@@ -103,6 +111,14 @@ class Receipt extends Component
             ,'vatamt'=> 0
             ,'whtaxamt' => 0
             ,'remark'=>''];
+    }
+     public function removeLine($index){
+        unset($this->receiptDetails[$index]);
+        $this->receiptDetails = array_values($this->receiptDetails);
+        $this->sumCheque = 0;
+        foreach($this->receiptDetails as $detail){
+            $this->sumCheque += $detail['payamt'];
+        }
     }
 
     public function mount(){
@@ -296,7 +312,14 @@ class Receipt extends Component
         $receiptHeader = ReceiptHeader::find($id);
         $this->receiptNumber = $receiptHeader->rec_no;
         $this->receiptDate = $receiptHeader->rec_date;
-        $this->showEditReceipt = true;
+
+        if($receiptHeader->rec_have_inv_flag === 0){
+            $this->editCustomer = $receiptHeader->customer_id;
+            $this->showEditReceiptNoInvoice = true;
+
+        }else{
+            $this->showEditReceipt = true;
+        }
     }
     public function editReceipt(){
         $this->validate([
@@ -315,10 +338,30 @@ class Receipt extends Component
             $this->closeEditReceipt();
         }
     }
+     public function editReceiptNoInvioce(){
+        $this->validate([
+            'receiptDate' => ['required'],
+            'editCustomer' => ['required'],
+        ]);
+        try{
+            ReceiptHeader::where('id',$this->editId)->update([
+                'rec_date' => $this->receiptDate,
+                'rec_no' => $this->receiptNumber,
+                'customer_id' => $this->editCustomer,
+            ]);
+             session()->flash('success', 'Updated successful.'); 
+        }catch(\Exception $e){
+             session()->flash('error', 'Failed to update receipt.'); 
+        }
+        finally{
+            $this->closeEditReceipt();
+        }
+    }
     public function closeEditReceipt(){
         $this->showEditReceipt = false;
+        $this->showEditReceiptNoInvoice = false;
         $this->receiptDate = null;
-        $this->reset('receiptNumber','editId');
+        $this->reset('receiptNumber','editId','editCustomer');
     }
     public function exportPdf($id){
         $number = new numberToBath;
@@ -580,10 +623,63 @@ class Receipt extends Component
         $this->sumCheque = 0;
         $this->resetValidation(); 
     }
+    public function openReport(){
+        $this->showExportReceipt = true;
+    }
+    public function closeReport(){
+        $this->showExportReceipt = false;
+    }
+    public function reportReceipt(){
+         $this->validate([
+            'exFromDate' => ['required','date'],
+            'exToDate' => ['required','date','after:exFromDate'],
+        ],
+        [
+            'exToDate.after' => "The TO DATE field must be a date after FROM DATE"
+        ]); 
+        $receipt = ReciptDetail::whereHas('receiptheader', function ($query) {
+            $query->whereDate('rec_date', '>=', $this->exFromDate)
+                  ->whereDate('rec_date', '<=', $this->exToDate);
+            })
+            ->with([
+                'invoicedetail',
+                'receiptheader',
+                'invoicedetail.invoiceheader',
+                'invoicedetail.invoiceheader.customerrental'
+            ])->get();
+
+        // Sum of rec_pay where rec_status is 'Yes'
+        $sumValidReceipt = $receipt->filter(function($detail) {
+            return $detail->receiptheader->rec_status === 'Yes';
+        })->sum('rec_pay');
+        $sumCancelReceipt = $receipt->filter(function($detail) {
+            return $detail->receiptheader->rec_status === 'Cancel';
+        })->sum('rec_pay');
+
+        $combineHtml = null;
+        $countPage = 0;
+        $chunks = $receipt->chunk(30);
+        $count = count($chunks);
+        foreach($chunks as $index => $chunk){
+            $report = view('invoicepdf.receiptreport',[
+                'startDate' => Carbon::parse($this->exFromDate)->format('d-m-Y'),
+                'endDate' => Carbon::parse($this->exToDate)->format('d-m-Y'),
+                'filteredDetails' => $chunk,
+                'sumPage' => $count,
+                'currentPage' => $index + 1,
+                'sumValidReceipt' => $sumValidReceipt,
+                'sumCancelReceipt' => $sumCancelReceipt
+            ]);
+            $combineHtml .= $report;
+            }
+        $pdf = PDF::loadHTML($combineHtml);
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        },'receipt_report.pdf'); 
+    }
 
     public function render()
     {
-
         $receipt = ReceiptHeader::with(['customer','receiptdetail'])
         ->when($this->startDate, function ($query) {
             $query->whereDate('rec_date','>=', $this->startDate);

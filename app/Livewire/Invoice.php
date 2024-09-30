@@ -831,12 +831,21 @@ public function closeCancelInvoice(){
         ->when($this->customer != "" ,function ($query){
             $query->where('customer_id',$this->customer);
         })
-         ->when($this->status != "", function ($query) {
-            $query->whereHas('invoicedetail', function ($detailQuery) {
-        }, '=', DB::raw('(SELECT COUNT(*) FROM invoice_details WHERE invoice_details.invoice_header_id =   invoice_headers.id)'));
+        ->when($this->status != "" && $this->status != "Cancel", function ($query) {
+        $query->where('inv_status', '!=', 'CANCEL') // Exclude 'close' statuses
+          ->whereHas('invoicedetail', function ($detailQuery) {
+              $detailQuery->where('invd_receipt_flag', $this->status);
+          }, '=', function ($subQuery) {
+              $subQuery->selectRaw('COUNT(*)')
+                       ->from('invoice_details')
+                       ->whereColumn('invoice_details.invoice_header_id', 'invoice_headers.id');
+          }); 
         }) 
+        ->when($this->status == "Cancel", function($query){
+            $query->where('inv_status' , $this->status);
+        })
         ->orderBy('id', 'desc')
         ->paginate(10);
-        return view('livewire.invoice',compact('invoices'));
+        return view('livewire.invoice',compact('invoices')); 
     }
 }

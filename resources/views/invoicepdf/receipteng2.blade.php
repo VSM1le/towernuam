@@ -270,13 +270,20 @@
              <tbody>
                 <tr style="height: 200px;">
                     <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
-                        @foreach ( $receiptdetails as $index => $receipt)
-                           <p style="font-size:18px; position: relative;">
-                           {{$index + 1 }}. {{App\Models\ProductService::where('ps_code', $receipt->recd_product_code)->pluck('ps_name_en')->first() }}
-                            @if ($receipt->recd_remake)
-                                 - {{ $receipt->recd_remake  }} 
-                            @endif
-                            </p> 
+                         @foreach ($receiptdetails as $index => $receipt)
+                            <div style="font-size: 18px; position: relative; padding-right: 100px;">
+                                {{$index + 1}} . {{App\Models\ProductService::where('ps_code', $receipt->recd_product_code)->pluck('ps_name_en')->first() }} 
+
+                                @if (strlen($receipt->recd_remark) < 20 && $receipt->recd_remark)
+                                    - {{ $receipt->recd_remark}}
+                                @endif
+                                
+                                @if (strlen($receipt->recd_remark) >= 20 )
+                                    <span style="position: absolute; left: 0; margin-top: 15px; width: 100%;">
+                                        {{ $receipt->recd_remark}} 
+                                    </span>
+                                @endif
+                            </div>
                         @endforeach
                     </td>
                    <td style="vertical-align: top; width: 100px; text-align: right; border-right: 1px solid #000;">
@@ -531,16 +538,27 @@
             <tbody>
                 <tr style="height: 200px;">
                     <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
-                        @foreach ( $receiptdetails as $index => $receipt)
-                           <p style="font-size:18px; position: relative;">
-                           {{$index + 1 }}. {{App\Models\ProductService::where('ps_code', $receipt->invoicedetail->invd_product_code)->pluck('ps_name_en')->first() }}
-                            @if ($receipt->invoicedetail->invd_remake)
-                                 - {{ $receipt->invoicedetail->invd_remake  }} 
-                            @endif
-                            <span style="position: absolute; right: 15px;">
-                                {{ $receipt->invoicedetail->invoiceheader->inv_no }}
-                            </span>
-                            </p> 
+                          @foreach ($receiptdetails as $index => $receipt)
+                            <div style="font-size: 18px; position: relative; padding-right: 100px;">
+                                {{$index + 1}}. {{App\Models\ProductService::where('ps_code', $receipt->invoicedetail->invd_product_code)->pluck('ps_name_en')->first() }} 
+                                
+                                <!-- Short remake inline if it's less than 30 characters -->
+                                @if (strlen($receipt->invoicedetail->invd_remake) < 20 && $receipt->invoicedetail->invd_remake)
+                                    - {{ $receipt->invoicedetail->invd_remake }}
+                                @endif
+
+                                <!-- Invoice number aligned to the right -->
+                                <span style="position: absolute; right: 15px; top: 0;">
+                                    {{ $receipt->invoicedetail->invoiceheader->inv_no }}
+                                </span>
+
+                                <!-- If remake is too long, position it on the next line using relative positioning -->
+                                @if (strlen($receipt->invoicedetail->invd_remake) >= 20)
+                                    <span style="position: absolute; left: 0; margin-top: 15px; width: 100%;">
+                                        {{ $receipt->invoicedetail->invd_remake }}
+                                    </span>
+                                @endif
+                            </div>
                         @endforeach
                     </td>
                    <td style="vertical-align: top; width: 100px; text-align: right; border-right: 1px solid #000;">
