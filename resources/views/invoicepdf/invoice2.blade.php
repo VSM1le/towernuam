@@ -273,12 +273,8 @@
                          @foreach ($receiptdetails as $index => $receipt)
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
                                 {{$index + 1}}. {{ $receipt->recd_product_name}}
-
-                                @if (mb_strlen($receipt->recd_remark) < 25 && $receipt->recd_remark)
-                                    - {{ $receipt->recd_remark}}
-                                @endif
                                 
-                                @if (mb_strlen($receipt->recd_remark) >= 25 )
+                                @if ($receipt->recd_remark )
                                     <span style="position: absolute; left: 0; margin-top: 15px; width: 100%;">
                                         {{ $receipt->recd_remark}} 
                                     </span>
@@ -542,18 +538,13 @@
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
                                 {{$index + 1}}. {{ $receipt->invoicedetail->invd_product_name }}
                                 
-                                <!-- Short remake inline if it's less than 30 characters -->
-                                @if (mb_strlen($receipt->invoicedetail->invd_remake) < 25 && $receipt->invoicedetail->invd_remake)
-                                    - {{ $receipt->invoicedetail->invd_remake }}
-                                @endif
-
                                 <!-- Invoice number aligned to the right -->
                                 <span style="position: absolute; right: 15px; top: 0;">
                                     {{ $receipt->invoicedetail->invoiceheader->inv_no }}
                                 </span>
 
                                 <!-- If remake is too long, position it on the next line using relative positioning -->
-                                @if (mb_strlen($receipt->invoicedetail->invd_remake) >= 25 )
+                                @if ($receipt->invoicedetail->invd_remake)
                                     <span style="position: absolute; left: 0; margin-top: 15px; width: 100%;">
                                         {{ $receipt->invoicedetail->invd_remake }}
                                     </span>
