@@ -85,7 +85,22 @@ class BillWE extends Component
         $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
         $totalSalesQuery = null;
         if($this->typeQuery == "7"){
-            $totalSalesQuery = DB::raw('SUM(p_unit * (price_unit /  0.041666667)) as total_sales');
+            $totalSalesQuery = DB::raw("
+                SUM(
+                    CASE 
+                        -- Convert p_unit to hours (p_unit * 24) and extract fractional minutes
+                        WHEN ((p_unit * 24 - FLOOR(p_unit * 24)) * 60) <= 15 THEN 
+                            FLOOR(p_unit * 24) * (price_unit)
+                            
+                        WHEN ((p_unit * 24 - FLOOR(p_unit * 24)) * 60) BETWEEN 16 AND 45 THEN
+                            (FLOOR(p_unit * 24) + 0.5) * (price_unit)
+                            
+                        ELSE 
+                            CEIL(p_unit * 24) * (price_unit)
+                    END
+                ) as total_sales
+            "); 
+            
         } else {
             $totalSalesQuery = DB::raw('SUM(p_unit * price_unit) as total_sales');
         }
@@ -108,6 +123,7 @@ class BillWE extends Component
                 'due_date',
             )
             ->get(); 
+        dd($sumBill);
         $prefix = 'IAS';
         $year = Carbon::parse($this->monthYear)->format('Y');
         $datePart = substr($year, -2) . Carbon::parse($this->monthYear)->format('m');
@@ -338,7 +354,6 @@ class BillWE extends Component
             $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
             }
         }
-        // dd($data);
         $combinedHtml = null;
         $uniqueContract = $data->unique('real_contract')->pluck('real_contract');
         foreach ($uniqueContract as $item) {
@@ -353,7 +368,14 @@ class BillWE extends Component
                         $hours += 1;
                         $minutes = 0;
                     }
-                    $item->amt = round($item->p_unit * ($item->price_unit / 0.041666667),2);
+                    $minutes_cal = round(($item->p_unit * 24 - floor($item->p_unit * 24)) * 60,0); // Calculate minutes
+                    if ($minutes_cal <= 15) {
+                        $item->amt = round(floor($item->p_unit * 24) * $item->price_unit, 2);
+                    } elseif ($minutes_cal >= 16 && $minutes_cal <= 45) {
+                        $item->amt = round((floor($item->p_unit * 24) + 0.5) * $item->price_unit, 2);
+                    } else {
+                        $item->amt = round(ceil($item->p_unit * 24) * $item->price_unit, 2);
+                    }
                     $item->hourM =  $item->hourM = $hours . ":" . sprintf('%02d', $minutes); 
                     return $item;
                  });

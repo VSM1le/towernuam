@@ -72,7 +72,7 @@ class Cusrent extends Component
         $this->contractRNumber = $contract->custr_contract_no_real; 
         $this->unit = $contract->custr_unit;
         $this->areaSqm = $contract->custr_area_sqm;
-        $this->rentalFee = $contract->custr_service_fee;
+        $this->rentalFee = $contract->custr_rental_fee;
         $this->serviceFee = $contract->custr_service_fee;
         $this->equipFee = $contract->custr_equipment_fee;
         $this->startDate = $contract->custr_begin_date2;
