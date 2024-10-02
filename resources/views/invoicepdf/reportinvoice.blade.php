@@ -130,56 +130,54 @@
             </thead>
             <tbody>
                 @foreach ($filteredDetails as $detail )
-                <tr style="vertical-align: top;">
-                    <td class="td-inv" style="height: 15px; vertical-align: top;">
-                       <p class="test">{{ $loop->iteration }}</p>
-                    </td>
-                    <td class="td-inv" style="height: 15px; vertical-align: top;">
-                       <p class="test">{{ $detail->invoiceheader->inv_no ?? null }}</p>
-                    </td>
-                    <td class="td-inv"tyle="text-align: center">
-                        <p class="test">{{  Carbon\Carbon::parse($detail->invoiceheader->inv_date)->format('d-m-Y') ?? null }}</p>
-                    </td>
-                    <td class="td-inv">
-                        <p class="test">{{ Str::limit($detail->invoiceheader->customer->cust_name_th ?? null,35) }}</p> 
-                    </td>
-                    <td class="td-inv">
-                        <p class="test">{{ $detail->invoiceheader->customerrental->custr_contract_no ?? null }}</p>
-                    </td>
-                    <td class="td-inv">
-                        <p class="test" style="text-align: right">{{ number_format($detail->invd_amt ?? 0, 2, '.', ',') }}</p>
-                    </td>
-                    <td class="td-inv">
-                        <p class="test" style="text-align: right">{{ number_format($detail->invd_vat_amt ?? 0,2,'.',',')}}</p>
+                    <tr style="vertical-align: top; @if($detail->invoiceheader->inv_status == 'CANCEL') color: red; @endif">
+                        <td class="td-inv" style="height: 15px; vertical-align: top;">
+                            <p class="test">{{ $loop->iteration }}</p>
                         </td>
-                    <td class="td-inv">
-                        <p class="test" style="text-align: right">{{ number_format($detail->invd_wh_tax_amt ?? 0,2,'.',',')}}</p>
-                    </td>
-                     <td class="td-inv">
-                        <p class="test" style="text-align: right">{{ number_format($detail->invd_net_amt ?? 0,2,'.',',')}}</p>
-                    </td>
-                    <td class="td-inv" style="text-align: center">
-                        <p class="test">{{  Carbon\Carbon::parse($detail->invoiceheader->invd_duedate)->format('d-m-Y') ?? null }}</p>
-                    </td>
-                    <td class="td-inv" style="text-align: center">
-                        <p class="test">{{ $detail->invd_receipt_flag ?? null}}</p>
-                    </td>
-                    <td class="td-inv">
-                        <p class="test" style="text-align: right">{{ number_format($detail->invd_receipt_amt ?? 0,2,'.',',')}}</p>
-                    </td>
-                    <td class="td-inv">
-                       <p class="test" style="text-align: center">
-                        {{ $detail->overdue }}
-                       </p>
-                    </td>
-                    <td class="td-inv">
-                       <p class="test">{{ $detail->invd_remark ?? null}}</p>
-                    </td>
-                    <td class="td-inv"style="text-align: center">
-                       <p class="test">{{ $detail->invoiceheader->inv_status ?? null }}</p>
-                    </td>
-                </tr>
-                @endforeach
+                        <td class="td-inv" style="height: 15px; vertical-align: top;">
+                            <p class="test">{{ $detail->invoiceheader->inv_no ?? null }}</p>
+                        </td>
+                        <td class="td-inv" style="text-align: center;">
+                            <p class="test">{{ Carbon\Carbon::parse($detail->invoiceheader->inv_date)->format('d-m-Y') ?? null }}</p>
+                        </td>
+                        <td class="td-inv">
+                            <p class="test">{{ Str::limit($detail->invoiceheader->customer->cust_name_th ?? null, 35) }}</p> 
+                        </td>
+                        <td class="td-inv">
+                            <p class="test">{{ $detail->invoiceheader->customerrental->custr_contract_no ?? null }}</p>
+                        </td>
+                        <td class="td-inv">
+                            <p class="test" style="text-align: right;">{{ number_format($detail->invd_amt ?? 0, 2, '.', ',') }}</p>
+                        </td>
+                        <td class="td-inv">
+                            <p class="test" style="text-align: right;">{{ number_format($detail->invd_vat_amt ?? 0, 2, '.', ',') }}</p>
+                        </td>
+                        <td class="td-inv">
+                            <p class="test" style="text-align: right;">{{ number_format($detail->invd_wh_tax_amt ?? 0, 2, '.', ',') }}</p>
+                        </td>
+                        <td class="td-inv">
+                            <p class="test" style="text-align: right;">{{ number_format($detail->invd_net_amt ?? 0, 2, '.', ',') }}</p>
+                        </td>
+                        <td class="td-inv" style="text-align: center;">
+                            <p class="test">{{ Carbon\Carbon::parse($detail->invoiceheader->invd_duedate)->format('d-m-Y') ?? null }}</p>
+                        </td>
+                        <td class="td-inv" style="text-align: center;">
+                            <p class="test">{{ $detail->invd_receipt_flag ?? null }}</p>
+                        </td>
+                        <td class="td-inv">
+                            <p class="test" style="text-align: right;">{{ number_format($detail->invd_receipt_amt ?? 0, 2, '.', ',') }}</p>
+                        </td>
+                        <td class="td-inv">
+                            <p class="test" style="text-align: center;">{{ $detail->overdue }}</p>
+                        </td>
+                        <td class="td-inv">
+                            <p class="test">{{ $detail->invd_remark ?? null }}</p>
+                        </td>
+                        <td class="td-inv" style="text-align: center;">
+                            <p class="test">{{ $detail->invoiceheader->inv_status ?? null }}</p>
+                        </td>
+                    </tr>
+                    @endforeach
                 @for($i = count($filteredDetails);$i < 29; $i++)
                 <tr>
                     <td class="td-inv" style="height: 15px"></td>

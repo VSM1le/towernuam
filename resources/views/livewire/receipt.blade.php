@@ -283,7 +283,7 @@
                         <select id= "customercode" wire:model.live="customerCode"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                             <option>Select Customer</option>
-                        @foreach ($this->customers as $customer)
+                        @foreach ($this->customerInvoices as $customer)
                             <option value="{{$customer->id}}">{{$customer->cust_code}} : {{$customer->cust_name_th}}</option>
                         @endforeach
                         </select>

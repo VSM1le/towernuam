@@ -61,6 +61,17 @@ class Receipt extends Component
     public function customers(){
         return Customer::orderBy('cust_code')->get();
     }
+
+    #[Computed()]
+    public function customerInvoices(){
+        return Customer::whereHas('invoiceheader',function($query){
+            return $query->where('inv_status','=','USE')
+                ->whereHas('invoicedetail',function($detail){
+                    return $detail->where('invd_receipt_flag','=','No')->orWhere('invd_receipt_flag','=','Partial'); 
+            });
+        })->get();
+    }
+
      private function sanitizeNumericValue($value)
     {
         $sanitizedValue = preg_replace('/[^-?\d.]/', '', $value);

@@ -585,10 +585,13 @@ public function closeCancelInvoice(){
             $invoiceFiltereds = $invoices->flatMap(function ($filter) use($unique){
                 return $filter->invoicedetail->where('invd_product_code',$unique);
             }); 
-            $sumInvoice->amount =  $invoiceFiltereds->sum('invd_amt');
-            $sumInvoice->vatAmt =  $invoiceFiltereds->sum('invd_vat_amt');
-            $sumInvoice->whAmt =  $invoiceFiltereds->sum('invd_wh_tax_amt');
-            $sumInvoice->netAmt =  $invoiceFiltereds->sum('invd_net_amt');
+            $forSum = $invoiceFiltereds->filter(function($query){
+                return $query->invoiceheader->where('inv_status','USE');
+            });
+            $sumInvoice->amount =  $forSum->sum('invd_amt');
+            $sumInvoice->vatAmt =  $forSum->sum('invd_vat_amt');
+            $sumInvoice->whAmt =  $forSum->sum('invd_wh_tax_amt');
+            $sumInvoice->netAmt =  $forSum->sum('invd_net_amt');
             $chunks = $invoiceFiltereds->chunk(30);
             foreach ($chunks as $index => $chunk) {
                 $chunk = $chunk->map(function ($detail) use($exToDate){
@@ -609,7 +612,6 @@ public function closeCancelInvoice(){
                 }
                 return $detail;
             });
-                // dd($chunk);
                 if ($index < $chunks->count() - 1) {
                     $report = view('invoicepdf.reportinvoice', [
                     'startDate' => Carbon::parse($edFromDate)->format('d-m-Y'),
@@ -636,10 +638,13 @@ public function closeCancelInvoice(){
         $allDetails = $invoices->flatMap(function($invoice) {
             return $invoice->invoicedetail;
         });
-        $sumAllInvoice->amount =  $allDetails->sum('invd_amt');
-        $sumAllInvoice->vatAmt =  $allDetails->sum('invd_vat_amt');
-        $sumAllInvoice->whAmt =  $allDetails->sum('invd_wh_tax_amt');
-        $sumAllInvoice->netAmt =  $allDetails->sum('invd_net_amt');
+        $forSum = $allDetails->filter(function($query){
+            return $query->invoiceheader->inv_status == 'USE';
+        });
+        $sumAllInvoice->amount =  $forSum->sum('invd_amt');
+        $sumAllInvoice->vatAmt =  $forSum->sum('invd_vat_amt');
+        $sumAllInvoice->whAmt =  $forSum->sum('invd_wh_tax_amt');
+        $sumAllInvoice->netAmt =  $forSum->sum('invd_net_amt');
 
         $chunks = $allDetails->chunk(30);
         foreach($chunks as $index => $chunk){

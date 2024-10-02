@@ -223,7 +223,7 @@
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;">Received From</p>
                             </td>
                             <td style="vertical-align: top; font-size: 18px;width:49% ">
-                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Receipt->customer->cust_name_th ?? null }}</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Receipt->customer->cust_name_en ?? null }}</p>
                             </td>
                             <td style="vertical-align: top; font-size: 18px; ;">
                                 <p style="margin: 0; font-size: 18px; line-height: 0.7;">เลขที่สัญญา {{ $Receipt->receiptdetail->first()->invoicedetail->invoiceheader
@@ -293,10 +293,12 @@
                     <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                          @foreach ($receiptdetails as $index => $receipt)
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
-                                {{$index + 1}} . {{App\Models\ProductService::where('ps_code', $receipt->recd_product_code)->pluck('ps_name_en')->first() }} 
+                                <span style="white-space: nowrap">
+                                    {{$index + 1}} . {{App\Models\ProductService::where('ps_code', $receipt->recd_product_code)->pluck('ps_name_en')->first() }} 
+                                </span>
 
                                 @if ($receipt->recd_remark)
-                                    <span style="position: absolute; left: 0; margin-top: 15px; width: 100%;">
+                                  <span style="position: absolute; left: 0; top: 0; white-space: nowrap; transform: translateY(50%);">
                                     &nbsp;&nbsp;&nbsp; - {{ $receipt->recd_remark}} 
                                     </span>
                                 @endif
@@ -557,7 +559,9 @@
                     <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                          @foreach ($receiptdetails as $index => $receipt)
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
-                                {{$index + 1}}. {{App\Models\ProductService::where('ps_code', $receipt->invoicedetail->invd_product_code)->pluck('ps_name_en')->first() }} 
+                                <span>
+                                    {{$index + 1}}. {{App\Models\ProductService::where('ps_code', $receipt->invoicedetail->invd_product_code)->pluck('ps_name_en')->first() }} 
+                                </span>
                                 
                                 <!-- Invoice number aligned to the right -->
                                 <span style="position: absolute; right: 15px; top: 0;">
@@ -566,7 +570,7 @@
 
                                 <!-- If remake is too long, position it on the next line using relative positioning -->
                                 @if ($receipt->invoicedetail->invd_remake)
-                                    <span style="position: absolute; left: 0; margin-top: 15px; width: 100%;">
+                                    <span style="position: absolute; left: 0; top: 0; white-space: nowrap; transform: translateY(50%);">
                                     &nbsp;&nbsp;&nbsp; - {{ $receipt->invoicedetail->invd_remake }}
                                     </span>
                                 @endif

@@ -239,11 +239,16 @@
                 <tr style="height: 200px;">
                     <td style="height:390px;width: 280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ( $Invoices->invoicedetail as $index => $invoice )
-                            <p style="font-size:18px">{{ $index + 1}}. {{ $invoice->invd_product_name }}
+                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
+                                <span style="white-space: nowrap">
+                                    {{ $index + 1}}. {{ $invoice->invd_product_name }}
+                                </span>
                                 @if ($invoice->invd_remake)
-                                 - {{ $invoice->invd_remake  }} 
+                                    <span style="position: absolute; left: 0; top: 0; white-space: nowrap; transform: translateY(50%);">
+                                        &nbsp;&nbsp;&nbsp; - {{ $invoice->invd_remake }}
+                                    </span> 
                                 @endif
-                            </p>
+                            </div> 
                         @endforeach
                     </td>
                     <td style="width: 140px; text-align: center; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">

@@ -272,14 +272,16 @@
                     <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                          @foreach ($receiptdetails as $index => $receipt)
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
-                                {{$index + 1}}. {{ $receipt->recd_product_name}}
-                                
-                                @if ($receipt->recd_remark )
-                                    <span style="position: absolute; left: 0; margin-top: 15px; width: 100%;">
+                                <span style="white-space: nowrap">
+                                    {{$index + 1}}. {{ $receipt->recd_product_name}}
+                                </span>
+
+                                @if ($receipt->recd_remark)
+                                    <span style="position: absolute; left: 0; top: 0; white-space: nowrap; transform: translateY(50%);">
                                     &nbsp;&nbsp;&nbsp; - {{ $receipt->recd_remark}} 
                                     </span>
                                 @endif
-                            </div>
+                            </div> 
                         @endforeach
                     </td>
                    <td style="vertical-align: top; width: 100px; text-align: right; border-right: 1px solid #000;">
@@ -536,8 +538,10 @@
                     <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ($receiptdetails as $index => $receipt)
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
+                                <span style="white-space: nowrap">
                                 {{$index + 1}}. {{ $receipt->invoicedetail->invd_product_name }}
-                                
+                                </span>
+
                                 <!-- Invoice number aligned to the right -->
                                 <span style="position: absolute; right: 15px; top: 0;">
                                     {{ $receipt->invoicedetail->invoiceheader->inv_no }}
@@ -545,11 +549,11 @@
 
                                 <!-- If remake is too long, position it on the next line using relative positioning -->
                                 @if ($receipt->invoicedetail->invd_remake)
-                                    <span style="position: absolute; left: 0; margin-top: 15px; width: 100%;">
-                                    &nbsp;&nbsp;&nbsp; - {{ $receipt->invoicedetail->invd_remake }}
+                                    <span style="position: absolute; left: 0; top: 0; white-space: nowrap; transform: translateY(50%);">
+                                        &nbsp;&nbsp;&nbsp; - {{ $receipt->invoicedetail->invd_remake }}
                                     </span>
                                 @endif
-                            </div>
+                            </div> 
                         @endforeach
                     </td>
                    <td style="vertical-align: top; width: 100px; text-align: right; border-right: 1px solid #000;">

@@ -180,7 +180,7 @@
                             <td style="vertical-align: top; font-size: 18px;width:43% ">
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Invoices->customerrental->custr_contract_no_real ?? "-" }}</p>
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;"><br></p>
-                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Invoices->customer->cust_name_th }}</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $Invoices->customer->cust_name_en }}</p>
 
                             </td>
                             <td style="vertical-align: top; font-size: 18px; ;">
@@ -238,11 +238,16 @@
                 <tr style="height: 200px;">
                     <td style="height:390px;width: 280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ( $Invoices->invoicedetail as $index => $invoice )
-                            <p style="font-size:18px">{{$index + 1}}. {{ App\Models\ProductService::where('ps_code', $invoice->invd_product_code)->pluck('ps_name_en')->first() }}
-                            @if ($invoice->invd_remake)
-                             - {{ $invoice->invd_remake  }} 
-                            @endif
-                            </p>
+                            <div style="font-size: 18px; position: relative; padding-right: 100px;">
+                                <span style="white-space: nowrap">
+                                    {{ $index + 1}}. {{ $invoice->invd_product_name }}
+                                </span>
+                                @if ($invoice->invd_remake)
+                                    <span style="position: absolute; left: 0; top: 0; white-space: nowrap; transform: translateY(50%);">
+                                        &nbsp;&nbsp;&nbsp; - {{ $invoice->invd_remake }}
+                                    </span> 
+                                @endif
+                            </div> 
                         @endforeach
                     </td>
                     <td style="width: 140px; text-align: center; border-bottom: 1px solid #000;border-right:1px solid #000;vertical-align:top;">

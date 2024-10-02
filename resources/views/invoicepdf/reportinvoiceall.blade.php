@@ -127,7 +127,7 @@
             </thead>
             <tbody>
               @foreach ($filteredDetails as $detail )
-                <tr style="vertical-align: top;">
+                <tr style="vertical-align: top;@if($detail->invoiceheader->inv_status == 'CANCEL') color: red; @endif">
                     <td class="td-inv" style="height: 15px; vertical-align: top;">
                        <p class="test">{{ $loop->iteration }}</p>
                     </td>

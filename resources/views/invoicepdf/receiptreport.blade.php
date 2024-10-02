@@ -124,7 +124,6 @@
                     <th class="th-inv">Vat Amt</th>
                     <th class="th-inv">Whtax Amt</th>
                     <th class="th-inv" style="width: 70px">Paid Amt</th>
-                    <th class="th-inv">Remark</th>
                     <th class="th-inv">
                         <p>Receipt </p>
                         <p style="line-height: 10px">Status</p>
@@ -135,7 +134,7 @@
             <tbody>
                 @foreach ($filteredDetails as $detail )
                 @if ($detail->receiptheader->rec_have_inv_flag != "0")
-                <tr style="vertical-align: top;">
+                <tr style="vertical-align: top;@if($detail->receiptheader->rec_status == 'Cancel') color: red; @endif">
                     <td class="td-inv" style="height: 15px; vertical-align: top;">
                        <p class="test">{{ $loop->iteration }}</p>
                     </td>
@@ -172,16 +171,13 @@
                      <td class="td-inv">
                         <p class="test" style="text-align: right">{{ number_format($detail->rec_pay ?? 0,2,'.',',')}}</p>
                     </td>
-                    <td class="td-inv">
-                       <p class="test">{{ $detail->invoicedetail->invd_remark ?? null}}</p>
-                    </td>
                     <td class="td-inv"style="text-align: center">
                        <p class="test">{{ $detail->receiptheader->rec_status ?? null }}</p>
                     </td>
                 </tr>
  
                 @else 
-                <tr style="vertical-align: top;">
+                <tr style="vertical-align: top;@if($detail->receiptheader->rec_status == 'Cancel') color: red; @endif">
                     <td class="td-inv" style="height: 15px; vertical-align: top;">
                        <p class="test">{{ $loop->iteration }}</p>
                     </td>
@@ -212,9 +208,6 @@
                      <td class="td-inv">
                         <p class="test" style="text-align: right">{{ number_format($detail->rec_pay ?? 0,2,'.',',')}}</p>
                     </td>
-                    <td class="td-inv">
-                       <p class="test"></p>
-                    </td>
                     <td class="td-inv"style="text-align: center">
                        <p class="test">{{ $detail->receiptheader->rec_status ?? null }}</p>
                     </td>
@@ -224,7 +217,6 @@
                 @for($i = count($filteredDetails);$i < 29; $i++)
                 <tr>
                     <td class="td-inv" style="height: 15px"></td>
-                    <td class="td-inv"></td>
                     <td class="td-inv"></td>
                     <td class="td-inv"></td>
                     <td class="td-inv"></td>
@@ -247,7 +239,7 @@
                         Paid Amount : {{ number_format($sumValidReceipt ?? 0,2,'.',',') }} 
                     </th>
                     <th style="text-align: center; background-color:white; width:250px">
-                        Cancel Paid Amount : {{ number_format($sumCancelReceipt ?? 0,2,'.',',') }} 
+                        Cancel Amount : {{ number_format($sumCancelReceipt ?? 0,2,'.',',') }} 
                     </th>
                 </tr>
              </tbody>

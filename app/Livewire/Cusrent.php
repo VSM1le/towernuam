@@ -11,6 +11,7 @@ use Livewire\WithPagination;
 class Cusrent extends Component
 {
     use WithPagination;
+    public $searchContract;
 
     public $customerId;
     public $contractNumber;
@@ -108,7 +109,15 @@ class Cusrent extends Component
     {
         $rentals = CustomerRental::whereHas('customer',function($query){
             $query->orderBy('cust_code');
-        })->paginate(10);
+        })
+        ->when($this->searchContract,function($query){
+            $query->where('custr_contract_no','like','%'.$this->searchContract.'%')
+                ->orWhereHas('customer',function($subquery){
+                    $subquery->where('cust_name_th','like','%'.$this->searchContract.'%')
+                        ->orWhere('cust_code','like','%'.$this->searchContract.'%');
+                });
+        })
+        ->paginate(10);
         return view('livewire.cusrent',compact('rentals'));
     }
 }

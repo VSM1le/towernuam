@@ -10,6 +10,7 @@ class Customer extends Component
 {
     use WithPagination;
 
+    public $searchCustomer;
     public $showCreateCustomer = false;
     public $custCode;
     public $taxId;
@@ -112,7 +113,12 @@ class Customer extends Component
 
     public function render()
     {
-        $customers = ModelsCustomer::orderBy('cust_code')->paginate(10);
+        $customers = ModelsCustomer::when($this->searchCustomer , function($query){
+            $query->where('cust_code','like','%'.$this->searchCustomer.'%')
+                ->orWhere('cust_name_th','like','%'.$this->searchCustomer.'%')
+                ->orWhere('cust_name_en','like','%'.$this->searchCustomer.'%')
+                ->orWhere('cust_taxid','like','%'.$this->searchCustomer.'%');
+        })->orderBy('cust_code')->paginate(10);
         return view('livewire.customer' , compact('customers'));
     }
 }
