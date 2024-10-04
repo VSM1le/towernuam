@@ -123,7 +123,6 @@ class BillWE extends Component
                 'due_date',
             )
             ->get(); 
-        dd($sumBill);
         $prefix = 'IAS';
         $year = Carbon::parse($this->monthYear)->format('Y');
         $datePart = substr($year, -2) . Carbon::parse($this->monthYear)->format('m');
@@ -167,7 +166,7 @@ class BillWE extends Component
             $period = $periodPs->invoicePeriod($this->monthYear, $ps_group); 
             $p_wh = $product->ps_whtax ?? 0;
         }
-
+        try{
         foreach($sumBill as $index => $bill){
             $contractInfo = CustomerRental::where('custr_contract_no',$bill->contract_no)->first(); 
             $amt = round($bill->total_sales,2);
@@ -211,7 +210,12 @@ class BillWE extends Component
                 'updated_by' => auth()->id(),
             ]);
         }
-        $this->closeGenInvoice();
+            session()->flash('success', ' Generate invoice successful.'); 
+        }catch(\Exception $e){
+            session()->flash('error', ' Something when wrong can not generate invoice.'); 
+        }finally{
+            $this->closeGenInvoice();
+        }
     }
 
     public function exportGroupByContract()
