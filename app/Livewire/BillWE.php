@@ -387,7 +387,7 @@ class BillWE extends Component
                 $vat_amt = round(($filteredItems->sum('amt') * $vat) / 100,2);
             }else{
                 $filteredItems = $filteredItems->map(function($item){
-                    $item->amt = round($item->p_unit * $item->price_unit);
+                    $item->amt = round($item->p_unit * $item->price_unit,2);
                     return $item;
                 });
                 $total_amt = $filteredItems->sum('amt');
