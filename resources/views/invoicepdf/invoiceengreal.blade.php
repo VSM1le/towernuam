@@ -240,7 +240,7 @@
                         @foreach ( $Invoices->invoicedetail as $index => $invoice )
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
                                 <span style="white-space: nowrap">
-                                    {{ $index + 1}}. {{ $invoice->invd_product_name }}
+                                    {{ $index + 1}}. {{App\Models\ProductService::where('ps_code', $invoice->invd_product_code)->pluck('ps_name_en')->first() }}   
                                 </span>
                                 @if ($invoice->invd_remake)
                                     <span style="position: absolute; left: 0; top: 0; white-space: nowrap; transform: translateY(50%);">
