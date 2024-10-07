@@ -130,12 +130,12 @@
             </tr>
             <tr>
                 <td>
-                    <p class="desc">Tax ID: {{$customer->cust_taxid}}</p>
+                    <p class="desc">Tax ID : {{$customer->cust_taxid}}</p>
                 </td>
 
             </tr>
             <tr>
-                <p class="desc">Address: {{ $customer->cust_address_th1}} {{$customer->cust_address_th2}}</p>
+                <p class="desc">Address: {{ $customer->cust_address_th1}} {{$customer->cust_address_th2}} {{$customer->cust_branch}} {{$customer->cust_zipcode}}</p>
             </tr>
         </table>
         <table class="content-table">
