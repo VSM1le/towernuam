@@ -179,10 +179,10 @@
                 @foreach ($customer->customercontract as $contract)
                         @foreach ($contract->listcust as $detail)
                         <tr>
-                            <td style="padding: 5px; text-align: center; border: 1px solid #000;">{{ $contract->custr_contract_no}}</td>
-                            <td style="padding: 10px; text-align: center; border: 1px solid #000;">{{ $detail->productservice->ps_code}}:{{$detail->productservice->ps_name_th}}</td>
-                            <td style="padding: 10px; text-align: center; border: 1px solid #000;">{{ $detail->lcr_area_sqm }}</td>
-                            <td style="padding: 10px; text-align: center; border: 1px solid #000;">{{ $detail->lcr_rental_fee }}</td>
+                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $contract->custr_contract_no}}</td>
+                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $detail->productservice->ps_code}}:{{$detail->productservice->ps_name_th}}</td>
+                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $detail->lcr_area_sqm }}</td>
+                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $detail->lcr_rental_fee }}</td>
                         </tr>
                         @endforeach
                 @endforeach
