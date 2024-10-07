@@ -213,7 +213,7 @@
                 <div class="w-48 ml-5">
                     <label for="receiptDate" class="text-xs">Receipt Date</label>
                     <input id="receiptDate" wire:model="receiptDate" type="date" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
-                    @error('dueDate') 
+                    @error('receiptDate') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror 
                 </div>
