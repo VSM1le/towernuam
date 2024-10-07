@@ -269,7 +269,7 @@
             @if ($Receipt->rec_have_inv_flag == '0')
             <tbody>
                 <tr style="height: 200px;">
-                    <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
+                    <td style="height:250px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                          @foreach ($receiptdetails as $index => $receipt)
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
                                 <span style="white-space: nowrap">
@@ -535,7 +535,7 @@
             @else 
             <tbody>
                 <tr style="height: 200px;">
-                    <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
+                    <td style="height:250px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ($receiptdetails as $index => $receipt)
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
                                 <span style="white-space: nowrap">

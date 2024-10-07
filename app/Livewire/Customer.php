@@ -5,6 +5,9 @@ namespace App\Livewire;
 use App\Models\Customer as ModelsCustomer;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Customer extends Component
 {
@@ -28,6 +31,7 @@ class Customer extends Component
     
     public $showEditCustomer = false;
     public $editId;
+    public $custStatus;
 
     public function openCreateCustomer(){
         $this->showCreateCustomer = true;
@@ -110,6 +114,54 @@ class Customer extends Component
         $this->autoInv = 'Y';
         $this->showEditCustomer = false;
     }
+    public function exportCustomer(){
+        $customers = ModelsCustomer::get(); 
+        $Html = view('invoicepdf.customerreport',[
+            'customers' => $customers,
+            ])->render();
+        $pdf = pdf::loadHTML($Html);
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        },  'pdfbill.pdf'); 
+    }
+    public function activeCustomer($id){
+        try{
+            ModelsCustomer::where('id',$id)->update([
+                'cust_status' => true
+            ]);
+            session()->flash('success','Update status customer successful');
+        }catch(\Exception $e){
+            session()->flash('error', 'Something went wrong'.$e->getMessage());
+        }
+    }
+    public function inactiveCustomer($id){
+        // dd('test');
+        try{
+            ModelsCustomer::where('id',$id)->update([
+                'cust_status' => false 
+            ]);
+            session()->flash('success','Update status customer successful');
+        }catch(\Exception $e){
+            session()->flash('error', 'Something went wrong'.$e->getMessage());
+        }
+    }
+    public function exportCustomerAndContract(){
+        $customers = ModelsCustomer::whereHas('customercontract')
+            ->where('cust_status',1)->get();
+        $combine = null;
+        foreach($customers as $customer){
+            $Html = view('invoicepdf.customercontract',[
+                'customer' => $customer,
+                'reportDate' => Carbon::now('Asia/Bangkok')->format('d-m-Y'),
+            ])->render();
+            $combine .= $Html;
+        }
+         $pdf = pdf::loadHTML($combine);
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        },  'pdfbill.pdf'); 
+
+    }
 
     public function render()
     {
@@ -118,7 +170,11 @@ class Customer extends Component
                 ->orWhere('cust_name_th','like','%'.$this->searchCustomer.'%')
                 ->orWhere('cust_name_en','like','%'.$this->searchCustomer.'%')
                 ->orWhere('cust_taxid','like','%'.$this->searchCustomer.'%');
-        })->orderBy('cust_code')->paginate(10);
+        })
+        ->when($this->custStatus != "", function($query){
+            $query->where('cust_status', $this->custStatus);
+        }) 
+        ->orderBy('cust_code')->paginate(10);
         return view('livewire.customer' , compact('customers'));
     }
 }

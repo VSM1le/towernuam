@@ -79,9 +79,7 @@ class Invoice extends Component
     }
 
     public function mount(){
-        // $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
-        $this->startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
-        // $this->genMontly();
+        $this->startDate = Carbon::now('Asia/Bangkok')->startOfMonth()->format('Y-m-d');
     }
 
     public function updatedCustomerCode(){
@@ -122,6 +120,10 @@ class Invoice extends Component
 
 
     #[Computed()]
+    public function activeCustomers(){
+        return Customer::where('cust_status',1)->orderBy('cust_code')->get();
+    }
+#[Computed()]
     public function customers(){
         return Customer::orderBy('cust_code')->get();
     }
@@ -272,7 +274,7 @@ class Invoice extends Component
     }
     public function closeCreateInvoice(){
         $this->showCreateInvoice = false;
-        $this->invoiceDetails = null; 
+        $this->invoiceDetails = []; 
         $this->reset(['psGroup','customerName','customerCode','customerrents','rental','service','invoiceDate','dueDate']);
         $this->resetValidation();
        

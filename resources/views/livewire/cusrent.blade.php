@@ -67,7 +67,7 @@
                                 {{ $rental->custr_contract_year }}
                             </td>
                             <td class="px-6 py-4">
-                                <button wire:click="openEditContract({{ $rental->id }})" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
+                                <button wire:click="openEditContract({{ $rental->id }})" class="font-medium text-yellow-500 dark:text-yellow-500 hover:underline">Edit</button>
                                  <button  onclick="window.location.href='{{ route('custlist', ['id' => $rental->id]) }}'" class="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline">Add</button>
                             </td>
                         </tr>

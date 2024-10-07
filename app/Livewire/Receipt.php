@@ -38,6 +38,7 @@ class Receipt extends Component
 
     public $showCancelReceipt = false;
     public $cancelId;
+    public $receiptCancelRemark;
     public $startDate;
     public $endDate;
     public $customer;
@@ -133,8 +134,7 @@ class Receipt extends Component
     }
 
     public function mount(){
-        // $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
-        $this->startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
+        $this->startDate = Carbon::now('Asia/Bangkok')->startOfMonth()->format('Y-m-d');
         // $this->genMontly();
     }
 
@@ -382,7 +382,7 @@ class Receipt extends Component
             $receiptDetails = $receipt->receiptdetail;
             $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay'),2); 
             $bath = $number->baht_text($receipt->rec_payment_amt);
-            $chunkReceipts = $receiptDetails->chunk(8);
+            $chunkReceipts = $receiptDetails->chunk(7);
             $countPage = count($chunkReceipts);
             $combinedHtml = null;
             foreach($chunkReceipts as $index => $chunkReceipt ){
@@ -415,7 +415,7 @@ class Receipt extends Component
         });
         $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2);
         $bath = $number->baht_text($receipt->rec_payment_amt);
-          $chunkReceipts = $receiptDetails->chunk(8);
+          $chunkReceipts = $receiptDetails->chunk(7);
         // dd($chunkReceipts);
         $countPage = count($chunkReceipts);
         $combinedHtml = null;
@@ -457,7 +457,7 @@ class Receipt extends Component
             $receiptDetails = $receipt->receiptdetail;
             $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay'),2); 
             $bath = $number->numberToWords($receipt->rec_payment_amt);
-            $chunkReceipts = $receiptDetails->chunk(8);
+            $chunkReceipts = $receiptDetails->chunk(7);
             $countPage = count($chunkReceipts);
             $combinedHtml = null;
             foreach($chunkReceipts as $index => $chunkReceipt ){
@@ -490,7 +490,7 @@ class Receipt extends Component
             });
             $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2);
             $bath = $number->numberToWords($receipt->rec_payment_amt);
-            $chunkReceipts = $receiptDetails->chunk(8);
+            $chunkReceipts = $receiptDetails->chunk(7);
             $countPage = count($chunkReceipts);
             $combinedHtml = null;
         foreach($chunkReceipts as $index => $chunkReceipt ){
@@ -539,7 +539,8 @@ class Receipt extends Component
             }
         }
             $receipt->update([
-               'rec_status' => "Cancel" 
+               'rec_status' => "Cancel",
+               'rec_remark' => $this->receiptCancelRemark
             ]);
         } 
         $this->closeCancelReceipt();

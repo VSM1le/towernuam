@@ -208,9 +208,9 @@
             </tr>
         </table>
         <div class="invoice-details" style="padding-bottom: 8px">
-            <p style="margin: -5px;font-size:24px;line-height:10px;"><strong>ใบลดนี้/ใบกำกับภาษี</strong></p>
-            <p style="margin: -5px;font-size:24px;line-height:18px"><strong>ORIGINAL CREDIT NOTE/ TAX INVOICE</strong></p>
-            <p style="margin: -5px;font-size:24px;line-height:18px"><strong>(ต้นฉบับ)</strong></p>
+            <p style="margin: -5px;font-size:24px;line-height:10px;"><strong>สำเนาใบลดหนี้/ใบกำกับภาษี</strong></p>
+            <p style="margin: -5px;font-size:24px;line-height:18px"><strong>COPY CREDIT NOTE/ TAX INVOICE</strong></p>
+            <p style="margin: -5px;font-size:24px;line-height:18px"><strong>(สำเนา)</strong></p>
         </div>
         {{-- @if () --}}
         <table style="width:100%; border: 1px solid #000; border-collapse: collapse;">
@@ -292,7 +292,7 @@
                          @foreach ($creditNoteDetails as $index => $detail)
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
                                 <span style="white-space: nowrap">
-                                    {{$index + 1}} . {{App\Models\ProductService::where('ps_code', $detail->crd_service_code)->pluck('ps_name_en')->first() ?? null }} 
+                                    {{$index + 1}} . {{ $detail->crd_service_name ?? null }} 
                                 </span>
                                 @if ($detail->crd_remark)
                                     <span style="position: absolute; left: 0; top: 0; white-space: nowrap; transform: translateY(50%);">
@@ -301,7 +301,7 @@
                                 @endif
                                 @if ($currentPage == $sumPage && $loop->last)
                                 <p style="white-space: nowrap;font-size: 18px;">
-                                    &nbsp;&nbsp;&nbsp;อ้าวอิงใบกำกับภาษีเลขที่ {{ $creditNote->credit_receipt_num ?? null }} ลงวันที่ {{$creditNote->credit_receipt_date ?? null}} 
+                                    &nbsp;&nbsp;&nbsp;อ้าวอิงใบกำกับภาษีเลขที่ {{ $creditNote->credit_No }} ลงวันที่ {{$creditNote->credit_receipt_date }} 
                                 </p>
                                 @endif
                             </div>

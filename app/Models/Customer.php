@@ -59,4 +59,7 @@ class Customer extends Model
     public function invoiceheader():HasMany{
         return $this->hasMany(InvoiceHeader::class);
     } 
+    public function customercontract():HasMany{
+        return $this->hasMany(CustomerRental::class);
+    }
 }

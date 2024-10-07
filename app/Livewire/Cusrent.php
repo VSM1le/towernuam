@@ -7,6 +7,7 @@ use App\Models\CustomerRental;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class Cusrent extends Component
 {

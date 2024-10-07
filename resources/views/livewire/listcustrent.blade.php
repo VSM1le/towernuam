@@ -57,7 +57,7 @@
                                 {{ $rent->lcr_rental_fee }}
                             </td>
                             <td class="px-6 py-4">
-                                <button wire:click="openEditList({{$rent->id}})" class="font-medium text-yellow-500 dark:text-blue-500 hover:underline">Edit</button>
+                                <button wire:click="openEditList({{$rent->id}})" class="font-medium text-yellow-500 dark:text-yellow-500 hover:underline">Edit</button>
                                 <button wire:click="openDeleteList({{$rent->id}})" class="font-medium ml-2 text-red-500 dark:text-blue-500 hover:underline">Delete</button>
                             </td>
                         </tr>

@@ -5,8 +5,7 @@
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
             Create Service</button>
     </div>
-   
-                  @if (session()->has('success'))
+        @if (session()->has('success'))
             <div class="flex items-center p-4  text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800 mb-1" role="alert">
                 <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
@@ -102,7 +101,7 @@
                                 {{ $service->gov_whtax}}
                             </td>
                             <td class="px-6 py-4">
-                                <button wire:click="openEditService({{$service->id}})" class="font-medium text-yellow-500 dark:text-blue-500 hover:underline">Edit</button>
+                                <button wire:click="openEditService({{$service->id}})" class="font-medium text-yellow-500 dark:text-yellow-500 hover:underline">Edit</button>
                             </td>
                         </tr>
                          @endforeach

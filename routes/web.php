@@ -44,6 +44,10 @@ Route::view('service', 'productservice')
     ->middleware(['auth'])
     ->name('service');
 
+Route::view('credit-note', 'creditnote')
+    ->middleware(['auth'])
+    ->name('creditnote');
+
 
 Route::view('contract/{id}','custconlist')->middleware(['auth'])->name('custlist');
 // Route::view('invoice3', 'invoicepdf.invoice3')

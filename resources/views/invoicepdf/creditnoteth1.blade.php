@@ -292,7 +292,7 @@
                          @foreach ($creditNoteDetails as $index => $detail)
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
                                 <span style="white-space: nowrap">
-                                    {{$index + 1}} . {{App\Models\ProductService::where('ps_code', $detail->crd_service_code)->pluck('ps_name_en')->first() ?? null }} 
+                                    {{$index + 1}} . {{ $detail->crd_service_name }}
                                 </span>
                                 @if ($detail->crd_remark)
                                     <span style="position: absolute; left: 0; top: 0; white-space: nowrap; transform: translateY(50%);">

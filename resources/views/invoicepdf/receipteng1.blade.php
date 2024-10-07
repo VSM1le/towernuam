@@ -170,7 +170,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            color: rgba(255, 0, 0); /* Red color for the text */
+             
             opacity:0.5;
             font-size: 10em;
             display: flex;
@@ -184,8 +184,8 @@
 </head>
 <body>
     @if($Receipt->rec_status=== "Cancel")
-        <div class="cancel-overlayy">CANCEL
-            <p style="font-size: 30px;"></p>
+        <div class="cancel-overlayy" style="color: rgba(255, 0, 0);">CANCEL
+            <p style="font-size: 30px;">{{$Receipt->rec_remark ?? null}}</p>
         </div>
     @endif 
     <div class="invoice-container">
@@ -290,11 +290,11 @@
             @if ($Receipt->rec_have_inv_flag == '0')
              <tbody>
                 <tr style="height: 200px;">
-                    <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
+                    <td style="height:250px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                          @foreach ($receiptdetails as $index => $receipt)
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
                                 <span style="white-space: nowrap">
-                                    {{$index + 1}} . {{App\Models\ProductService::where('ps_code', $receipt->recd_product_code)->pluck('ps_name_en')->first() }} 
+                                    {{$index + 1}} . {{App\Models\ProductService::where('ps_code', $receipt->recd_product_code)->pluck('ps_name_en')->first() ?? null }} 
                                 </span>
 
                                 @if ($receipt->recd_remark)
@@ -556,7 +556,7 @@
             @else 
             <tbody>
                 <tr style="height: 200px;">
-                    <td style="height:220px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
+                    <td style="height:250px;width: 320px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                          @foreach ($receiptdetails as $index => $receipt)
                             <div style="font-size: 18px; position: relative; padding-right: 100px;">
                                 <span>

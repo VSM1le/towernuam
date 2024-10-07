@@ -34,7 +34,7 @@ class BillWE extends Component
     public $showExportBill = false;
     
     public function __construct(){
-        $this->monthYear = Carbon::now()->format('Y-m');
+        $this->monthYear = Carbon::now('Asia/Bangkok')->format('Y-m');
     }
     public function bill()
     {
@@ -82,7 +82,7 @@ class BillWE extends Component
     } 
 
     public function genInvoice(){
-        $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
+        $monthYear = $this->monthYear ?? Carbon::now('Asia/Bangkok')->format('Y-m');
         $totalSalesQuery = null;
         if($this->typeQuery == "7"){
             $totalSalesQuery = DB::raw("
@@ -220,7 +220,7 @@ class BillWE extends Component
 
     public function exportGroupByContract()
     {
-       $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
+       $monthYear = $this->monthYear ?? Carbon::now('Asia/Bangkok')->format('Y-m');
        $data = Bill::join('customer_rentals', 'bill.contract_no', '=', 'customer_rentals.custr_contract_no')
             ->select(
                 'bill.id',
@@ -276,7 +276,7 @@ class BillWE extends Component
     }
     public function clearBill(){
 
-        $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
+        $monthYear = $this->monthYear ?? Carbon::now('Asia/Bangkok')->format('Y-m');
         try{
             Bill::when($monthYear, function($query) use($monthYear){
                 $query->where('invoice_date','like','%'.$monthYear.'%');
@@ -310,7 +310,7 @@ class BillWE extends Component
     }
     
     protected function reportPdfBill(){
-       $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
+       $monthYear = $this->monthYear ?? Carbon::now('Asia/Bangkok')->format('Y-m');
        $data = Bill::join('customer_rentals', 'bill.contract_no', '=', 'customer_rentals.custr_contract_no')
             ->select(
                 'bill.id',
@@ -422,7 +422,7 @@ class BillWE extends Component
 
     public function render()
     {   
-       $monthYear = $this->monthYear ?? Carbon::now()->format('Y-m');
+       $monthYear = $this->monthYear ?? Carbon::now('Asia/Bangkok')->format('Y-m');
        $this->bills = Bill::when($monthYear, function ($query) use($monthYear)  {
        $query->where('invoice_date', 'like', '%' . $monthYear. '%');
        })
