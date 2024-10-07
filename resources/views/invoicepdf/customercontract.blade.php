@@ -130,7 +130,7 @@
             </tr>
             <tr>
                 <td>
-                    <p class="desc">Tax if: {{$customer->cust_taxid}}</p>
+                    <p class="desc">Tax ID: {{$customer->cust_taxid}}</p>
                 </td>
 
             </tr>
