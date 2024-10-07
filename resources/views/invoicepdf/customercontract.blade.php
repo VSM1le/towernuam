@@ -120,18 +120,24 @@
                 <td>
                     <p class="desc">Report Date: {{$reportDate}} </p>
                 </td>
+
             </tr> 
             <tr>
                 <td>
-                    <p class="desc">Building : อาคารนวม</p>
+                    <p class="desc">Customer Code : {{$customer->cust_code}} {{ $customer->cust_name_th }} {{ $customer->cust_name_en }}</p>
                 </td>
 
             </tr>
             <tr>
-                <p class="desc">Customer Code : {{ $customer->cust_name_th }}</p>
+                <td>
+                    <p class="desc">Tax if: {{$customer->cust_taxid}}</p>
+                </td>
+
+            </tr>
+            <tr>
+                <p class="desc">Address: {{ $customer->cust_address_th1}} {{$customer->cust_address_th2}}</p>
             </tr>
         </table>
-        @if (isset($customer->customercontract))
         <table class="content-table">
             <thead>
                 <tr style="text-align: center;">
@@ -150,19 +156,39 @@
                 <tr style="">
                     <td class="td-border" style="text-align: center">{{ $contract->custr_contract_no}}</td>
                     <td class="td-border" style="text-align: center">{{ $contract->custr_contract_no_real}}</td>
-                    <td class="td-border" style="text-align: center">{{ $contract->custr_begin_date2}}</td>
-                    <td class="td-border" style="text-align: center">{{ $contract->custr_end_date2}}</td>
+                    <td class="td-border" style="text-align: center">{{  Carbon\Carbon::parse($contract->custr_begin_date2)->format('d-m-Y') ?? null}}</td>
+                    <td class="td-border" style="text-align: center">{{  Carbon\Carbon::parse($contract->custr_end)->format('d-m-Y') ?? null}}</td>
                     <td class="td-border" style="text-align: center">{{ $contract->custr_contract_year}}</td>
                     <td class="td-border" style="text-align: center; word-wrap: break-word; white-space: normal;">
                         {{ $contract->custr_unit }}
                     </td>
-                    {{-- <td class="td-border" style="text-align: right">{{ number_format($bill->price_unit,2,'.',',') }}</td> --}}
-                    {{-- <td class="td-border" style="text-align: right">{{ number_format($bill->amt,2,'.',',') }}</td> --}}
                 </tr>
                 @endforeach
             </tbody>
         </table>
-        @endif
+        <table class="content-table" style="width: 100%; border-collapse: collapse; border: 1px solid #000;">
+            <thead>
+                <tr>
+                    <th style="padding: 10px; line-height: 8px; border: 1px solid #000; text-align: center; border-bottom: 1px solid #000;">Contract Number</th>
+                    <th style="padding: 10px; line-height: 8px; border: 1px solid #000; text-align: center;">Service Name</th>
+                    <th style="padding: 10px; line-height: 8px; border: 1px solid #000; text-align: center;">Area SQM</th>
+                    <th style="padding: 10px; line-height: 8px; border: 1px solid #000; text-align: center;">Rental Fee</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($customer->customercontract as $contract)
+                        @foreach ($contract->listcust as $detail)
+                        <tr>
+                            <td style="padding: 5px; text-align: center; border: 1px solid #000;">{{ $contract->custr_contract_no}}</td>
+                            <td style="padding: 10px; text-align: center; border: 1px solid #000;">{{ $detail->productservice->ps_code}}:{{$detail->productservice->ps_name_th}}</td>
+                            <td style="padding: 10px; text-align: center; border: 1px solid #000;">{{ $detail->lcr_area_sqm }}</td>
+                            <td style="padding: 10px; text-align: center; border: 1px solid #000;">{{ $detail->lcr_rental_fee }}</td>
+                        </tr>
+                        @endforeach
+                @endforeach
+            </tbody>
+        </table>
+ 
     </div> 
 </body>
 </html>
