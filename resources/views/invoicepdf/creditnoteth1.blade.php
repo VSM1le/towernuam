@@ -183,11 +183,11 @@
     </style>
 </head>
 <body>
-    {{-- @if($Receipt->rec_status=== "Cancel")
+    @if($creditNote->credit_status === 0)
         <div class="cancel-overlayy">CANCEL
-            <p style="font-size: 30px;"></p>
+            <p style="font-size: 30px;">{{$creditNote->credit_remark ?? null}}</p>
         </div>
-    @endif  --}}
+    @endif  
     <div class="invoice-container">
         <table class="header" style="padding-bottom:15px">
             <tr>

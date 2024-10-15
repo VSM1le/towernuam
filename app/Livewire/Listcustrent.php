@@ -14,6 +14,7 @@ class Listcustrent extends Component
     public $contractInfo;
     public $showCreateList = false;
     public $line;
+    public $roomNumber;
     public $remark;
     public $productId;
     public $areaSqm;
@@ -33,7 +34,7 @@ class Listcustrent extends Component
     }
     public function closeCreateList(){
         $this->showCreateList = false;
-        $this->reset('line','productId','remark','areaSqm','rentalFee','serviceFee','equipFee');
+        $this->reset('line','productId','remark','areaSqm','rentalFee','serviceFee','equipFee','roomNumber');
         $this->resetValidation();
     }
     public function createList(){
@@ -51,6 +52,7 @@ class Listcustrent extends Component
             'lcr_remark' => $this->remark,
             'lcr_area_sqm' => $this->areaSqm,
             'lcr_rental_fee' => $this->rentalFee,
+            'lcr_room_number' => $this->roomNumber,
             'created_by' => auth()->id(),
             'updated_by' => auth()->id()
         ]);
@@ -65,6 +67,7 @@ class Listcustrent extends Component
         $this->areaSqm = $listrent->lcr_area_sqm;
         $this->rentalFee = $listrent->lcr_rental_fee;
         $this->line = $listrent->lcr_line;
+        $this->roomNumber = $listrent->lcr_room_number;
         $this->showEditList = true;
     }
     public function editList(){
@@ -80,13 +83,14 @@ class Listcustrent extends Component
             'lcr_area_sqm' => $this->areaSqm,
             'lcr_line' => $this->line,
             'lcr_rental_fee' => $this->rentalFee,
+            'lcr_room_number' => $this->roomNumber,
             'updated_by' => auth()->id()
         ]);
         $this->closeEditList();
     }
     public function closeEditList(){
         $this->showEditList = false;
-       $this->reset('productId','line','remark','areaSqm','rentalFee','serviceFee','equipFee','listId'); 
+       $this->reset('productId','line','remark','areaSqm','rentalFee','serviceFee','equipFee','listId','roomNumber'); 
        $this->resetValidation();
     }
     public function openDeleteList($id)

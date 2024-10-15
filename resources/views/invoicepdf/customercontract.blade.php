@@ -173,16 +173,18 @@
                     <th style="padding: 10px; line-height: 8px; border: 1px solid #000; text-align: center;">Service Name</th>
                     <th style="padding: 10px; line-height: 8px; border: 1px solid #000; text-align: center;">Area SQM</th>
                     <th style="padding: 10px; line-height: 8px; border: 1px solid #000; text-align: center;">Rental Fee</th>
+                    <th style="padding: 10px; line-height: 8px; border: 1px solid #000; text-align: center;">Room number</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($customer->customercontract as $contract)
                         @foreach ($contract->listcust as $detail)
                         <tr>
-                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $contract->custr_contract_no}}</td>
-                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $detail->productservice->ps_code}}:{{$detail->productservice->ps_name_th}}</td>
-                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $detail->lcr_area_sqm }}</td>
-                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $detail->lcr_rental_fee }}</td>
+                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $contract->custr_contract_no ?? null}}</td>
+                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $detail->productservice->ps_code ?? null}}:{{$detail->productservice->ps_name_th ?? null}}</td>
+                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $detail->lcr_area_sqm ?? null }}</td>
+                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $detail->lcr_rental_fee ?? null }}</td>
+                            <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $detail->lcr_room_number ?? null}}</td>
                         </tr>
                         @endforeach
                 @endforeach

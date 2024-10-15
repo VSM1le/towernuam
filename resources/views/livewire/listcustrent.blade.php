@@ -32,6 +32,9 @@
                             <th scope="col" class="px-6 py-3">
                                Rental fee 
                             </th>
+                             <th scope="col" class="px-6 py-3">
+                                Room Name
+                            </th>
                             <th scope="col" class="px-6 py-3">
                                Action
                             </th>
@@ -55,6 +58,9 @@
                             </td>
                             <td class="px-6 py-4">
                                 {{ $rent->lcr_rental_fee }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ $rent->lcr_room_number}}
                             </td>
                             <td class="px-6 py-4">
                                 <button wire:click="openEditList({{$rent->id}})" class="font-medium text-yellow-500 dark:text-yellow-500 hover:underline">Edit</button>
@@ -128,6 +134,16 @@
                     <input wire:model="rentalFee" step="0.01"  type="number"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                     @error('rentalFee') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror
+                </div>
+            </div>
+            <div class="flex w-full">
+                <div class="m-3 w-full">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Room Name</label>
+                    <input wire:model="roomNumber"  
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                    @error('roomNumber') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror
                 </div>
@@ -206,6 +222,16 @@
                     <input wire:model="rentalFee" step="0.01"  type="number"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                     @error('rentalFee') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                    @enderror
+                </div>
+            </div>
+             <div class="flex w-full">
+                <div class="m-3 w-full">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Room Name</label>
+                    <input wire:model="roomNumber"  
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                    @error('roomNumber') 
                         <span class="text-red-500 text-xs">{{ $message }}</span> 
                     @enderror
                 </div>
