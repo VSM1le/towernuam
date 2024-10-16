@@ -408,7 +408,7 @@
                     </div>
                     <div class="w-48 ml-2">
                         <label for="vdate" class="text-xs">Amount</label>
-                        <input id="vdate" wire:model="amountExceed" type=number  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                        <input id="vdate" wire:model="amountExceed" type=number  step="0.01" class="w-full p-2 border border-gray-300 text-sm rounded" /> 
                         @error('amountExceed') 
                             <span class="text-red-500 text-xs">{{ $message }}</span> 
                         @enderror 
