@@ -576,22 +576,39 @@
                                         &nbsp;&nbsp;&nbsp; - {{ $receipt->invoicedetail->invd_remake }}
                                     </span>
                                 @endif
+                                
                             </div>
+                            @if ($currentPage == $sumPage && $loop->last && $Receipt->rec_exceed_amount)
+                                <div style="font-size: 18px; position: relative; padding-right: 100px;">
+                                    <span style="white-space: nowrap">
+                                        {{$index + 2}}. {{ $Receipt->rec_exceed_desc}}
+                                    </span> 
+                                s</div>
+                            @endif
                         @endforeach
                     </td>
                    <td style="vertical-align: top; width: 100px; text-align: right; border-right: 1px solid #000;">
                         @foreach ( $receiptdetails as $receiptdetail)
                             <p style="font-size: 18px; margin: 0;">{{ number_format($receiptdetail->gross,2,'.',',') }}</p>
+                            @if ($currentPage == $sumPage && $loop->last && $Receipt->rec_exceed_amount)
+                            <p style="font-size: 18px; margin: 0;">{{ number_format($Receipt->rec_exceed_amount,2,'.',',') }}</p>
+                            @endif
                         @endforeach
                     </td> 
                     <td style="text-align: right; border-right:1px solid #000;vertical-align:top;width:100px">
                          @foreach ( $receiptdetails as $receiptdetail)
-                            <p style="font-size: 18px" >{{ number_format($receiptdetail->calculated_vat,2,'.',',')}}</p>
+                                <p style="font-size: 18px" >{{ number_format($receiptdetail->calculated_vat,2,'.',',')}}</p>
+                            @if ($currentPage == $sumPage && $loop->last && $Receipt->rec_exceed_amount)
+                                <p style="font-size: 18px; margin: 0;">{{ number_format(0,2,'.',',') }}</p>
+                            @endif
                         @endforeach
                     </td>
                     <td style="text-align: right; border-right:1px solid #000;vertical-align:top;width:100px">
                          @foreach ( $receiptdetails as $receipt)
                             <p style="font-size: 18px" >{{ number_format($receipt->rec_pay,2,'.',',')}}</p>
+                            @if ($currentPage == $sumPage && $loop->last && $Receipt->rec_exceed_amount)
+                            <p style="font-size: 18px; margin: 0;">{{ number_format($Receipt->rec_exceed_amount,2,'.',',') }}</p>
+                            @endif
                         @endforeach
                     </td>
                 </tr>
@@ -608,7 +625,7 @@
                                         return $detail->invoicedetail->invd_vat_percent == 0;
                                     })
                                     ->pluck('gross')
-                                    ->sum(), 2, '.', ',') }}
+                                    ->sum() + $Receipt->rec_exceed_amount ?? 0, 2, '.', ',') }}
                                 @endif
                             </span> 
                         </p>
@@ -667,7 +684,7 @@
                     <td style="border:1px solid #000; text-align:right">
                         <p style="font-size: 18px">
                             @if ($currentPage == $sumPage)
-                                {{  number_format($Receipt->receiptdetail->pluck('gross')->sum(),2,'.',',') }}
+                                {{  number_format($Receipt->receiptdetail->pluck('gross')->sum() + ($Receipt->rec_exceed_amount ?? 0),2,'.',',') }}
                             @endif
                         </p>
                     </td>
@@ -682,7 +699,7 @@
                     <td style="border:1px solid #000; text-align:right">
                         <p style="font-size: 18px">
                             @if ($currentPage == $sumPage)
-                                {{  number_format($Receipt->receiptdetail->pluck('rec_pay')->sum(),2,'.',',') }} 
+                                {{  number_format($Receipt->receiptdetail->pluck('rec_pay')->sum() + ($Receipt->rec_exceed_amount ?? 0),2,'.',',') }} 
                             @endif
                         </p> 
                     </td> 

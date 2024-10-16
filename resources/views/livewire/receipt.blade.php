@@ -398,6 +398,22 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="flex mt-2 justify-center">
+                    <div class="w-52">
+                        <label for="vdate" class="text-xs">Description</label>
+                        <input id="vdate" wire:model="descExceed"  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                        @error('descExceed') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror 
+                    </div>
+                    <div class="w-48 ml-2">
+                        <label for="vdate" class="text-xs">Amount</label>
+                        <input id="vdate" wire:model="amountExceed" type=number  class="w-full p-2 border border-gray-300 text-sm rounded" /> 
+                        @error('amountExceed') 
+                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                        @enderror 
+                    </div>
+                </div>
                 @endif
             </div> 
          
@@ -409,8 +425,8 @@
                 <div class="w-48">
                     <label  class="text-xs">Cheque Bank</label>
                     <input  
-                    wire:model="cheque.bank"  class="w-full p-2 border border-gray-300 text-sm rounded" 
-                    wire:change="updateCheque('bank')"
+                        wire:model="cheque.bank"  class="w-full p-2 border border-gray-300 text-sm rounded" 
+                        wire:change="updateCheque('bank')"
                     /> 
 
                     @error('cheque.bank') 

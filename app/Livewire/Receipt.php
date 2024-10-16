@@ -52,6 +52,8 @@ class Receipt extends Component
     public $exFromDate;
     public $exToDate;
     public $showExportReceipt = false;
+    public $descExceed;
+    public $amountExceed;
 
     #[Computed()]
     public function productservices(){
@@ -245,6 +247,8 @@ class Receipt extends Component
             'cheque.branch' => ['required_if:paymentType,cheq'],
             'cheque.no' => ['required_if:paymentType,cheq'],
             'cheque.chequeDate' => ['required_if:paymentType,cheq', 'nullable', 'date'],
+            'amountExceed' => ['required_with:descExceed','numeric'],
+            'descExceed' => ['required_with:amountExceed'],
         ],
         [
             'cheque.bank.required_if' => 'Bank is required.',
@@ -279,6 +283,8 @@ class Receipt extends Component
             'rec_branch' => $this->cheque['branch'] ?? null,
             'rec_cheque_no' => $this->cheque['no'] ?? null,
             'rec_cheque_date' => $this->cheque['chequeDate'] ?? null,
+            'rec_exceed_desc' => $this->descExceed ?? null,
+            'rec_exceed_amount'  => $this->amountExceed ?? null,
             'created_by' => auth()->id(),
             'updated_by' => auth()->id(),
         ]);
@@ -380,8 +386,8 @@ class Receipt extends Component
         $receipt= ReceiptHeader::where('id',$id)->with(['receiptdetail','customer'])->first();
         if($receipt->rec_have_inv_flag == '0'){
             $receiptDetails = $receipt->receiptdetail;
-            $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay'),2); 
-            $bath = $number->baht_text($receipt->rec_payment_amt);
+            $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2); 
+            $bath = $number->baht_text($receipt->rec_payment_amt );
             $chunkReceipts = $receiptDetails->chunk(7);
             $countPage = count($chunkReceipts);
             $combinedHtml = null;
@@ -413,8 +419,8 @@ class Receipt extends Component
         $detail->whtax = round(($detail->rec_pay * $detail->invoicedetail->invd_wh_tax_percent) / 100 , 2);
         return $detail;
         });
-        $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2);
-        $bath = $number->baht_text($receipt->rec_payment_amt);
+        $realAmount = round($receipt->rec_payment_amt - ($receiptDetails->sum('whpay') ?? 0) + ($receipt->rec_exceed_amount ?? 0),2);
+        $bath = $number->baht_text($receipt->rec_payment_amt + ($receipt->rec_exceed_amount ?? 0));
           $chunkReceipts = $receiptDetails->chunk(7);
         // dd($chunkReceipts);
         $countPage = count($chunkReceipts);
@@ -488,8 +494,8 @@ class Receipt extends Component
             $detail->whtax = round(($detail->rec_pay * $detail->invoicedetail->invd_wh_tax_percent) / 100 , 2);
             return $detail;
             });
-            $realAmount = round($receipt->rec_payment_amt - $receiptDetails->sum('whpay') ?? 0,2);
-            $bath = $number->numberToWords($receipt->rec_payment_amt);
+            $realAmount = round($receipt->rec_payment_amt - ($receiptDetails->sum('whpay') ?? 0) + ($receipt->rec_exceed_amount ?? 0),2);
+            $bath = $number->numberToWords($receipt->rec_payment_amt+ ($receipt->rec_exceed_amount ?? 0));
             $chunkReceipts = $receiptDetails->chunk(7);
             $countPage = count($chunkReceipts);
             $combinedHtml = null;
