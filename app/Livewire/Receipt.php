@@ -247,7 +247,7 @@ class Receipt extends Component
             'cheque.branch' => ['required_if:paymentType,cheq'],
             'cheque.no' => ['required_if:paymentType,cheq'],
             'cheque.chequeDate' => ['required_if:paymentType,cheq', 'nullable', 'date'],
-            'amountExceed' => ['required_with:descExceed','numeric'],
+            'amountExceed' => ['required_with:descExceed'],
             'descExceed' => ['required_with:amountExceed'],
         ],
         [
