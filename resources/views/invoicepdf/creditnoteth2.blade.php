@@ -224,7 +224,7 @@
                                     <p style="margin: 0; line-height: 0.7; font-size: 18px;">Received From</p>
                                 </td>
                                 <td style="vertical-align: top; font-size: 18px;width:49% ">
-                                    <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $creditNote->customer->cust_name_en ?? null }}</p>
+                                    <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $creditNote->customer->cust_name_th ?? null }}</p>
                                 </td>
                                 <td style="vertical-align: top; font-size: 18px; ;">
                                     <p style="margin: 0; font-size: 18px; line-height: 0.7;">
