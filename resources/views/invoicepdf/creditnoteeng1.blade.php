@@ -208,7 +208,7 @@
             </tr>
         </table>
         <div class="invoice-details" style="padding-bottom: 8px">
-            <p style="margin: -5px;font-size:24px;line-height:10px;"><strong>ใบลดนี้/ใบกำกับภาษี</strong></p>
+            <p style="margin: -5px;font-size:24px;line-height:10px;"><strong>ใบลดหนี้/ใบกำกับภาษี</strong></p>
             <p style="margin: -5px;font-size:24px;line-height:18px"><strong>ORIGINAL CREDIT NOTE/ TAX INVOICE</strong></p>
             <p style="margin: -5px;font-size:24px;line-height:18px"><strong>(ต้นฉบับ)</strong></p>
         </div>
@@ -269,7 +269,7 @@
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;">Plan No.</p>
                             </td>
                             <td style="vertical-align: top; font-size: 18px;width:49% ">
-                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $creditNote->inv_unite ?? null}}</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $creditNote->credit_room_num ?? null}}</p>
                             </td>
                         </tr>
                     </table>  
@@ -301,7 +301,7 @@
                                 @endif
                                 @if ($currentPage == $sumPage && $loop->last)
                                 <p style="white-space: nowrap;font-size: 18px;">
-                                    &nbsp;&nbsp;&nbsp;อ้าวอิงใบกำกับภาษีเลขที่ {{ $creditNote->credit_receipt_num ?? null }} ลงวันที่ {{$creditNote->credit_receipt_date ?? null}} 
+                                    &nbsp;&nbsp;&nbsp;อ้างอิงใบกำกับภาษีเลขที่ {{ $creditNote->credit_receipt_num ?? null }} ลงวันที่ {{$creditNote->credit_receipt_date ?? null}} 
                                 </p>
                                 @endif
                             </div>

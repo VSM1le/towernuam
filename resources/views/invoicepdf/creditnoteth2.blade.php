@@ -269,7 +269,7 @@
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;">Plan No.</p>
                             </td>
                             <td style="vertical-align: top; font-size: 18px;width:49% ">
-                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $creditNote->inv_unite ?? null}}</p>
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $creditNote->credit_room_num ?? null}}</p>
                             </td>
                         </tr>
                     </table>  
@@ -301,7 +301,7 @@
                                 @endif
                                 @if ($currentPage == $sumPage && $loop->last)
                                 <p style="white-space: nowrap;font-size: 18px;">
-                                    &nbsp;&nbsp;&nbsp;อ้าวอิงใบกำกับภาษีเลขที่ {{ $creditNote->credit_No }} ลงวันที่ {{$creditNote->credit_receipt_date }} 
+                                    &nbsp;&nbsp;&nbsp;อ้างอิงใบกำกับภาษีเลขที่ {{ $creditNote->credit_No }} ลงวันที่ {{$creditNote->credit_receipt_date }} 
                                 </p>
                                 @endif
                             </div>
