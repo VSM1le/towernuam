@@ -159,7 +159,7 @@ class Customer extends Component
          $pdf = pdf::loadHTML($combine);
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
-        },  'pdfbill.pdf'); 
+        },  'Customer.pdf'); 
 
     }
 
