@@ -38,6 +38,7 @@ class BillWE extends Component
     }
     public function bill()
     {
+        sleep(10);
         // Validate the uploaded file
         $this->validate([
             'csvFile' => 'required|file|mimes:csv,txt,xls,xlsx',
@@ -69,6 +70,7 @@ class BillWE extends Component
     }
     public function closeImport(){
         $this->showImportModal = false;
+        $this->resetValidation();
         $this->reset(['csvFile']);
     }
 
