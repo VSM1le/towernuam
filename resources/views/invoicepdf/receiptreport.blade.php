@@ -119,7 +119,7 @@
                     <th class="th-inv">Invoice No.</th>
                     <th class="th-inv">Receipt Date</th>
                     <th class="th-inv" style="width:200px">Customer Name</th>
-                    <th class="th-inv">Contrat Number</th>
+                    <th class="th-inv">Contract Number</th>
                     <th class="th-inv" style="width:70px">Amt</th>
                     <th class="th-inv">Vat Amt</th>
                     <th class="th-inv">Whtax Amt</th>

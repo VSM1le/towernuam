@@ -670,6 +670,9 @@ class Receipt extends Component
         $sumValidReceipt = $receipt->filter(function($detail) {
             return $detail->receiptheader->rec_status === 'Yes';
         })->sum('rec_pay');
+         $sumExceed= $receipt->filter(function($detail) {
+            return $detail->receiptheader->rec_status === 'Yes';
+        })->sum('rec_exceed_amount');
         $sumCancelReceipt = $receipt->filter(function($detail) {
             return $detail->receiptheader->rec_status === 'Cancel';
         })->sum('rec_pay');
@@ -686,10 +689,23 @@ class Receipt extends Component
                 'sumPage' => $count,
                 'currentPage' => $index + 1,
                 'sumValidReceipt' => $sumValidReceipt,
-                'sumCancelReceipt' => $sumCancelReceipt
+                'sumCancelReceipt' => $sumCancelReceipt,
+                'sumExceed' => $sumExceed,
             ]);
             $combineHtml .= $report;
             }
+        $excessOrLacks = ReceiptHeader::whereDate('rec_date', '>=', $this->exFromDate)
+            ->whereDate('rec_date', '<=', $this->exToDate)
+            ->whereNotNull('rec_exceed_amount')
+            ->get();
+        if($excessOrLacks->count() > 0){
+            $report = view('invoicepdf.receiptreport2',[
+                'startDate' => Carbon::parse($this->exFromDate)->format('d-m-Y'),
+                'endDate' => Carbon::parse($this->exToDate)->format('d-m-Y'),
+                'excessOrLacks' => $excessOrLacks,
+            ]);
+            $combineHtml .= $report;
+        }
         $pdf = PDF::loadHTML($combineHtml);
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();

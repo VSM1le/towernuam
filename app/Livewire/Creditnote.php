@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\CreditnoteDetail;
 use App\Models\CreditnoteHeader;
 use App\Models\Customer;
 use App\Models\CustomerRental;
@@ -30,11 +31,13 @@ class Creditnote extends Component
     public $endDate;
     public $showDeleteCreditNote = false;
     public $showExportCreditNote = false;
+    public $showEditCredit = false;
     public $creditId;
     public $creditRemark;
     public $exFromDate;
     public $exToDate;
     public $statusCredit;
+    public $editId;
 
     #[Computed()]
     public function customers(){
@@ -71,6 +74,10 @@ class Creditnote extends Component
             ,'netamt'=> 0
             ,'remark'=> null];
     }
+    public function removeItem($index){
+       unset($this->creditDetails[$index]);
+       $this->creditDetails= array_values($this->creditDetails);
+    }
 
 
     public function openCreateCreditNoteNoReceipt(){
@@ -86,7 +93,6 @@ class Creditnote extends Component
         $this->validate([
             'creditDate' => ['required','date'],
             'customerCode'  => ['required'],
-            'service' => ['required'],
             'receiptDate' => ['required','date'],
             'receiptNumber' => ['required'],
         ]);
@@ -223,7 +229,7 @@ class Creditnote extends Component
         $this->showDeleteCreditNote = false;
         $this->reset('creditId','creditRemark');
     }
-    public function showExportCreditNote(){
+    public function openExportCreditNote(){
         $this->showExportCreditNote = true;
     }
 
@@ -258,6 +264,95 @@ class Creditnote extends Component
     public function closeExportCreditNote(){
         $this->showExportCreditNote = false;
     }
+    public function openEditCreditNote($id){
+        $this->creditId = $id;
+        $creditNote = CreditnoteHeader::where('id', $id)->with('creditdetail')->first();
+        $this->creditDate = $creditNote->credit_date;
+        $this->customerCode = $creditNote->customer_id;
+        $this->rental = $creditNote->customer_rental_id;
+        $this->receiptNumber = $creditNote->credit_receipt_num;
+        $this->customerrents = CustomerRental::where('customer_id', $this->customerCode)->get(); 
+        $this->receiptDate = $creditNote->credit_date;
+        foreach($creditNote->creditdetail as $creditDetail){
+            $this->creditDetails[]=[
+                     'id'=> $creditDetail->id,
+                     'pscode'=> $creditDetail->crd_service_code,
+                     'psname'=> $creditDetail->crd_service_name,
+                     'amt'=> $creditDetail->crd_amt,
+                     'vatamt'=> $creditDetail->crd_tax_amt,
+                     'whtaxamt'=> $creditDetail->crd_wh_amt,
+                     'netamt'=> $creditDetail->crd_net_amt,
+                     'remark'=> $creditDetail->crd_remark,
+            ];
+        }
+        $this->showEditCredit = true;
+    }
+    public function editCredit(){
+        // dd('test');
+        $this->validate([
+            'creditDate' => ['required','date'],
+            'customerCode'  => ['required'],
+            'receiptDate' => ['required','date'],
+            'receiptNumber' => ['required'],
+        ]);
+        try{
+        $header = CreditnoteHeader::find($this->creditId);
+        $header->update([
+            'credit_date' => $this->creditDate,
+            'customer_id' => $this->customerCode,
+            'customer_rental_id' => $this->rental,
+            'credit_receipt_num' => trim($this->receiptNumber),
+            'credit_receipt_date' => $this->receiptDate,
+            'updated_by' => auth()->id(),
+        ]);
+        $existingDetailIds = collect($this->creditDetails)->pluck('id')->filter();
+
+        CreditnoteDetail::where('creditnote_header_id', $header->id)
+            ->whereNotIn('id', $existingDetailIds->toArray())
+            ->delete();
+        foreach($this->creditDetails as $detail){
+            if(isset($detail['id'])){
+                CreditnoteDetail::where('id', $detail['id'])->update([
+                    'crd_service_code' => $detail['pscode'],
+                    'crd_service_name' => $detail['psname'],
+                    'crd_amt' => $detail['amt'],
+                    'crd_tax_amt' => $detail['vatamt'],
+                    'crd_wh_amt' => $detail['whtaxamt'],
+                    'crd_net_amt' => $detail['netamt'],
+                    'crd_remark' => $detail['remark'],
+                    'updated_by' => auth()->id(),
+                ]);
+            }
+            else{
+               $newDetail =  new CreditnoteDetail([
+                    'creditnote_header_id' => $header->id,
+                    'crd_service_code' => $detail['pscode'],
+                    'crd_service_name' => $detail['psname'],
+                    'crd_amt' => $detail['amt'],
+                    'crd_tax_amt' => $detail['vatamt'],
+                    'crd_wh_amt' => $detail['whtaxamt'],
+                    'crd_net_amt' => $detail['netamt'],
+                    'crd_remark' => $detail['remark'],
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
+                $header->creditdetail()->save($newDetail);
+            }
+        }
+          session()->flash('success','Update creditnote succesfully.');
+        }catch(\Exception $e){
+            session()->flash('error','Something went wrong.');
+        }finally{
+            $this->closeEditCreditNoteNoReceipt();
+        }
+
+    }
+     public  function closeEditCreditNoteNoReceipt(){
+        $this->showEditCredit = false;
+        $this->reset(['creditDate','customerCode','service','receiptDate','receiptNumber']); 
+        $this->creditDetails = [];
+        $this->resetValidation();
+    } 
 
     public function render()
     {
