@@ -87,21 +87,22 @@ class BillWE extends Component
         $monthYear = $this->monthYear ?? Carbon::now('Asia/Bangkok')->format('Y-m');
         $totalSalesQuery = null;
         if($this->typeQuery == "7"){
-            $totalSalesQuery = DB::raw("
-                SUM(
-                    CASE 
-                        -- Convert p_unit to hours (p_unit * 24) and extract fractional minutes
-                        WHEN ((p_unit * 24 - FLOOR(p_unit * 24)) * 60) <= 15 THEN 
-                            FLOOR(p_unit * 24) * (price_unit)
+            // $totalSalesQuery = DB::raw("
+            //     SUM(
+            //         CASE 
+            //             -- Convert p_unit to hours (p_unit * 24) and extract fractional minutes
+            //             WHEN ((p_unit * 24 - FLOOR(p_unit * 24)) * 60) <= 15 THEN 
+            //                 FLOOR(p_unit * 24) * (price_unit)
                             
-                        WHEN ((p_unit * 24 - FLOOR(p_unit * 24)) * 60) BETWEEN 16 AND 45 THEN
-                            (FLOOR(p_unit * 24) + 0.5) * (price_unit)
+            //             WHEN ((p_unit * 24 - FLOOR(p_unit * 24)) * 60) BETWEEN 16 AND 45 THEN
+            //                 (FLOOR(p_unit * 24) + 0.5) * (price_unit)
                             
-                        ELSE 
-                            CEIL(p_unit * 24) * (price_unit)
-                    END
-                ) as total_sales
-            "); 
+            //             ELSE 
+            //                 CEIL(p_unit * 24) * (price_unit)
+            //         END
+            //     ) as total_sales
+            // "); 
+            $totalSalesQuery = DB::raw('SUM(p_unit * (price_unit /  0.041666667)) as total_sales');
             
         } else {
             $totalSalesQuery = DB::raw('SUM(p_unit * price_unit) as total_sales');

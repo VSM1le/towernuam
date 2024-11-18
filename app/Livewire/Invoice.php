@@ -693,7 +693,8 @@ public function closeCancelInvoice(){
 
         $availableContracts = CustomerRental::where(function($query) use ($carbon_date) {
             $query->whereDate('custr_begin_date2', '<=', $carbon_date->endOfMonth())
-                ->whereDate('custr_end_date2', '>=', $carbon_date->startOfMonth());
+                ->whereDate('custr_end_date2', '>=', $carbon_date->startOfMonth())
+                ->where('custr_status', '!=', 0);
         })
         ->whereHas("customer",function($query){
             $query->where('cust_invauto','Y');

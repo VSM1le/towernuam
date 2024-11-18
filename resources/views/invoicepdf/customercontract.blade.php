@@ -147,12 +147,10 @@
                     <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">end contract</th>
                     <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">contract year</th>
                     <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">Unit</th>
-                    {{-- <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">Price/unit</th> --}}
-                    {{-- <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">Amount</th> --}}
                 </tr>
             </thead>
             <tbody style="border: 1px solid #000;">
-                @foreach ($customer->customercontract as $contract)
+                @foreach ($customer->customercontract->where("custr_status","!=",0) as $contract)
                 <tr style="">
                     <td class="td-border" style="text-align: center">{{ $contract->custr_contract_no}}</td>
                     <td class="td-border" style="text-align: center">{{ $contract->custr_contract_no_real}}</td>
@@ -177,7 +175,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($customer->customercontract as $contract)
+                @foreach ($customer->customercontract->where("custr_status" ,"!=",0) as $contract)
                         @foreach ($contract->listcust as $detail)
                         <tr>
                             <td style="padding: 3px; text-align: center; border: 1px solid #000;">{{ $contract->custr_contract_no ?? null}}</td>

@@ -59,6 +59,27 @@ class Cusrent extends Component
         ]);
         $this->closeCreateContract();
     }
+    public function activeCustomerRent($id){
+        try{
+            CustomerRental::where('id',$id)->update([
+                'custr_status' => true
+            ]);
+            session()->flash('success','Update status customer rental successful');
+        }catch(\Exception $e){
+            session()->flash('error', 'Something went wrong'.$e->getMessage());
+        }
+    }
+    public function inactiveCustomerRent($id){
+        // dd('test');
+        try{
+            CustomerRental::where('id',$id)->update([
+                'custr_status' => false 
+            ]);
+            session()->flash('success','Update status customer rental successful');
+        }catch(\Exception $e){
+            session()->flash('error', 'Something went wrong'.$e->getMessage());
+        }
+    }
     public function closeCreateContract(){
         $this->showCreateContract = false;
         $this->reset(['contractNumber','contractRNumber','customerId','unit','areaSqm','rentalFee','serviceFee','equipFee','startDate','endDate','year']);
