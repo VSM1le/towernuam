@@ -137,14 +137,15 @@ class ContractSheetExport implements WithCustomStartCell, WithStyles,WithHeading
         $sheet->getColumnDimension('D')->setWidth(10);
             foreach($this->items as $bill){
                 $minutes = $bill->p_unit;
-                $minutes_cal = round(($bill->p_unit * 24 - floor($bill->p_unit * 24)) * 60,0); // Calculate minutes
-                if ($minutes_cal <= 15) {
-                    $amt = round(floor($bill->p_unit * 24) * $bill->price_unit, 2);
-                } elseif ($minutes_cal >= 16 && $minutes_cal <= 45) {
-                    $amt = round((floor($bill->p_unit * 24) + 0.5) * $bill->price_unit, 2);
-                } else {
-                    $amt = round(ceil($bill->p_unit * 24) * $bill->price_unit, 2);
-                }
+                 $amt = round($bill->p_unit * ($bill->price_unit / 0.041666667),2);
+                // $minutes_cal = round(($bill->p_unit * 24 - floor($bill->p_unit * 24)) * 60,0); // Calculate minutes
+                // if ($minutes_cal <= 15) {
+                //     $amt = round(floor($bill->p_unit * 24) * $bill->price_unit, 2);
+                // } elseif ($minutes_cal >= 16 && $minutes_cal <= 45) {
+                //     $amt = round((floor($bill->p_unit * 24) + 0.5) * $bill->price_unit, 2);
+                // } else {
+                //     $amt = round(ceil($bill->p_unit * 24) * $bill->price_unit, 2);
+                // }
                 $sheet->getStyle("B{$currentRow}:H{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle("B{$currentRow}:I{$currentRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
                 $sheet->getStyle("B{$currentRow}:I{$currentRow}")->getBorders()->getAllborders()->setBorderStyle(Border::BORDER_THIN);

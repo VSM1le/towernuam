@@ -375,14 +375,15 @@ class BillWE extends Component
                         $hours += 1;
                         $minutes = 0;
                     }
-                    $minutes_cal = round(($item->p_unit * 24 - floor($item->p_unit * 24)) * 60,0); // Calculate minutes
-                    if ($minutes_cal <= 15) {
-                        $item->amt = round(floor($item->p_unit * 24) * $item->price_unit, 2);
-                    } elseif ($minutes_cal >= 16 && $minutes_cal <= 45) {
-                        $item->amt = round((floor($item->p_unit * 24) + 0.5) * $item->price_unit, 2);
-                    } else {
-                        $item->amt = round(ceil($item->p_unit * 24) * $item->price_unit, 2);
-                    }
+                    $item->amt = round($item->p_unit * ($item->price_unit / 0.041666667),2);
+                    // $minutes_cal = round(($item->p_unit * 24 - floor($item->p_unit * 24)) * 60,0); // Calculate minutes
+                    // if ($minutes_cal <= 15) {
+                    //     $item->amt = round(floor($item->p_unit * 24) * $item->price_unit, 2);
+                    // } elseif ($minutes_cal >= 16 && $minutes_cal <= 45) {
+                    //     $item->amt = round((floor($item->p_unit * 24) + 0.5) * $item->price_unit, 2);
+                    // } else {
+                    //     $item->amt = round(ceil($item->p_unit * 24) * $item->price_unit, 2);
+                    // }
                     $item->hourM =  $item->hourM = $hours . ":" . sprintf('%02d', $minutes); 
                     return $item;
                  });
