@@ -283,7 +283,8 @@
                 <tr style="text-align: center;">
                     <th style="text-align: center;padding:10px; line-height:8px; border: 1px solid #000;border-top: none;">รายการ<br style="margin: 0">Description</th>
                     <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">จำนวนเงิน<br>Gross Amount</th>
-                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">ภาษีมูลค่าเพิ่ม<br>Value Added Tax</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">ภาษีมูลค่าเพิ่ม
+                        <br><span style="white-space: nowrap;">Value Added Tax</span></th>
                     <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">จำนวนเงินสุทธิ<br>Net Amount</th>
                 </tr>
             </thead>

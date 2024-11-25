@@ -231,13 +231,14 @@
                     <th style="text-align: center;padding:10px; line-height:8px; border: 1px solid #000;border-top: none;">รายการ<br style="margin: 0">Description</th>
                     <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">ประจำเดือน<br>Period</th>
                     <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">จำนวนเงิน<br>Gross Amount</th>
-                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">ภาษีมูลค่าเพิ่ม<br>Value Added Tax</th>
+                    <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">ภาษีมูลค่าเพิ่ม
+                        <br><span style="white-space: nowrap;">Value Added Tax</span></th>
                     <th style="text-align: center; padding:10px; line-height:8px;border: 1px solid #000;border-top: none;">จำนวนเงินสุทธิ<br>Net Amount</th>
                 </tr>
             </thead>
             <tbody>
                 <tr style="height: 200px;">
-                    <td style="height:390px;width: 280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
+                    <td style="height:390px;width: 280px;min-width:280px;max-width:280px; border-bottom: 1px solid #000;border-left: 1px solid #000;border-right: 1px solid #000;vertical-align:top; border-collapse: collapse;">
                         @foreach ( $Invoices->invoicedetail as $index => $invoice )
                              <div style="font-size: 18px; position: relative; padding-right: 100px;">
                                 <span style="white-space: nowrap">
