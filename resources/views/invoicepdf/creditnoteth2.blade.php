@@ -228,7 +228,7 @@
                                 </td>
                                 <td style="vertical-align: top; font-size: 18px; ;">
                                     <p style="margin: 0; font-size: 18px; line-height: 0.7;">
-                                        เลขที่สัญญา {{ $creditNote->customerrental->custr_contract_no_real }}
+                                        เลขที่สัญญา {{ $creditNote->customerrental->custr_contract_no_real ?? null }}
                                     </p>
                                 </td>
                             </tr>
@@ -259,7 +259,7 @@
                 </tr>
                 <tr>
                     <td style="height: 40px; vertical-align:top; font-size:18px;line-height:0.8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เลขประจำตัวผู้เสียภาษี&nbsp;{{ $creditNote->customer->cust_taxid }}&nbsp;
-                        {{ $creditNote->customer->cust_branch }}
+                        {{ $creditNote->customer->cust_branch ?? null }}
                     </td>
                     <td style="vertical-align:top; width: 40%; border:1px solid #000; margin:0px;">
                       <table style="width: 100%; border-collapse: collapse;margin:0">
