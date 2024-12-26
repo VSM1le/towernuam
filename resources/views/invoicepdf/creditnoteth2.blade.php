@@ -301,7 +301,7 @@
                                 @endif
                                 @if ($currentPage == $sumPage && $loop->last)
                                 <p style="white-space: nowrap;font-size: 18px;">
-                                    &nbsp;&nbsp;&nbsp;อ้างอิงใบกำกับภาษีเลขที่ {{ $creditNote->credit_No }} ลงวันที่ {{$creditNote->credit_receipt_date }} 
+                                    &nbsp;&nbsp;&nbsp;อ้างอิงใบกำกับภาษีเลขที่ {{ $creditNote->credit_receipt_num ?? null }} ลงวันที่ {{$creditNote->credit_receipt_date }} 
                                 </p>
                                 @endif
                             </div>
