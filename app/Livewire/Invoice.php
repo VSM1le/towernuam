@@ -123,7 +123,7 @@ class Invoice extends Component
     public function activeCustomers(){
         return Customer::where('cust_status',1)->orderBy('cust_code')->get();
     }
-#[Computed()]
+    #[Computed()]
     public function customers(){
         return Customer::orderBy('cust_code')->get();
     }
@@ -214,60 +214,85 @@ class Invoice extends Component
        unset($this->invoiceDetails[$index]);
        $this->invoiceDetails = array_values($this->invoiceDetails);
     }
-    public function createInvoice(){
-        $this->validate([
-            'psGroup' => ['required'],
-            'invoiceDate' => ['required'],
-            'customerCode'  => ['required'],
-            'service' => ['required'],  
-            'dueDate' => ['required'],
-        ]);
-        $prefix = 'I'.$this->tower.'S';
-        $year = Carbon::parse($this->invoiceDate)->format('Y');
-        $datePart = substr($year,-2) . Carbon::parse($this->invoiceDate)->format('m');
-        $unite = CustomerRental::where('id',$this->rental)->first();
-        $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
+    public function createInvoice()
+    {
+        DB::beginTransaction(); // Start the transaction
 
-        if (is_null($lastInvoice)) {
-            $invNo = $prefix . $datePart . '0001';
-        } else {
-            $lastNumber = (int)substr($lastInvoice->inv_no, -4);
-            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-            $invNo = $prefix . $datePart . $newNumber;
-        }
         
-        $createInvoice = InvoiceHeader::create([
-            'inv_no' => $invNo,
-            'customer_id' => $this->customerCode,
-            'customer_rental_id' => $this->rental,
-            'inv_date' => $this->invoiceDate,
-            'invd_duedate' => $this->dueDate,
-            'ps_group_id' => $this->psGroup,
-            'inv_status' => 'USE',
-            'inv_unite' => $unite->custr_unit ?? null, 
-            'inv_tower' => $this->tower,
-            'created_by' => auth()->id(),
-            'updated_by' => auth()->id(),
-        ]);
-        foreach ($this->invoiceDetails as $detail) {
-            $createInvoice->invoicedetail()->create([
-                'invd_product_code' => $detail['pscode'],
-                'invd_product_name' => $detail['psname'],
-                'invd_period' => $detail['period'],
-                'invd_amt' => $detail['amt'],
-                'invd_vat_percent' => $detail['vat'],
-                'invd_vat_amt' => $detail['vatamt'],
-                'invd_wh_tax_percent' => $detail['whvat'],
-                'invd_wh_tax_amt' => $detail['whtaxamt'],
-                'invd_net_amt' => $detail['netamt'],
-                'invd_remake' => $detail['remark'],
-                'invd_receipt_flag' => "No",
+            // Validate inputs
+            $this->validate([
+                'psGroup' => ['required'],
+                'invoiceDate' => ['required'],
+                'customerCode' => ['required'],
+                'service' => ['required'],
+                'dueDate' => ['required'],
+                'invoiceDetails.*.remark' => ['max:80']
+            ],
+            [
+                'invoiceDetails.*.remark.max' => 'Remark must not be greater than 80 characters.'
+            ]);
+        try {
+            $prefix = 'I' . $this->tower . 'S';
+            $year = Carbon::parse($this->invoiceDate)->format('Y');
+            $datePart = substr($year, -2) . Carbon::parse($this->invoiceDate)->format('m');
+            $unite = CustomerRental::where('id', $this->rental)->first();
+            $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
+
+            // Generate invoice number
+            if (is_null($lastInvoice)) {
+                $invNo = $prefix . $datePart . '0001';
+            } else {
+                $lastNumber = (int) substr($lastInvoice->inv_no, -4);
+                $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+                $invNo = $prefix . $datePart . $newNumber;
+            }
+
+            // Create InvoiceHeader
+            $createInvoice = InvoiceHeader::create([
+                'inv_no' => $invNo,
+                'customer_id' => $this->customerCode,
+                'customer_rental_id' => $this->rental,
+                'inv_date' => $this->invoiceDate,
+                'invd_duedate' => $this->dueDate,
+                'ps_group_id' => $this->psGroup,
+                'inv_status' => 'USE',
+                'inv_unite' => $unite->custr_unit ?? null,
+                'inv_tower' => $this->tower,
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
             ]);
+
+            // Create InvoiceDetails
+            foreach ($this->invoiceDetails as $detail) {
+                $createInvoice->invoicedetail()->create([
+                    'invd_product_code' => $detail['pscode'],
+                    'invd_product_name' => $detail['psname'],
+                    'invd_period' => $detail['period'],
+                    'invd_amt' => $detail['amt'],
+                    'invd_vat_percent' => $detail['vat'],
+                    'invd_vat_amt' => $detail['vatamt'],
+                    'invd_wh_tax_percent' => $detail['whvat'],
+                    'invd_wh_tax_amt' => $detail['whtaxamt'],
+                    'invd_net_amt' => $detail['netamt'],
+                    'invd_remake' => $detail['remark'],
+                    'invd_receipt_flag' => "No",
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
+            }
+
+            DB::commit(); // Commit the transaction if everything goes well
+            $this->closeCreateInvoice();
+
+            // Redirect to dashboard or another route
+            return redirect()->route('dashboard');
+
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback the transaction if an error occurs
+            $this->closeCreateInvoice();
+            // Log the error for debugging (optional)
+            session()->flash('error','Invoice creation failed: ' . $e->getMessage());
         }
-        $this->closeCreateInvoice();
-        return redirect()->route('dashboard');
     }
     public function openCreateInvoice(){
         $this->showCreateInvoice = true;
@@ -439,105 +464,125 @@ class Invoice extends Component
     }
 
     public function editInvoice()
-{
-    $this->validate([
-        'editInvoiceDate' => ['required'],
-        'editCustomerCode'  => ['required'],
-        'editPsGroup' => ['required'],
-        'editDueDate' => ['required'],
-    ]); 
+    {
+        DB::beginTransaction(); // Start the transaction
 
-    // Update InvoiceHeader
-    $header = InvoiceHeader::find($this->editInvoices->id); // Fetch the InvoiceHeader instance
+       
+            $this->validate([
+                'editInvoiceDate' => ['required'],
+                'editCustomerCode' => ['required'],
+                'editPsGroup' => ['required'],
+                'editDueDate' => ['required'],
+                'editInvoiceDetails.*.remark' => ['max:80']
+            ],[
+                'editInvoiceDetails.*.remark.max' => 'Remark must not be greater than 80 characters.'
+            ]);
+        try {
+            // Update InvoiceHeader
+            $header = InvoiceHeader::find($this->editInvoices->id); // Fetch the InvoiceHeader instance
 
-    if (!$header) {
-        // Handle case where InvoiceHeader is not found
-        return;
-    }
+            if (!$header) {
+                // Handle case where InvoiceHeader is not found
+                throw new \Exception('InvoiceHeader not found');
+            }
 
-    $header->update([
-        'customer_id' => $this->editCustomerCode,
-        'inv_no' => $this->editInvoiceNumber,
-        'customer_rental_id' => !empty($this->editRental) ? $this->editRental : null,
-        'inv_date' => $this->editInvoiceDate,
-        'invd_duedate' => $this->editDueDate,
-        'ps_group_id' => $this->editPsGroup,
-        'inv_unite' => CustomerRental::where('id',$this->editRental)
-            ->pluck('custr_unit')->first() ?? null,
-        'updated_by' => auth()->id(),
-    ]);
-
-    // Collect existing InvoiceDetail IDs
-    $existingDetailIds = collect($this->editInvoiceDetails)->pluck('id')->filter();
-
-    // Delete InvoiceDetails that are not in the updated list
-    InvoiceDetail::where('invoice_header_id', $header->id)
-        ->whereNotIn('id', $existingDetailIds->toArray())
-        ->delete();
-
-    // Update or Create InvoiceDetails
-    foreach ($this->editInvoiceDetails as $detail) {
-        if (isset($detail['id'])) {
-            // Update existing InvoiceDetail
-            InvoiceDetail::where('id', $detail['id'])->update([
-                'invd_product_code' => $detail['pscode'],
-                'invd_product_name' => $detail['psname'],
-                'invd_period' => $detail['period'],
-                'invd_amt' => $detail['amt'],
-                'invd_vat_percent' => $detail['vat'],
-                'invd_vat_amt' => $detail['vatamt'],
-                'invd_wh_tax_percent' => $detail['whvat'],
-                'invd_wh_tax_amt' => $detail['whtaxamt'],
-                'invd_net_amt' => $detail['netamt'],
-                'invd_remake' => $detail['remark'],
-                'invd_receipt_flag' => 'No',
+            $header->update([
+                'customer_id' => $this->editCustomerCode,
+                'inv_no' => $this->editInvoiceNumber,
+                'customer_rental_id' => !empty($this->editRental) ? $this->editRental : null,
+                'inv_date' => $this->editInvoiceDate,
+                'invd_duedate' => $this->editDueDate,
+                'ps_group_id' => $this->editPsGroup,
+                'inv_unite' => CustomerRental::where('id', $this->editRental)
+                    ->pluck('custr_unit')->first() ?? null,
                 'updated_by' => auth()->id(),
             ]);
-        } else {
-            // Create new InvoiceDetail with invoice_header_id
-            $newDetail = new InvoiceDetail([
-                'invoice_header_id' => $header->id,
-                'invd_product_code' => $detail['pscode'],
-                'invd_product_name' => $detail['psname'],
-                'invd_period' => $detail['period'],
-                'invd_amt' => $detail['amt'],
-                'invd_vat_percent' => $detail['vat'],
-                'invd_vat_amt' => $detail['vatamt'],
-                'invd_wh_tax_percent' => $detail['whvat'],
-                'invd_wh_tax_amt' => $detail['whtaxamt'],
-                'invd_net_amt' => $detail['netamt'],
-                'invd_remake' => $detail['remark'],
-                'invd_receipt_flag' => 'No',
-                'created_by' => auth()->id(),
-                'updated_by' => auth()->id(),
-            ]);
-            $header->invoicedetail()->save($newDetail); // Save the new detail with relationship
+
+            // Collect existing InvoiceDetail IDs
+            $existingDetailIds = collect($this->editInvoiceDetails)->pluck('id')->filter();
+
+            // Delete InvoiceDetails that are not in the updated list
+            InvoiceDetail::where('invoice_header_id', $header->id)
+                ->whereNotIn('id', $existingDetailIds->toArray())
+                ->delete();
+
+            // Update or Create InvoiceDetails
+            foreach ($this->editInvoiceDetails as $detail) {
+                if (isset($detail['id'])) {
+                    // Update existing InvoiceDetail
+                    InvoiceDetail::where('id', $detail['id'])->update([
+                        'invd_product_code' => $detail['pscode'],
+                        'invd_product_name' => $detail['psname'],
+                        'invd_period' => $detail['period'],
+                        'invd_amt' => $detail['amt'],
+                        'invd_vat_percent' => $detail['vat'],
+                        'invd_vat_amt' => $detail['vatamt'],
+                        'invd_wh_tax_percent' => $detail['whvat'],
+                        'invd_wh_tax_amt' => $detail['whtaxamt'],
+                        'invd_net_amt' => $detail['netamt'],
+                        'invd_remake' => $detail['remark'],
+                        'invd_receipt_flag' => 'No',
+                        'updated_by' => auth()->id(),
+                    ]);
+                } else {
+                    // Create new InvoiceDetail with invoice_header_id
+                    $newDetail = new InvoiceDetail([
+                        'invoice_header_id' => $header->id,
+                        'invd_product_code' => $detail['pscode'],
+                        'invd_product_name' => $detail['psname'],
+                        'invd_period' => $detail['period'],
+                        'invd_amt' => $detail['amt'],
+                        'invd_vat_percent' => $detail['vat'],
+                        'invd_vat_amt' => $detail['vatamt'],
+                        'invd_wh_tax_percent' => $detail['whvat'],
+                        'invd_wh_tax_amt' => $detail['whtaxamt'],
+                        'invd_net_amt' => $detail['netamt'],
+                        'invd_remake' => $detail['remark'],
+                        'invd_receipt_flag' => 'No',
+                        'created_by' => auth()->id(),
+                        'updated_by' => auth()->id(),
+                    ]);
+                    $header->invoicedetail()->save($newDetail); // Save the new detail with relationship
+                }
+            }
+
+            DB::commit(); // Commit the transaction if everything goes well
+            $this->closeEditModal();
+
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback the transaction if an error occurs
+            $this->closeEditModal();
+            // Optionally, log the error or handle it
+            session()->flash('error','Invoice edit failed: ' . $e->getMessage());
+            // You can also re-throw the exception if you need to handle it elsewhere
         }
-    }
-    $this->closeEditModal();
-    
-}
-public function closeEditModal(){
-     $this->showEditInvoice = false;
-        $this->reset(['editPsGroup','editCustomerCode','editcustomerrents','editRental','editInvoiceDate','editInvoiceDetails']);
-        $this->resetValidation();
-}
+    } 
 
-public function openCancelInvoice($id){
-    $this->showDeleteInvoice = true;
-    $this->cancelInvoice = $id;
-}
-public function cancelInvoiceModal(){
-    InvoiceHeader::where('id',$this->cancelInvoice)->update([
-        'inv_status' => 'CANCEL',
-        'inv_remark' => $this->invRemark,
-    ]);
-    $this->closeCancelInvoice();
-}
-public function closeCancelInvoice(){
-    $this->showDeleteInvoice = false;
-    $this->reset(['cancelInvoice','invRemark']);
-}
+    public function closeEditModal(){
+        $this->showEditInvoice = false;
+            $this->reset(['editPsGroup','editCustomerCode','editcustomerrents','editRental','editInvoiceDate','editInvoiceDetails']);
+            $this->resetValidation();
+    }
+
+    public function openCancelInvoice($id){
+        $this->showDeleteInvoice = true;
+        $this->cancelInvoice = $id;
+    }
+    public function cancelInvoiceModal(){
+        try{
+        InvoiceHeader::where('id',$this->cancelInvoice)->update([
+            'inv_status' => 'CANCEL',
+            'inv_remark' => $this->invRemark,
+        ]);
+        }catch(\Exception $e){
+            session()->flash('error','The remark character is exceed 150 character'.$e->getMessage());
+        }
+        $this->closeCancelInvoice();
+    }
+    public function closeCancelInvoice(){
+        $this->showDeleteInvoice = false;
+        $this->reset(['cancelInvoice','invRemark']);
+    }
 
     public function exportPdf($id){
         $number = new numberToBath;
@@ -681,122 +726,142 @@ public function closeCancelInvoice(){
         $this->reset('genInvDate','genDueDate');
         $this->resetValidation();
     }
-    public function genMonthly(){
-        $this->validate([
-            'genInvDate' => 'required',
-            'genDueDate' => 'required'
-        ]);
-        $carbon_date = Carbon::parse($this->genInvDate)->addMonth();
-        $start = $carbon_date->copy()->startOfMonth()->format('d/m/Y');
-        $end = $carbon_date->copy()->endOfMonth()->format('d/m/Y');
-        $period = $start . " - " . $end;
+    public function genMonthly()
+    {
+        DB::beginTransaction(); // Start a transaction
 
-        $availableContracts = CustomerRental::where(function($query) use ($carbon_date) {
-            $query->whereDate('custr_begin_date2', '<=', $carbon_date->endOfMonth())
-                ->whereDate('custr_end_date2', '>=', $carbon_date->startOfMonth());
-                // ->where('custr_status', '==', 1);
-        })
-        ->where("custr_status","!=", 0)
-        ->whereHas("customer",function($query){
-            $query->where('cust_invauto','Y');
-        })
-        ->whereHas('listcust')
-        ->with('listcust')
-        ->get();
-        // dd($availableContracts);
-        if($availableContracts){
-        $prefix = 'I'.$this->tower.'S';
-        $year = Carbon::parse($this->genInvDate)->format('Y');
-        $datePart = substr($year,-2) . Carbon::parse($this->genInvDate)->format('m');
-        $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
-
-        if (is_null($lastInvoice)) {
-            foreach($availableContracts as $index => $bill){
-                 $generatedInvoices[] = $prefix . $datePart . str_pad(1 + $index, 4, '0', STR_PAD_LEFT);
-                }
-        } else {
-            foreach($availableContracts as $index => $bill){
-            $lastNumber = (int)substr($lastInvoice->inv_no, -4);
-            $newNumber = str_pad($lastNumber + 1 + $index, 4, '0', STR_PAD_LEFT);
-            $generatedInvoices[]= $prefix . $datePart . $newNumber;
-            }
-        } 
-        foreach($availableContracts as $index => $contract){
-            
-            $createInvoice = InvoiceHeader::create([
-            'inv_no' => $generatedInvoices[$index],
-            'customer_id' => $contract->customer_id,
-            'customer_rental_id' => $contract->id,
-            'inv_date' => $this->genInvDate,
-            'invd_duedate' => $this->genDueDate,
-            'ps_group_id' => 1,
-            'inv_status' => 'USE',
-            'inv_unite' => $contract->custr_unit ?? null, 
-            'inv_tower' => $this->tower,
-            'created_by' => auth()->id(),
-            'updated_by' => auth()->id(),
-        ]);
-
-        $groupedMonth = $contract->listcust()
-        ->select(
-            'customer_rental_id',
-            'lcr_line',
-            'product_service_id',
-            DB::raw("GROUP_CONCAT(lcr_remark SEPARATOR ' ') as con_remark"),
-            DB::raw('SUM(lcr_rental_fee * lcr_area_sqm) as amt' ), 
-        )->groupBy(
-            'customer_rental_id',
-            'product_service_id',
-            'lcr_line',
-        )->orderBy('lcr_line')
-        ->get();
-
-        foreach ($groupedMonth as $list) {
-            $wh_tax = $list->productservice->ps_whtax;
-            if($contract->customer->cust_gov_flag == 1){
-                $wh_tax = $list->productservice->gov_whtax;
-            } 
-            if($contract->customer->cust_gov_flag == 3){
-                $wh_tax = 0;
-            }
-            $amt = $list->amt;
-           
-            if(Carbon::parse($contract->custr_begin_date2)->format('m-Y') == $carbon_date->format('m-Y') )
-            {
-                $day = Carbon::parse($contract->custr_begin_date2);
-                $endMonth = $day->copy()->endOfMonth();
-                $daysRemaining = $day->diffInDays($endMonth) + 1;
-                $amt = round(($amt / 30) * $daysRemaining,2);
-            } 
-            if(Carbon::parse($contract->custr_end_date2)->format('m-Y') == $carbon_date->format('m-Y') )
-            {
-                $day = Carbon::parse($contract->custr_end_date2)->day; 
-                $amt = round(($amt / 30) * $day, 2);    
-            }
-
-            $vatamt = round(($amt * $list->productservice->ps_vat)/100,2);
-            $whamt = round(($amt * $wh_tax)/100,2);
-            $netamt = $amt + $vatamt;
-            $createInvoice->invoicedetail()->create([
-                'invd_product_code' => $list->productservice->ps_code,
-                'invd_product_name' => $list->productservice->ps_name_th,
-                'invd_period' => $period,
-                'invd_amt' => $amt,
-                'invd_vat_percent' => $list->productservice->ps_vat,
-                'invd_vat_amt' => $vatamt,
-                'invd_wh_tax_percent' => $wh_tax,
-                'invd_wh_tax_amt' => $whamt,
-                'invd_net_amt' => $netamt,
-                'invd_remake' => $list->con_remark,
-                'invd_receipt_flag' => "No",
-                'created_by' => auth()->id(),
-                'updated_by' => auth()->id(),
+        try {
+            $this->validate([
+                'genInvDate' => 'required',
+                'genDueDate' => 'required'
             ]);
+
+            $carbon_date = Carbon::parse($this->genInvDate)->addMonth();
+            $start = $carbon_date->copy()->startOfMonth()->format('d/m/Y');
+            $end = $carbon_date->copy()->endOfMonth()->format('d/m/Y');
+            $period = $start . " - " . $end;
+
+            $availableContracts = CustomerRental::where(function ($query) use ($carbon_date) {
+                $query->whereDate('custr_begin_date2', '<=', $carbon_date->endOfMonth())
+                    ->whereDate('custr_end_date2', '>=', $carbon_date->startOfMonth());
+            })
+                ->where("custr_status", "!=", 0)
+                ->whereHas("customer", function ($query) {
+                    $query->where('cust_invauto', 'Y');
+                })
+                ->whereHas('listcust')
+                ->with('listcust')
+                ->get();
+
+            if ($availableContracts) {
+                $prefix = 'I' . $this->tower . 'S';
+                $year = Carbon::parse($this->genInvDate)->format('Y');
+                $datePart = substr($year, -2) . Carbon::parse($this->genInvDate)->format('m');
+                $lastInvoice = InvoiceHeader::where('inv_no', 'like', $prefix . $datePart . '%')->orderBy('inv_no', 'desc')->first();
+
+                if (is_null($lastInvoice)) {
+                    foreach ($availableContracts as $index => $bill) {
+                        $generatedInvoices[] = $prefix . $datePart . str_pad(1 + $index, 4, '0', STR_PAD_LEFT);
+                    }
+                } else {
+                    foreach ($availableContracts as $index => $bill) {
+                        $lastNumber = (int) substr($lastInvoice->inv_no, -4);
+                        $newNumber = str_pad($lastNumber + 1 + $index, 4, '0', STR_PAD_LEFT);
+                        $generatedInvoices[] = $prefix . $datePart . $newNumber;
+                    }
+                }
+
+                // Creating the InvoiceHeader and InvoiceDetail for each contract
+                foreach ($availableContracts as $index => $contract) {
+
+                    $createInvoice = InvoiceHeader::create([
+                        'inv_no' => $generatedInvoices[$index],
+                        'customer_id' => $contract->customer_id,
+                        'customer_rental_id' => $contract->id,
+                        'inv_date' => $this->genInvDate,
+                        'invd_duedate' => $this->genDueDate,
+                        'ps_group_id' => 1,
+                        'inv_status' => 'USE',
+                        'inv_unite' => $contract->custr_unit ?? null,
+                        'inv_tower' => $this->tower,
+                        'created_by' => auth()->id(),
+                        'updated_by' => auth()->id(),
+                    ]);
+
+                    $groupedMonth = $contract->listcust()
+                        ->select(
+                            'customer_rental_id',
+                            'lcr_line',
+                            'product_service_id',
+                            DB::raw("GROUP_CONCAT(lcr_remark SEPARATOR ' ') as con_remark"),
+                            DB::raw('SUM(lcr_rental_fee * lcr_area_sqm) as amt'),
+                        )
+                        ->groupBy(
+                            'customer_rental_id',
+                            'product_service_id',
+                            'lcr_line',
+                        )
+                        ->orderBy('lcr_line')
+                        ->get();
+
+                    foreach ($groupedMonth as $list) {
+                        $wh_tax = $list->productservice->ps_whtax;
+                        if ($contract->customer->cust_gov_flag == 1) {
+                            $wh_tax = $list->productservice->gov_whtax;
+                        }
+                        if ($contract->customer->cust_gov_flag == 3) {
+                            $wh_tax = 0;
+                        }
+                        $amt = $list->amt;
+
+                        // Adjust the amount based on the contract start and end dates
+                        if (Carbon::parse($contract->custr_begin_date2)->format('m-Y') == $carbon_date->format('m-Y')) {
+                            $day = Carbon::parse($contract->custr_begin_date2);
+                            $endMonth = $day->copy()->endOfMonth();
+                            $daysRemaining = $day->diffInDays($endMonth) + 1;
+                            $amt = round(($amt / 30) * $daysRemaining, 2);
+                        }
+                        if (Carbon::parse($contract->custr_end_date2)->format('m-Y') == $carbon_date->format('m-Y')) {
+                            $day = Carbon::parse($contract->custr_end_date2)->day;
+                            $amt = round(($amt / 30) * $day, 2);
+                        }
+
+                        // Calculate VAT and withholding tax
+                        $vatamt = round(($amt * $list->productservice->ps_vat) / 100, 2);
+                        $whamt = round(($amt * $wh_tax) / 100, 2);
+                        $netamt = $amt + $vatamt;
+
+                        // Create InvoiceDetail for each product/service
+                        $createInvoice->invoicedetail()->create([
+                            'invd_product_code' => $list->productservice->ps_code,
+                            'invd_product_name' => $list->productservice->ps_name_th,
+                            'invd_period' => $period,
+                            'invd_amt' => $amt,
+                            'invd_vat_percent' => $list->productservice->ps_vat,
+                            'invd_vat_amt' => $vatamt,
+                            'invd_wh_tax_percent' => $wh_tax,
+                            'invd_wh_tax_amt' => $whamt,
+                            'invd_net_amt' => $netamt,
+                            'invd_remake' => $list->con_remark,
+                            'invd_receipt_flag' => "No",
+                            'created_by' => auth()->id(),
+                            'updated_by' => auth()->id(),
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit(); // Commit the transaction if everything goes well
+            $this->closeGenMonth();
+            return redirect()->route('dashboard');
+            
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback the transaction if something goes wrong
+            $this->closeGenMonth();
+            session()->flash('error','Monthly invoice generation failed: ' . $e->getMessage());
+            // Log the error for debugging
         }
-        }
-        }
-      $this->closeGenMonth(); 
-    }
+    } 
     public function openExportInvoice(){
         $this->showExportInvoice = true;
 

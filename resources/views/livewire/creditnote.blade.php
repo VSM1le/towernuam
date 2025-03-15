@@ -279,6 +279,9 @@
                                     </td>
                                      <td scope="row" class="px-2 py-4 font-medium text-gray-900 ">
                                         <input wire:model="creditDetails.{{ $index }}.remark" type="text" class="w-full p-2 border border-gray-300 text-xs rounded" />     
+                                        @error('creditDetails.'.$index.'.remark') 
+                                            <span class="text-red-500 text-xs">{{ $message }}</span> 
+                                        @enderror 
                                     </td>
                                 
                                 <td class="px-6 py-4">

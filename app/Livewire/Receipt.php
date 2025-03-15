@@ -13,6 +13,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Dompdf\Options;
 use FontLib\TrueType\Collection;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -236,77 +237,102 @@ class Receipt extends Component
         $this->sumCheque = round($this->sumCheque,2);
     } 
 
-    public function createReceipt(){
-        $this->validate([
-            'receiptDate' => ['required', 'date'],
-            'customerCode' => ['required'],
-            'sumCheque' => ['required', 'numeric', 'min:0'],
-            'paymentType' => ['required'],
-            'invoiceDetails' => ['required', 'array'],
-            'cheque.bank' => ['required_if:paymentType,cheq'],
-            'cheque.branch' => ['required_if:paymentType,cheq'],
-            'cheque.no' => ['required_if:paymentType,cheq'],
-            'cheque.chequeDate' => ['required_if:paymentType,cheq', 'nullable', 'date'],
-            'amountExceed' => ['required_with:descExceed'],
-            'descExceed' => ['required_with:amountExceed'],
-        ],
-        [
-            'cheque.bank.required_if' => 'Bank is required.',
-            'cheque.no.required_if' => 'Bank No. is required.',
-            'cheque.chequeDate.required_if' => 'Cheque Date is required.',
-            'cheque.branch.required_if' => 'branch is required.'
-        ]);
+    public function createReceipt()
+    {
+        DB::beginTransaction(); // Start a transaction
 
+       
+            $this->validate([
+                'receiptDate' => ['required', 'date'],
+                'customerCode' => ['required'],
+                'sumCheque' => ['required', 'numeric', 'min:0'],
+                'paymentType' => ['required'],
+                'invoiceDetails' => ['required', 'array'],
+                'cheque.bank' => ['required_if:paymentType,cheq'],
+                'cheque.branch' => ['required_if:paymentType,cheq'],
+                'cheque.no' => ['required_if:paymentType,cheq'],
+                'cheque.chequeDate' => ['required_if:paymentType,cheq', 'nullable', 'date'],
+                'amountExceed' => ['required_with:descExceed'],
+                'descExceed' => ['required_with:amountExceed','max:180'],
+            ],
+            [
+                'descExceed.max' => 'Remark must not be greater than 180 characters.',
+                'cheque.bank.required_if' => 'Bank is required.',
+                'cheque.no.required_if' => 'Bank No. is required.',
+                'cheque.chequeDate.required_if' => 'Cheque Date is required.',
+                'cheque.branch.required_if' => 'Branch is required.'
+            ]);
+        try {
+            // Receipt number generation logic
+            $prefix = 'R' . $this->tower . 'S';
+            $year = Carbon::parse($this->receiptDate)->format("Y");
+            $datePart = substr($year, -2) . Carbon::parse($this->receiptDate)->format('m');
+            $lastReceipt = ReceiptHeader::where('rec_no', 'like', $prefix . $datePart . '%')->orderBy('rec_no', 'desc')->first();
 
-        $prefix = 'R'.$this->tower.'S';
-        $year = Carbon::parse($this->receiptDate)->format("Y");
-        $datePart = substr($year,-2) . Carbon::parse($this->receiptDate)->format('m');
+            if (is_null($lastReceipt)) {
+                $recNo = $prefix . $datePart . '0001';
+            } else {
+                $lastNumber = (int)substr($lastReceipt->rec_no, -4);
+                $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+                $recNo = $prefix . $datePart . $newNumber;
+            }
 
-        $lastReceipt= ReceiptHeader::where('rec_no', 'like', $prefix . $datePart . '%')->orderBy('rec_no', 'desc')->first();
-
-        if (is_null($lastReceipt)) {
-            $recNo = $prefix . $datePart . '0001';
-        } else {
-            $lastNumber = (int)substr($lastReceipt->rec_no, -4);
-            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-            $recNo = $prefix . $datePart . $newNumber;
-        }
-
-        $create_receipt = ReceiptHeader::create([
-            'rec_no' => $recNo,
-            'customer_id' => $this->customerCode,
-            'rec_date' => $this->receiptDate,
-            'rec_status' => "Yes",
-            'rec_payment_amt' => $this->sumCheque,
-            'rec_payment_type' => $this->paymentType,
-            'rec_bank' => $this->cheque['bank'] ?? null,
-            'rec_branch' => $this->cheque['branch'] ?? null,
-            'rec_cheque_no' => $this->cheque['no'] ?? null,
-            'rec_cheque_date' => $this->cheque['chequeDate'] ?? null,
-            'rec_exceed_desc' => $this->descExceed ?? null,
-            'rec_exceed_amount'  => $this->amountExceed ?? null,
-            'created_by' => auth()->id(),
-            'updated_by' => auth()->id(),
-        ]);
-
-        foreach ($this->invoiceDetails as $detail) {
-            $flag = ($detail['netamt'] <= $detail['paid'] + $detail['receiptamt']) ? "Yes" : "Partial";
-            InvoiceDetail::where('id', $detail['id'])->update([
-                "invd_receipt_flag" => $flag,
-                "invd_receipt_amt" =>round($detail['receiptamt'] +  $detail['paid'],2),
+            // Create the receipt header
+            $create_receipt = ReceiptHeader::create([
+                'rec_no' => $recNo,
+                'customer_id' => $this->customerCode,
+                'rec_date' => $this->receiptDate,
+                'rec_status' => "Yes",
+                'rec_payment_amt' => $this->sumCheque,
+                'rec_payment_type' => $this->paymentType,
+                'rec_bank' => $this->cheque['bank'] ?? null,
+                'rec_branch' => $this->cheque['branch'] ?? null,
+                'rec_cheque_no' => $this->cheque['no'] ?? null,
+                'rec_cheque_date' => $this->cheque['chequeDate'] ?? null,
+                'rec_exceed_desc' => $this->descExceed ?? null,
+                'rec_exceed_amount' => $this->amountExceed ?? null,
+                'created_by' => auth()->id(),
+                'updated_by' => auth()->id(),
             ]);
 
+            // Process each invoice detail
+            foreach ($this->invoiceDetails as $detail) {
+                // Determine receipt flag (Paid or Partial)
+                $flag = ($detail['netamt'] <= $detail['paid'] + $detail['receiptamt']) ? "Yes" : "Partial";
+
+                // Update invoice details with the receipt flag and receipt amount
+                InvoiceDetail::where('id', $detail['id'])->update([
+                    "invd_receipt_flag" => $flag,
+                    "invd_receipt_amt" => round($detail['receiptamt'] + $detail['paid'], 2),
+                ]);
+
+                // Create the receipt detail
                 $create_receipt->receiptdetail()->create([
                     'invoice_detail_id' => $detail['id'],
-                    'rec_pay' =>  $detail['paid'],
-                    'whpay' => $detail['whpay'], 
+                    'rec_pay' => $detail['paid'],
+                    'whpay' => $detail['whpay'],
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
+            }
+
+            // Commit the transaction after all operations are successful
+            DB::commit();
             
+            // Close receipt creation process
+            $this->closeCreateReceipt();
+
+            // Redirect to receipt page
+            return redirect()->route('receipt');
+
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of error
+            DB::rollBack();
+            $this->closeCreateReceipt();
+
+            // Log the error for debugging
+            session()->flash('error','Receipt creation failed: ' . $e->getMessage());
         } 
-        $this->closeCreateReceipt();
-        return redirect()->route('receipt');
     }
 
     public function openCreateReceipt(){
@@ -532,24 +558,33 @@ class Receipt extends Component
     }
 
     public function cancelReceipt(){
-        $receipt = ReceiptHeader::find($this->cancelId);
-        if($receipt->rec_status != "Cancel"){
-        if($receipt->rec_have_inv_flag != '0'){
-        foreach($receipt->receiptdetail as $detail){
-            $unpaid = max($detail->invoicedetail->invd_receipt_amt - $detail->rec_pay,0);
-            $receiptFlag = ($unpaid == 0) ? "No" : "Partial";
-            InvoiceDetail::where('id',$detail->invoice_detail_id)->update([
-                "invd_receipt_flag" => $receiptFlag,
-                "invd_receipt_amt" =>$unpaid,
-            ]);
+        DB::transaction();
+        try{
+
+            $receipt = ReceiptHeader::find($this->cancelId);
+            if($receipt->rec_status != "Cancel"){
+            if($receipt->rec_have_inv_flag != '0'){
+            foreach($receipt->receiptdetail as $detail){
+                $unpaid = max($detail->invoicedetail->invd_receipt_amt - $detail->rec_pay,0);
+                $receiptFlag = ($unpaid == 0) ? "No" : "Partial";
+                InvoiceDetail::where('id',$detail->invoice_detail_id)->update([
+                    "invd_receipt_flag" => $receiptFlag,
+                    "invd_receipt_amt" =>$unpaid,
+                ]);
+                }
             }
+                $receipt->update([
+                'rec_status' => "Cancel",
+                'rec_remark' => $this->receiptCancelRemark
+                ]);
+            } 
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollBack();
+            session()->flash('error','something wrong while trying to cancel receipt: '.$e->getMessage());
+        }finally{
+            $this->closeCancelReceipt();
         }
-            $receipt->update([
-               'rec_status' => "Cancel",
-               'rec_remark' => $this->receiptCancelRemark
-            ]);
-        } 
-        $this->closeCancelReceipt();
     }
 
     public function closeCancelReceipt(){
@@ -570,8 +605,10 @@ class Receipt extends Component
             'cheque.branch' => ['required_if:paymentType,cheq'],
             'cheque.no' => ['required_if:paymentType,cheq'],
             'cheque.chequeDate' => ['required_if:paymentType,cheq', 'nullable', 'date'],
+            'receiptDetails.*.remark' => ['max:80']
         ],
         [
+            'receiptDetails.*.remark.max' => 'Remark must not be greater than 80 characters.',
             'customerCodeNoInvoice.required' => "The customer code field is required.",
             'cheque.bank.required_if' => 'Bank is required.',
             'cheque.no.required_if' => 'Bank No. is required.',
@@ -593,7 +630,8 @@ class Receipt extends Component
             $recNo = $prefix . $datePart . $newNumber;
         }
         try{
-         $create_receipt = ReceiptHeader::create([
+        DB::beginTransaction(); 
+        $create_receipt = ReceiptHeader::create([
             'rec_no' => $recNo,
             'customer_id' => $this->customerCodeNoInvoice,
             'rec_date' => $this->receiptDate,
@@ -610,7 +648,7 @@ class Receipt extends Component
         ]);
 
         foreach($this->receiptDetails as $detail){
-        $create_receipt->receiptdetail()->create([
+            $create_receipt->receiptdetail()->create([
                 'recd_product_code' => $detail['pscode'],
                 'recd_product_name' => $detail['psname'],
                 'recd_amt' => $detail['rawamt'],
@@ -622,10 +660,12 @@ class Receipt extends Component
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
             ]);
+            DB::commit();
             session()->flash('success', ' Create receipt successful.'); 
         }
         }catch(\Exception $e){
-            session()->flash('error', " Something went wrong can't create receipt."); 
+            DB::rollBack();
+            session()->flash('error', " Something went wrong can't create receipt.".$e->getMessage()); 
 
         }finally{
             $this->closeCreateNoInvoice();

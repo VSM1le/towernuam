@@ -10,6 +10,7 @@ use App\Models\ProductService;
 use App\Services\numberToBath;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -95,7 +96,11 @@ class Creditnote extends Component
             'customerCode'  => ['required'],
             'receiptDate' => ['required','date'],
             'receiptNumber' => ['required'],
+            'creaditDetails.*.remark' => ['max:80'],
+        ],[
+            'creaditDetails.*.remark.max'=> 'Remark must not be greater than 80 characters.'
         ]);
+        DB::beginTransaction();
         $prefix = 'CAS';
         $year = Carbon::parse($this->creditDate)->format('Y');
         $datePart = substr($year,-2) . Carbon::parse($this->creditDate)->format('m');
@@ -136,8 +141,10 @@ class Creditnote extends Component
                     'updated_by' => auth()->id(),
                 ]);
             }
+            DB::commit();
             session()->flash('success','Create creditnote succesfully.');
         }catch(\Exception $e){
+            DB::rollBack();
             session()->flash('error','Something went wrong.');
         }finally{
             $this->closeCreateCreditNoteNoReceipt();
@@ -219,7 +226,7 @@ class Creditnote extends Component
             ]);
             session()->flash('success','Cancel creditnote successful.');
         }catch(\Exception $e){
-            session()->flash('error','Something went wrong can note cancel creditnote.');
+            session()->flash('error','Something went wrong can note cancel creditnote: '.$e->getMessage());
         }finally{
             $this->closeCancelCreditNote();
         }
@@ -294,6 +301,10 @@ class Creditnote extends Component
             'customerCode'  => ['required'],
             'receiptDate' => ['required','date'],
             'receiptNumber' => ['required'],
+            'creditDetails.*.remark' => ['max:80'],
+        ],
+        [
+            'creaditDetails.*.remark'=>'Remark must not be greater than 180 characters.', 
         ]);
         try{
         $header = CreditnoteHeader::find($this->creditId);
