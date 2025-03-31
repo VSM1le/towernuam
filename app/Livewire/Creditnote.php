@@ -96,9 +96,9 @@ class Creditnote extends Component
             'customerCode'  => ['required'],
             'receiptDate' => ['required','date'],
             'receiptNumber' => ['required'],
-            'creaditDetails.*.remark' => ['max:80'],
+            'creditDetails.*.remark' => ['max:80'],
         ],[
-            'creaditDetails.*.remark.max'=> 'Remark must not be greater than 80 characters.'
+            'creditDetails.*.remark.max'=> 'Remark must not be greater than 80 characters.'
         ]);
         DB::beginTransaction();
         $prefix = 'CAS';
