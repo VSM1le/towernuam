@@ -558,7 +558,7 @@ class Receipt extends Component
     }
 
     public function cancelReceipt(){
-        DB::transaction();
+        DB::beginTransaction();
         try{
 
             $receipt = ReceiptHeader::find($this->cancelId);
