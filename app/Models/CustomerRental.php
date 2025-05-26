@@ -45,6 +45,9 @@ class CustomerRental extends Model
         'created_by',
         'updated_by',
         'custr_contract_no_real',
+        'insurance_rental',
+        'insurance_service',
+        'contract_note',
     ];
 
     public function invoiceheader():HasMany{

@@ -86,7 +86,7 @@ class Invoice extends Component
         $this->rental = null;
         $this->invoiceDetails = [];
           if (!is_null($this->customerCode)) {
-            $this->customerrents = CustomerRental::where('customer_id',$this->customerCode)->get();
+            $this->customerrents = CustomerRental::where('customer_id',$this->customerCode)->where('custr_status',1)->get();
         } else {
             $this->customerrents = null;    
         }

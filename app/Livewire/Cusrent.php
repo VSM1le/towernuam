@@ -25,6 +25,9 @@ class Cusrent extends Component
     public $rentalFee;
     public $serviceFee;
     public $equipFee;
+    public $insuranceService; 
+    public $insuranceRental; 
+    public $noteContract; 
     public $tower = "A";
 
     public $showCreateContract = false;
@@ -54,6 +57,9 @@ class Cusrent extends Component
             'custr_begin_date2' => $this->startDate,
             'custr_end_date2' => $this->endDate,
             'custr_contract_year' => $this->year,
+            'insurance_rental' => $this->insuranceRental,
+            'insurance_service' => $this->insuranceService,
+            'contract_note' => $this->noteContract,
             'created_by' => auth()->id(),
             'updated_by' => auth()->id(),
         ]);
@@ -82,7 +88,7 @@ class Cusrent extends Component
     }
     public function closeCreateContract(){
         $this->showCreateContract = false;
-        $this->reset(['contractNumber','contractRNumber','customerId','unit','areaSqm','rentalFee','serviceFee','equipFee','startDate','endDate','year']);
+        $this->reset(['insuranceRental','insuranceService','noteContract','contractNumber','contractRNumber','customerId','unit','areaSqm','rentalFee','serviceFee','equipFee','startDate','endDate','year']);
     }
 
     public function openEditContract($id){
@@ -100,6 +106,9 @@ class Cusrent extends Component
         $this->startDate = $contract->custr_begin_date2;
         $this->endDate = $contract->custr_end_date2;
         $this->year = $contract->custr_contract_year;
+        $this->insuranceRental = $contract->insurance_rental;
+        $this->insuranceService = $contract->insurance_service;
+        $this->noteContract = $contract->contract_note;
         $this->showEditContract = true;
     } 
 
@@ -117,13 +126,16 @@ class Cusrent extends Component
             'custr_begin_date2' => $this->startDate,
             'custr_end_date2' => $this->endDate,
             'custr_contract_year' => $this->year,
+            'insurance_rental' => $this->insuranceRental,
+            'insurance_service' => $this->insuranceService,
+            'contract_note' => $this->noteContract,
             'updated_by' => auth()->id(),
         ]);
         $this->closeEditContract();
     }
 
     public function closeEditContract(){
-        $this->reset(['contractNumber','contractRNumber','customerId','unit','areaSqm','rentalFee','serviceFee','equipFee','startDate','endDate','year','editId']);
+        $this->reset(['insuranceRental','insuranceService','noteContract','contractNumber','contractRNumber','customerId','unit','areaSqm','rentalFee','serviceFee','equipFee','startDate','endDate','year','editId']);
         $this->showEditContract = false;
     }
 
