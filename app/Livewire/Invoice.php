@@ -815,16 +815,16 @@ class Invoice extends Component
                         $amt = $list->amt;
 
                         // Adjust the amount based on the contract start and end dates
-                        if (Carbon::parse($contract->custr_begin_date2)->format('m-Y') == $carbon_date->format('m-Y')) {
-                            $day = Carbon::parse($contract->custr_begin_date2);
-                            $endMonth = $day->copy()->endOfMonth();
-                            $daysRemaining = $day->diffInDays($endMonth) + 1;
-                            $amt = round(($amt / 30) * $daysRemaining, 2);
-                        }
-                        if (Carbon::parse($contract->custr_end_date2)->format('m-Y') == $carbon_date->format('m-Y')) {
-                            $day = Carbon::parse($contract->custr_end_date2)->day;
-                            $amt = round(($amt / 30) * $day, 2);
-                        }
+                        // if (Carbon::parse($contract->custr_begin_date2)->format('m-Y') == $carbon_date->format('m-Y')) {
+                        //     $day = Carbon::parse($contract->custr_begin_date2);
+                        //     $endMonth = $day->copy()->endOfMonth();
+                        //     $daysRemaining = $day->diffInDays($endMonth) + 1;
+                        //     $amt = round(($amt / 30) * $daysRemaining, 2);
+                        // }
+                        // if (Carbon::parse($contract->custr_end_date2)->format('m-Y') == $carbon_date->format('m-Y')) {
+                        //     $day = Carbon::parse($contract->custr_end_date2)->day;
+                        //     $amt = round(($amt / 30) * $day, 2);
+                        // }
 
                         // Calculate VAT and withholding tax
                         $vatamt = round(($amt * $list->productservice->ps_vat) / 100, 2);
