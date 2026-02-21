@@ -28,6 +28,7 @@ class Cusrent extends Component
     public $insuranceService; 
     public $insuranceRental; 
     public $noteContract; 
+    public $contractStatus;
     public $tower = "A";
 
     public $showCreateContract = false;
@@ -150,7 +151,9 @@ class Cusrent extends Component
                     $subquery->where('cust_name_th','like','%'.$this->searchContract.'%')
                         ->orWhere('cust_code','like','%'.$this->searchContract.'%');
                 });
-        })
+        })->when($this->contractStatus != "", function($query){
+            $query->where('custr_status', $this->contractStatus);
+        }) 
         ->paginate(10);
         return view('livewire.cusrent',compact('rentals'));
     }

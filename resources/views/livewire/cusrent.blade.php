@@ -29,7 +29,7 @@
               </div>
         @endif
         <div class="p-6 text-gray-900 dark:text-gray-100">
-            <div class="mb-2">
+            <div class="mb-2 flex justify-between">
             <label for="table-search" class="sr-only">Search</label>
                 <div class="relative mt-1">
                     <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -38,7 +38,17 @@
                         </svg>
                     </div>
                     <input type="text" wire:model.live="searchContract" class="block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search for items">
-                    </div>
+                </div>
+                <div>
+                    <div class="mr-5">
+                            <label class=" text-sm font-medium text-gray-900"></label>
+                            <select id= "status" wire:model.live="contractStatus"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-24  p-2.5 ">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                    </div> 
+                </div>
             </div>
              <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
