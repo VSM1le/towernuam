@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Exports\ReceiptExport;
 use App\Models\Customer;
 use App\Models\InvoiceDetail;
 use App\Models\InvoiceHeader;
@@ -14,6 +15,7 @@ use Carbon\Carbon;
 use Dompdf\Options;
 use FontLib\TrueType\Collection;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -55,6 +57,7 @@ class Receipt extends Component
     public $showExportReceipt = false;
     public $descExceed;
     public $amountExceed;
+    public $reportType = '1';
 
     #[Computed()]
     public function productservices(){
@@ -717,39 +720,45 @@ class Receipt extends Component
             return $detail->receiptheader->rec_status === 'Cancel';
         })->sum('rec_pay');
 
-        $combineHtml = null;
-        $countPage = 0;
-        $chunks = $receipt->chunk(30);
-        $count = count($chunks);
-        foreach($chunks as $index => $chunk){
-            $report = view('invoicepdf.receiptreport',[
-                'startDate' => Carbon::parse($this->exFromDate)->format('d-m-Y'),
-                'endDate' => Carbon::parse($this->exToDate)->format('d-m-Y'),
-                'filteredDetails' => $chunk,
-                'sumPage' => $count,
-                'currentPage' => $index + 1,
-                'sumValidReceipt' => $sumValidReceipt,
-                'sumCancelReceipt' => $sumCancelReceipt,
-                'sumExceed' => $sumExceed,
-            ]);
-            $combineHtml .= $report;
+        if($this->reportType== '1'){
+
+            $combineHtml = null;
+            $countPage = 0;
+            $chunks = $receipt->chunk(30);
+            $count = count($chunks);
+            foreach($chunks as $index => $chunk){
+                $report = view('invoicepdf.receiptreport',[
+                    'startDate' => Carbon::parse($this->exFromDate)->format('d-m-Y'),
+                    'endDate' => Carbon::parse($this->exToDate)->format('d-m-Y'),
+                    'filteredDetails' => $chunk,
+                    'sumPage' => $count,
+                    'currentPage' => $index + 1,
+                    'sumValidReceipt' => $sumValidReceipt,
+                    'sumCancelReceipt' => $sumCancelReceipt,
+                    'sumExceed' => $sumExceed,
+                ]);
+                $combineHtml .= $report;
+                }
+            $excessOrLacks = ReceiptHeader::whereDate('rec_date', '>=', $this->exFromDate)
+                ->whereDate('rec_date', '<=', $this->exToDate)
+                ->whereNotNull('rec_exceed_amount')
+                ->get();
+            if($excessOrLacks->count() > 0){
+                $report = view('invoicepdf.receiptreport2',[
+                    'startDate' => Carbon::parse($this->exFromDate)->format('d-m-Y'),
+                    'endDate' => Carbon::parse($this->exToDate)->format('d-m-Y'),
+                    'excessOrLacks' => $excessOrLacks,
+                ]);
+                $combineHtml .= $report;
             }
-        $excessOrLacks = ReceiptHeader::whereDate('rec_date', '>=', $this->exFromDate)
-            ->whereDate('rec_date', '<=', $this->exToDate)
-            ->whereNotNull('rec_exceed_amount')
-            ->get();
-        if($excessOrLacks->count() > 0){
-            $report = view('invoicepdf.receiptreport2',[
-                'startDate' => Carbon::parse($this->exFromDate)->format('d-m-Y'),
-                'endDate' => Carbon::parse($this->exToDate)->format('d-m-Y'),
-                'excessOrLacks' => $excessOrLacks,
-            ]);
-            $combineHtml .= $report;
+            $pdf = PDF::loadHTML($combineHtml);
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->stream();
+            },'receipt_report.pdf'); 
+        }else{
+
+            return Excel::download(new ReceiptExport($receipt),'report.xlsx');
         }
-        $pdf = PDF::loadHTML($combineHtml);
-        return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->stream();
-        },'receipt_report.pdf'); 
     }
 
     public function render()

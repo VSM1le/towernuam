@@ -832,6 +832,17 @@
                         @enderror
                     </div>
                 </div>
+                <div class="w-full pr-5 pl-5">
+                        <label class="w-40 text-sm font-medium text-gray-900"></label>
+                        <select id= "reportType" wire:model="reportType"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                            <option value="1">PDF Report</option>  
+                            <option value="2">Excel Report</option>  
+                        </select>
+                          @error('editCustomerCode') 
+                        <span class="text-red-500 text-xs">{{ $message }}</span> 
+                         @enderror
+                </div>
             </div>
             <div class="bg-gray-100 w-full flex justify-between p-4">
                 <div class="flex">
