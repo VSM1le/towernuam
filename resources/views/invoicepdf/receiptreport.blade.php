@@ -121,7 +121,6 @@
                     <th class="th-inv" style="max-width:150px">Customer Name</th>
                     <th class="th-inv">Contract Number</th>
                     <th class="th-inv" style="max-width:70px">Product Name</th>
-                    <th class="th-inv" style="width:70px;max-width:70px">Remark</th>
                     <th class="th-inv" style="width:70px">Amt</th>
                     <th class="th-inv">Vat Amt</th>
                     <th class="th-inv">Whtax Amt</th>
@@ -160,10 +159,6 @@
                     <td class="td-inv">
                         <p class="test">{{ Str::limit($detail->invoicedetail->invd_product_name ?? $detail->recd_product_name ,25) }}</p> 
                     </td>
-                    <td class="td-inv">
-                        <p class="test">{{ Str::limit($detail->invoicedetail->invd_remake ?? $detail->recd_remark, 25) }}</p> 
-                    </td>
-
                     <td class="td-inv">
                         <p class="test" style="text-align: right">
                             {{ number_format(round($detail->rec_pay * (100 / (100 + $detail->invoicedetail->invd_vat_percent)),2) ?? 0, 2, '.', ',') }}
@@ -206,6 +201,9 @@
                         <p class="test">{{ $detail->receiptheader->customerrental->custr_contract_no ?? null }}</p>
                     </td>
                     <td class="td-inv">
+                        <p class="test">{{ Str::limit($detail->recd_product_name ,25) }}</p> 
+                    </td>
+                    <td class="td-inv">
                         <p class="test" style="text-align: right">{{ number_format($detail->recd_amt ?? 0, 2, '.', ',') }}</p>
                     </td>
                     <td class="td-inv">
@@ -226,7 +224,6 @@
                 @for($i = count($filteredDetails);$i < 29; $i++)
                 <tr>
                     <td class="td-inv" style="height: 15px"></td>
-                    <td class="td-inv"></td>
                     <td class="td-inv"></td>
                     <td class="td-inv"></td>
                     <td class="td-inv"></td>
