@@ -161,7 +161,7 @@
                         <p class="test">{{ Str::limit($detail->invoicedetail->invd_product_name ?? $detail->recd_product_name ,25) }}</p> 
                     </td>
                     <td class="td-inv">
-                        <p class="test">{{ Str::limit($detail->invoicedetail->invd_remake ?? 'yeah', 25) }}</p> 
+                        <p class="test">{{ Str::limit($detail->invoicedetail->invd_remake ?? $detail->recd_remark, 25) }}</p> 
                     </td>
 
                     <td class="td-inv">
