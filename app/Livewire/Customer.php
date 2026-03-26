@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Exports\CustomerExport;
 use App\Models\Customer as ModelsCustomer;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -30,6 +31,7 @@ class Customer extends Component
     public $autoInv = 'Y';
     
     public $showEditCustomer = false;
+    public $showExportCustomer = false;
     public $editId;
     public $custStatus;
 
@@ -161,6 +163,13 @@ class Customer extends Component
             echo $pdf->stream();
         },  'Customer.pdf'); 
 
+    }
+    public function exportExcelCustomer(){
+        $customers = ModelsCustomer::when($this->custStatus != "", function($query){
+            $query->where('cust_status', $this->custStatus);
+        })->get();
+
+        return Excel::download(new CustomerExport($customers), 'customer.xlsx');
     }
 
     public function render()

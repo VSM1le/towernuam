@@ -2,8 +2,10 @@
 
 namespace App\Livewire;
 
+use App\Exports\PsGroupExcelExport;
 use Livewire\Component;
 use App\Models\PsGroup as mPsGroup;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Psgroup extends Component
 {
@@ -88,6 +90,11 @@ class Psgroup extends Component
     public function closeEditPs(){
         $this->showEditPsGroup = false;
         $this->reset('psGroupId','groupName','description','begin','end','type');
+    }
+
+    public function exportExcelPsGroup(){
+        $psGroups = mPsGroup::get();
+        return Excel::download(new PsGroupExcelExport($psGroups), 'productGroup.xlsx');
     }
     public function render()
     {

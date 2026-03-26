@@ -2,11 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Exports\ServiceExcelExport;
 use App\Models\PsGroup;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use App\Models\ProductService as Service;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Productservice extends Component
 {
@@ -109,6 +111,11 @@ class Productservice extends Component
             $this->closeEditService();
         }
     }
+
+    public function exportExcelService(){
+        $services =  Service::get();
+        return Excel::download(new ServiceExcelExport($services), 'services.xlsx');
+    } 
     public function render()
     {
         $psGroups = PsGroup::all();

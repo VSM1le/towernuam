@@ -2,12 +2,14 @@
 
 namespace App\Livewire;
 
+use App\Exports\ContractExcel;
 use App\Models\Customer;
 use App\Models\CustomerRental;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Cusrent extends Component
 {
@@ -91,7 +93,12 @@ class Cusrent extends Component
         $this->showCreateContract = false;
         $this->reset(['insuranceRental','insuranceService','noteContract','contractNumber','contractRNumber','customerId','unit','areaSqm','rentalFee','serviceFee','equipFee','startDate','endDate','year']);
     }
-
+    public function exportContract(){
+        $contracts = CustomerRental::with('customer')->when($this->contractStatus != "", function($query){
+            $query->where('custr_status', $this->contractStatus);
+        }) ->get();
+        return Excel::download(new ContractExcel($contracts), 'contracts.xlsx');
+    }
     public function openEditContract($id){
      
         $this->editId = $id;
