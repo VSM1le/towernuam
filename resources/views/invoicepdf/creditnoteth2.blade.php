@@ -268,9 +268,11 @@
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;">พื้นที่เลขที่</p>
                                 <p style="margin: 0; line-height: 0.7; font-size: 18px;">Plan No.</p>
                             </td>
-                            <td style="vertical-align: top; font-size: 18px;width:49% ">
-                                <p style="margin: 0; line-height: 0.7; font-size: 18px;">{{ $creditNote->credit_room_num ?? null}}</p>
-                            </td>
+                            <td style="vertical-align: top; font-size: 18px; width: 49%; max-width: 49%; word-wrap: break-word; overflow-wrap: break-word; overflow: hidden;">
+                                <p style="margin: 0; line-height: 0.7; font-size: 18px; word-wrap: break-word; overflow-wrap: break-word;">
+                                    {{ substr($creditNote->credit_room_num ?? null,0,25) }}
+                                </p>
+                            </td>  
                         </tr>
                     </table>  
                     </td>
